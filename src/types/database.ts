@@ -21,7 +21,7 @@ export type StatusPengajuan =
   | "dibayar"
   | "dibatalkan";
 export type StatusJurnal = "draf" | "diposting" | "dibalik";
-export type SumberJurnal = "manual" | "pembayaran_pengajuan" | "pembalik";
+export type SumberJurnal = "saldo_awal" | "manual" | "pengajuan" | "pembalik" | "impor_bank" | "pembayaran_pengajuan";
 
 // Backward-compatible alias
 export type UserRole = PeranPengguna;
