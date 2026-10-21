@@ -471,6 +471,29 @@ export interface Database {
         };
         Returns: Database["public"]["Tables"]["periode"]["Row"];
       };
+      posting_jurnal: {
+        Args: {
+          p_jurnal_id: number;
+        };
+        Returns: Database["public"]["Tables"]["jurnal"]["Row"];
+      };
+      buat_jurnal_pembalik: {
+        Args: {
+          p_jurnal_id: number;
+          p_tanggal_pembalik: string;
+          p_keterangan: string;
+        };
+        Returns: Database["public"]["Tables"]["jurnal"]["Row"];
+      };
+      simpan_jurnal_draf: {
+        Args: {
+          p_jurnal_id?: number | null;
+          p_tanggal: string;
+          p_keterangan: string;
+          p_baris: Json;
+        };
+        Returns: Database["public"]["Tables"]["jurnal"]["Row"];
+      };
     };
   };
 }

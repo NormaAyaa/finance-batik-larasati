@@ -118,7 +118,91 @@ export function getFriendlyErrorMessage(error: unknown): string {
     return "Gagal membuka kembali periode: hanya periode terakhir yang ditutup yang dapat dibuka kembali (BR-06).";
   }
 
+  // 1.d Pesan eksplisit untuk Jurnal Umum (BR-02, BR-03, BR-04, BR-05)
+  if (msg.includes("Jurnal minimal harus memiliki 2 baris akun")) {
+    return "Jurnal minimal harus memiliki 2 baris akun (BR-02).";
+  }
+  if (msg.includes("Jurnal tidak seimbang") || (msg.includes("Total Debit") && msg.includes("Total Kredit"))) {
+    return "Jurnal tidak seimbang: Total Debit harus sama persis dengan Total Kredit (BR-02).";
+  }
+  if (msg.includes("Total nilai transaksi jurnal harus lebih dari 0")) {
+    return "Total nilai transaksi jurnal harus lebih dari Rp 0 (BR-02).";
+  }
+  if (msg.includes("Semua akun yang digunakan dalam baris jurnal harus aktif")) {
+    return "Semua akun yang digunakan dalam baris jurnal harus berstatus aktif (BR-01).";
+  }
+  if (msg.includes("Hanya jurnal berstatus draf yang dapat diposting")) {
+    return "Hanya jurnal berstatus draf yang dapat diposting.";
+  }
+  if (msg.includes("Tidak dapat memposting: periode akuntansi") || (msg.includes("memposting") && msg.includes("berstatus ditutup"))) {
+    return "Gagal memposting: periode akuntansi untuk tanggal jurnal ini sudah ditutup (BR-05).";
+  }
+  if (msg.includes("Hanya Akuntan yang berhak memposting jurnal umum")) {
+    return "Hanya pengguna dengan peran Akuntan yang berhak memposting jurnal umum (BR-05).";
+  }
+  if (msg.includes("Hanya jurnal yang sudah diposting yang dapat dibalik")) {
+    return "Hanya jurnal dengan status Diposting yang dapat dibuatkan jurnal pembalik (BR-04).";
+  }
+  if (msg.includes("Jurnal pembalik tidak dapat dibalik kembali")) {
+    return "Jurnal pembalik tidak dapat dibalik kembali (BR-04).";
+  }
+  if (msg.includes("Jurnal pembayaran pengajuan tidak dapat dibalik")) {
+    return "Jurnal pembayaran pengajuan otomatis tidak dapat dibalik (BR-04).";
+  }
+  if (msg.includes("Jurnal ini sudah pernah dibalik sebelumnya")) {
+    return "Jurnal ini sudah pernah dibalik sebelumnya dan tidak dapat dibalik lagi (BR-04).";
+  }
+  if (msg.includes("Periode akuntansi untuk tanggal pembalik") && msg.includes("belum dibuat")) {
+    return "Periode akuntansi untuk tanggal pembalik yang dipilih belum dibuat di sistem.";
+  }
+  if (msg.includes("Tanggal pembalik berada di periode akuntansi yang sudah ditutup")) {
+    return "Gagal membuat jurnal pembalik: tanggal pembalik berada di periode akuntansi yang sudah ditutup (BR-05).";
+  }
+  if (msg.includes("Hanya Akuntan yang berhak membuat jurnal pembalik")) {
+    return "Hanya pengguna dengan peran Akuntan yang berhak membuat jurnal pembalik (BR-04).";
+  }
+  if (msg.includes("Jurnal yang sudah diposting atau dibalik tidak dapat dihapus")) {
+    return "Jurnal yang sudah diposting atau dibalik tidak dapat dihapus oleh siapa pun (BR-04).";
+  }
+  if (msg.includes("Jurnal yang sudah diposting tidak dapat diubah datanya")) {
+    return "Jurnal yang sudah diposting tidak dapat diubah datanya oleh siapa pun (BR-04).";
+  }
+  if (msg.includes("Baris jurnal tidak dapat ditambah, diubah, atau dihapus")) {
+    return "Baris jurnal tidak dapat diubah karena jurnal sudah diposting atau dibalik (BR-04).";
+  }
+  if (msg.includes("Periode akuntansi untuk tanggal jurnal") && msg.includes("belum dibuat")) {
+    return "Periode akuntansi untuk tanggal transaksi yang dipilih belum dibuat di sistem (BR-05).";
+  }
+  if (msg.includes("Jurnal hanya bisa dibuat atau diubah pada periode yang berstatus terbuka")) {
+    return "Jurnal hanya bisa dibuat atau disimpan pada periode akuntansi yang berstatus terbuka (BR-05).";
+  }
+  if (msg.includes("Akun yang dinonaktifkan tidak dapat dipilih pada baris jurnal")) {
+    return "Akun yang dinonaktifkan tidak dapat dipilih pada baris jurnal baru (BR-01).";
+  }
+
   // 2. Constraint PostgreSQL
+  // Jurnal & Jurnal Baris (BR-02, BR-03, BR-04)
+  if (msg.includes("chk_jurnal_posting_rules")) {
+    return "Nomor jurnal JU hanya diterbitkan saat posting resmi (BR-03).";
+  }
+  if (msg.includes("chk_jurnal_pembalik_sumber")) {
+    return "Referensi jurnal pembalik hanya valid untuk transaksi bertipe pembalik (BR-04).";
+  }
+  if (msg.includes("chk_jurnal_pembayaran_tidak_dibalik")) {
+    return "Jurnal pembayaran pengajuan dilarang memiliki pembalik (BR-04).";
+  }
+  if (msg.includes("chk_jurnal_keterangan")) {
+    return "Keterangan jurnal wajib diisi minimal 5 karakter.";
+  }
+  if (msg.includes("chk_jurnal_baris_satu_sisi")) {
+    return "Setiap baris jurnal hanya boleh diisi salah satu antara debit atau kredit dengan nilai lebih dari 0 (BR-02).";
+  }
+  if (msg.includes("chk_jurnal_baris_debit_nonnegatif") || msg.includes("chk_jurnal_baris_kredit_nonnegatif")) {
+    return "Nilai debit dan kredit tidak boleh bernilai negatif (BR-02).";
+  }
+  if (msg.includes("uq_jurnal_baris_urutan")) {
+    return "Terjadi duplikasi nomor urut baris jurnal.";
+  }
   // Pengajuan
   if (msg.includes("chk_pengajuan_jumlah")) {
     return "Jumlah pengajuan harus bernilai antara Rp 10.000 sampai Rp 25.000.000 (BR-07).";
