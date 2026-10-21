@@ -81,7 +81,45 @@ export function getFriendlyErrorMessage(error: unknown): string {
     return "Perubahan status pengajuan dilarang dilakukan secara langsung tanpa alur resmi.";
   }
 
+  // 1.b Pesan eksplisit untuk Akun (BR-01)
+  if (msg.includes("tidak boleh dihapus karena sudah dipakai dalam transaksi")) {
+    return "Akun tidak dapat dihapus karena sudah digunakan dalam transaksi jurnal atau pengajuan (BR-01). Silakan nonaktifkan akun.";
+  }
+  if (msg.includes("tidak boleh diubah kode atau tipenya karena sudah dipakai")) {
+    return "Kode dan tipe akun tidak dapat diubah karena akun sudah digunakan dalam transaksi (BR-01).";
+  }
+  if (msg.includes("Akun yang dinonaktifkan tidak dapat dipilih")) {
+    return "Akun yang dinonaktifkan tidak dapat digunakan untuk transaksi baru (BR-01).";
+  }
+
+  // 1.c Pesan eksplisit untuk Periode (BR-05, BR-06)
+  if (msg.includes("Hanya pengguna dengan peran Akuntan yang berhak menutup periode")) {
+    return "Hanya Akuntan yang berwenang menutup periode akuntansi (BR-06).";
+  }
+  if (msg.includes("Periode akuntansi ini sudah ditutup sebelumnya")) {
+    return "Periode akuntansi ini sudah ditutup sebelumnya.";
+  }
+  if (msg.includes("Periode sebelumnya harus sudah ditutup terlebih dahulu")) {
+    return "Gagal menutup periode: periode sebelumnya harus sudah ditutup terlebih dahulu (BR-06).";
+  }
+  if (msg.includes("masih terdapat jurnal draf yang belum diposting")) {
+    return "Tidak dapat menutup periode: masih terdapat draf jurnal yang belum diposting atau dihapus di periode ini (BR-06).";
+  }
+  if (msg.includes("Hanya Direktur yang berhak membuka kembali periode")) {
+    return "Hanya Direktur yang berwenang membuka kembali periode (BR-06).";
+  }
+  if (msg.includes("Alasan pembukaan kembali periode wajib diisi minimal 20 karakter")) {
+    return "Alasan pembukaan kembali periode wajib diisi minimal 20 karakter (BR-06).";
+  }
+  if (msg.includes("Periode akuntansi ini sudah dalam status terbuka")) {
+    return "Periode akuntansi ini sudah dalam status terbuka.";
+  }
+  if (msg.includes("Hanya periode terakhir yang ditutup yang dapat dibuka kembali")) {
+    return "Gagal membuka kembali periode: hanya periode terakhir yang ditutup yang dapat dibuka kembali (BR-06).";
+  }
+
   // 2. Constraint PostgreSQL
+  // Pengajuan
   if (msg.includes("chk_pengajuan_jumlah")) {
     return "Jumlah pengajuan harus bernilai antara Rp 10.000 sampai Rp 25.000.000 (BR-07).";
   }
@@ -95,9 +133,40 @@ export function getFriendlyErrorMessage(error: unknown): string {
     return "Catatan peninjau wajib diisi minimal 10 karakter saat meminta revisi atau menolak (BR-08).";
   }
 
+  // Akun (BR-01)
+  if (msg.includes("chk_akun_kode_format")) {
+    return "Kode akun harus berupa 4 digit angka dengan digit pertama 1 sampai 5 (BR-01).";
+  }
+  if (msg.includes("chk_akun_kode_tipe_match")) {
+    return "Digit pertama kode akun harus sesuai tipenya (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapatan, 5 Beban) (BR-01).";
+  }
+  if (msg.includes("chk_akun_saldo_normal_tipe")) {
+    return "Saldo normal tidak sesuai dengan klasifikasi tipe akun (BR-01).";
+  }
+  if (msg.includes("chk_akun_is_kas_bank")) {
+    return "Hanya akun bertipe Aset yang dapat ditandai sebagai Kas atau Bank (BR-01).";
+  }
+  if (msg.includes("chk_akun_nama")) {
+    return "Nama akun wajib diisi minimal 3 karakter.";
+  }
+  if (msg.includes("akun_kode_key") || (msg.includes("unique") && msg.includes("kode"))) {
+    return "Kode akun sudah digunakan oleh akun lain. Silakan gunakan kode unik yang berbeda (BR-01).";
+  }
+
+  // Periode (BR-06)
+  if (msg.includes("uq_periode_tahun_bulan")) {
+    return "Periode untuk bulan dan tahun ini sudah pernah dibuat sebelumnya.";
+  }
+  if (msg.includes("chk_periode_alasan_buka_ulang")) {
+    return "Alasan pembukaan kembali periode wajib diisi minimal 20 karakter (BR-06).";
+  }
+  if (msg.includes("chk_periode_status_tutup")) {
+    return "Status penutupan periode tidak valid.";
+  }
+
   // 3. RLS Policy Violation
   if (msg.includes("row-level security policy") || msg.includes("violates row-level security")) {
-    return "Akses ditolak: Anda tidak memiliki izin untuk melakukan tindakan ini pada data pengajuan.";
+    return "Akses ditolak: Anda tidak memiliki izin untuk melakukan tindakan ini sesuai hak akses peran Anda.";
   }
 
   // 4. Storage errors

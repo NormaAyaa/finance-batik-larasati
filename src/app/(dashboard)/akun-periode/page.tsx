@@ -1,37 +1,80 @@
 import type { Metadata } from "next";
 import { requireAuth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { AkunPeriodeView } from "@/components/akun-periode/akun-periode-view";
+import type { PeriodeWithProfile } from "@/components/akun-periode/daftar-periode";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Akun dan Periode",
+  title: "Bagan Akun & Periode Akuntansi",
+  description:
+    "Kelola Chart of Accounts (COA 4 digit) dan kontrol status tutup/buka periode bulanan CV Batik Larasati",
 };
 
-export default async function AkunPeriodePage() {
-  await requireAuth(["akuntan", "direktur"]);
+interface PageProps {
+  searchParams: Promise<{
+    tab?: string;
+  }>;
+}
+
+export default async function AkunPeriodePage({ searchParams }: PageProps) {
+  // 1. Guard autentikasi: Hanya Akuntan dan Direktur yang memiliki akses (PRD Bagian 7)
+  // Staf yang mencoba mengakses akan dialihkan ke /dashboard oleh requireAuth
+  const { profile } = await requireAuth(["akuntan", "direktur"]);
+  const params = await searchParams;
+
+  const defaultTab = params.tab === "periode" ? "periode" : "akun";
+
+  // 2. Client Supabase pengguna yang login (anon key + sesi cookie)
+  // Memastikan aturan RLS berlaku
+  const supabase = await createClient();
+
+  // Ambil daftar akun diurutkan berdasarkan kode 4 digit (BR-01)
+  const { data: rawAkun, error: akunError } = await supabase
+    .from("akun")
+    .select("*")
+    .order("kode", { ascending: true });
+
+  if (akunError) {
+    console.error("Gagal mengambil data akun:", akunError);
+  }
+
+  // Ambil daftar periode bulanan beserta data operator yang menutup
+  const { data: rawPeriode, error: periodeError } = await supabase
+    .from("periode")
+    .select(`
+      id,
+      tahun,
+      bulan,
+      tanggal_mulai,
+      status,
+      ditutup_oleh,
+      ditutup_pada,
+      alasan_buka_ulang,
+      penutup:profiles!ditutup_oleh (
+        id,
+        nama_lengkap,
+        email,
+        peran
+      )
+    `)
+    .order("tahun", { ascending: false })
+    .order("bulan", { ascending: false });
+
+  if (periodeError) {
+    console.error("Gagal mengambil data periode:", periodeError);
+  }
+
+  const akunList = rawAkun || [];
+  const periodeList = (rawPeriode || []) as unknown as PeriodeWithProfile[];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">Bagan Akun & Periode Akuntansi</h1>
-        <p className="text-xs text-slate-500 mt-1">
-          Kelola Chart of Accounts (COA 4 digit) dan kontrol status tutup/buka periode bulanan
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center">
-          <h2 className="text-sm font-semibold text-slate-700">Kerangka Bagan Akun (COA)</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Tabel akun (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapatan, 5 Beban), form tambah/edit, dan penonaktifan akun (BR-01) akan diimplementasikan di sini.
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center">
-          <h2 className="text-sm font-semibold text-slate-700">Kerangka Periode Akuntansi</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Daftar periode bulanan, tombol Tutup Periode (Akuntan), dan tombol Buka Kembali Periode (Direktur dengan alasan min 20 karakter, BR-06) akan berada di sini.
-          </p>
-        </div>
-      </div>
-    </div>
+    <AkunPeriodeView
+      initialAkun={akunList}
+      initialPeriode={periodeList}
+      userRole={profile.peran as "akuntan" | "direktur"}
+      activeTabDefault={defaultTab}
+    />
   );
 }

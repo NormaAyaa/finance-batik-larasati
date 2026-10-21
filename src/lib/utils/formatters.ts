@@ -52,3 +52,27 @@ export function formatDocNumber(
   const paddedSeq = String(seq).padStart(4, "0");
   return `${prefix}-${yearMonth}-${paddedSeq}`;
 }
+
+export const NAMA_BULAN = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+] as const;
+
+/**
+ * Format kombinasi tahun dan nomor bulan (1-12) ke teks Indonesia (misal: "Oktober 2026").
+ */
+export function formatBulanTahun(tahun: number, bulan: number): string {
+  const nama = NAMA_BULAN[bulan - 1] || `Bulan ${bulan}`;
+  return `${nama} ${tahun}`;
+}
+

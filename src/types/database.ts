@@ -458,6 +458,19 @@ export interface Database {
         };
         Returns: Database["public"]["Tables"]["pengajuan"]["Row"];
       };
+      tutup_periode: {
+        Args: {
+          p_periode_id: number;
+        };
+        Returns: Database["public"]["Tables"]["periode"]["Row"];
+      };
+      buka_kembali_periode: {
+        Args: {
+          p_periode_id: number;
+          p_alasan: string;
+        };
+        Returns: Database["public"]["Tables"]["periode"]["Row"];
+      };
     };
   };
 }
