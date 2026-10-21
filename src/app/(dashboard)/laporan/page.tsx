@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { requireAuth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Laporan Keuangan",
 };
 
-export default function LaporanPage() {
+export default async function LaporanPage() {
+  await requireAuth(["akuntan", "direktur"]);
+
   const reports = [
     {
       title: "Laporan Laba Rugi",
@@ -38,11 +41,11 @@ export default function LaporanPage() {
           <Link
             key={report.href}
             href={report.href}
-            className="rounded-xl border border-slate-200 bg-white p-5 hover:border-indigo-400 hover:shadow-sm transition"
+            className="rounded-xl border border-slate-200 bg-white p-5 hover:border-amber-700 hover:shadow-sm transition"
           >
             <h2 className="text-sm font-bold text-slate-900">{report.title}</h2>
             <p className="text-xs text-slate-500 mt-2">{report.desc}</p>
-            <span className="inline-block mt-4 text-xs font-medium text-indigo-600">
+            <span className="inline-block mt-4 text-xs font-semibold text-amber-800">
               Buka Laporan →
             </span>
           </Link>

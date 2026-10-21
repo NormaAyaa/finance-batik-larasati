@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { requireAuth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Input Jurnal Baru",
 };
 
-export default function BaruJurnalPage() {
+export default async function BaruJurnalPage() {
+  await requireAuth(["akuntan", "direktur"]);
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -24,7 +27,7 @@ export default function BaruJurnalPage() {
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
         <h2 className="text-sm font-semibold text-slate-700">Kerangka Input Jurnal</h2>
         <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-          Belum ada fitur. Form input baris jurnal dinamis, kalkulator total debit, kredit, selisih seimbang, simpan draf, dan tombol posting akan dibangun di sini.
+          Form input baris jurnal dinamis, kalkulator total debit, kredit, selisih seimbang, simpan draf, dan tombol posting akan dibangun di sini.
         </p>
       </div>
     </div>

@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { requireAuth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Neraca Saldo",
 };
 
-export default function NeracaSaldoPage() {
+export default async function NeracaSaldoPage() {
+  await requireAuth(["akuntan", "direktur"]);
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -24,7 +27,7 @@ export default function NeracaSaldoPage() {
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
         <h2 className="text-sm font-semibold text-slate-700">Kerangka Neraca Saldo</h2>
         <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-          Belum ada fitur. Tabel neraca saldo terakumulasi untuk memastikan jumlah debit sama dengan kredit per periode akan dibangun di sini.
+          Tabel neraca saldo terakumulasi untuk memastikan jumlah debit sama dengan kredit per periode akan dibangun di sini.
         </p>
       </div>
     </div>

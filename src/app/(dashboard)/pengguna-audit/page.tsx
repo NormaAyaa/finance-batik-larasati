@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { requireAuth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Pengguna & Audit Log",
 };
 
-export default function PenggunaAuditPage() {
+export default async function PenggunaAuditPage() {
+  await requireAuth(["direktur"]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -18,14 +21,14 @@ export default function PenggunaAuditPage() {
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center">
           <h2 className="text-sm font-semibold text-slate-700">Kerangka Manajemen Pengguna</h2>
           <p className="text-xs text-slate-500 mt-1">
-            Belum ada fitur. Daftar pengguna, kontrol aktivasi/penonaktifan akun, dan perubahan peran pengguna (Staf, Akuntan, Direktur) akan diimplementasikan di sini.
+            Daftar pengguna, kontrol aktivasi/penonaktifan akun, dan perubahan peran pengguna (Staf, Akuntan, Direktur) akan diimplementasikan di sini.
           </p>
         </div>
 
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center">
           <h2 className="text-sm font-semibold text-slate-700">Kerangka Audit Log</h2>
           <p className="text-xs text-slate-500 mt-1">
-            Belum ada fitur. Tabel log immutable (pencatatan posting, pembalikan jurnal, verifikasi, pembayaran, tutup/buka periode, data lama vs baru) akan berada di sini.
+            Tabel log immutable (pencatatan posting, pembalikan jurnal, verifikasi, pembayaran, tutup/buka periode, data lama vs baru) akan berada di sini.
           </p>
         </div>
       </div>

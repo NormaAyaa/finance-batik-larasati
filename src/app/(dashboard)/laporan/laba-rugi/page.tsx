@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { requireAuth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Laporan Laba Rugi",
 };
 
-export default function LabaRugiPage() {
+export default async function LabaRugiPage() {
+  await requireAuth(["akuntan", "direktur"]);
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -24,7 +27,7 @@ export default function LabaRugiPage() {
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
         <h2 className="text-sm font-semibold text-slate-700">Kerangka Laporan Laba Rugi</h2>
         <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-          Belum ada fitur. Filter periode/rentang tanggal, kalkulasi dari jurnal terposting, tampilan negatif berkurung, dan ekspor cetak/PDF akan berada di sini.
+          Filter periode/rentang tanggal, kalkulasi dari jurnal terposting, tampilan negatif berkurung, dan ekspor cetak/PDF akan berada di sini.
         </p>
       </div>
     </div>

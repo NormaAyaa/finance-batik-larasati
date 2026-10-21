@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { requireAuth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ interface PageProps {
 }
 
 export default async function DetailJurnalPage({ params }: PageProps) {
+  await requireAuth(["akuntan", "direktur"]);
   const { id } = await params;
 
   return (
@@ -32,7 +34,7 @@ export default async function DetailJurnalPage({ params }: PageProps) {
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
         <h2 className="text-sm font-semibold text-slate-700">Kerangka Detail Jurnal</h2>
         <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-          Belum ada fitur. Tampilan rincian baris akun, nominal debit/kredit seimbang, status posting, dan tombol Buat Jurnal Pembalik (koreksi BR-04) akan ada di sini.
+          Tampilan rincian baris akun, nominal debit/kredit seimbang, status posting, dan tombol Buat Jurnal Pembalik (koreksi BR-04) akan ada di sini.
         </p>
       </div>
     </div>
