@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +22,8 @@ interface PageProps {
 export default async function DetailJurnalPage({ params }: PageProps) {
   // 1. Guard autentikasi: Akuntan dan Direktur berhak melihat detail jurnal (PRD Bagian 7)
   const { profile } = await requireAuth(["akuntan", "direktur"]);
+
+  // Next.js 16: params harus di-await sebelum dibaca
   const { id } = await params;
   const numericId = parseInt(id, 10);
 
@@ -32,6 +35,8 @@ export default async function DetailJurnalPage({ params }: PageProps) {
   const supabase = await createClient();
 
   // 3. Ambil data jurnal, baris akun, relasi pembuat, pemosting, periode, dan pengajuan
+  // Catatan: Relasi self-referensial (jurnal_dibalik_id) tidak di-embed langsung pada select utama
+  // untuk mencegah error schema cache PostgREST (PGRST200), melainkan diambil terpisah secara aman.
   const { data: rawJurnal, error: jurnalError } = await supabase
     .from("jurnal")
     .select(`
@@ -48,11 +53,6 @@ export default async function DetailJurnalPage({ params }: PageProps) {
         nomor
       ),
       jurnal_dibalik_id,
-      jurnal_dibalik:jurnal!jurnal_dibalik_id (
-        id,
-        nomor,
-        tanggal
-      ),
       dibuat_oleh,
       pembuat:profiles!dibuat_oleh (
         id,
@@ -92,19 +92,66 @@ export default async function DetailJurnalPage({ params }: PageProps) {
     .eq("id", numericId)
     .maybeSingle();
 
-  if (jurnalError || !rawJurnal) {
-    console.error("Jurnal tidak ditemukan atau gagal diambil:", jurnalError);
+  // Pembedaan error: Jika query gagal (syntax/network/relasi), catat di server log dan tampilkan pesan ramah (bukan 404)
+  if (jurnalError) {
+    console.error("Gagal memuat data jurnal detail id", numericId, ":", jurnalError);
+    return (
+      <div className="space-y-4 max-w-4xl mx-auto py-8">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center space-y-3 shadow-sm">
+          <span className="text-3xl block">⚠️</span>
+          <h1 className="text-base font-bold text-red-900">Kendala Memuat Data Jurnal</h1>
+          <p className="text-xs text-red-700 max-w-md mx-auto">
+            Terjadi kendala teknis saat memuat data jurnal #{numericId}. Silakan muat ulang halaman atau hubungi administrator.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/jurnal"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-red-800 text-white text-xs font-semibold hover:bg-red-900 transition"
+            >
+              ← Kembali ke Daftar Jurnal
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Jika jurnal memang tidak ada atau tidak diizinkan oleh RLS, tampilkan 404 sesungguhnya
+  if (!rawJurnal) {
     notFound();
   }
 
-  // 4. Periksa apakah jurnal ini pernah dibalik oleh jurnal lain
-  const { data: rawReversingJournal } = await supabase
+  // 4. Jika jurnal ini merupakan jurnal pembalik, ambil data jurnal asli yang dibalik secara terpisah
+  let rawOriginalJournal: { id: number; nomor: string | null; tanggal: string } | null = null;
+  if (rawJurnal.jurnal_dibalik_id) {
+    const { data: orig, error: origError } = await supabase
+      .from("jurnal")
+      .select("id, nomor, tanggal")
+      .eq("id", rawJurnal.jurnal_dibalik_id)
+      .maybeSingle();
+
+    if (origError) {
+      console.error("Gagal mengambil data jurnal asal yang dibalik:", origError);
+    } else {
+      rawOriginalJournal = orig;
+    }
+  }
+
+  // 5. Periksa apakah jurnal ini pernah dibalik oleh jurnal lain
+  let rawReversingJournal: { id: number; nomor: string | null; tanggal: string } | null = null;
+  const { data: rev, error: revError } = await supabase
     .from("jurnal")
     .select("id, nomor, tanggal")
     .eq("jurnal_dibalik_id", numericId)
     .maybeSingle();
 
-  // 5. Ambil data akun aktif & periode untuk keperluan form ubah atau modal pembalik
+  if (revError) {
+    console.error("Gagal memeriksa jurnal pembalik:", revError);
+  } else {
+    rawReversingJournal = rev;
+  }
+
+  // 6. Ambil data akun aktif & periode untuk keperluan form ubah atau modal pembalik
   const { data: rawAkun } = await supabase
     .from("akun")
     .select("id, kode, nama, tipe, saldo_normal, aktif")
@@ -148,8 +195,8 @@ export default async function DetailJurnalPage({ params }: PageProps) {
     pengajuan_id: rawJurnal.pengajuan_id,
     pengajuan: (rawJurnal.pengajuan as unknown as { id: number; nomor: string | null }) || null,
     jurnal_dibalik_id: rawJurnal.jurnal_dibalik_id,
-    jurnal_dibalik: (rawJurnal.jurnal_dibalik as unknown as { id: number; nomor: string | null; tanggal: string }) || null,
-    jurnal_pembalik: rawReversingJournal || null,
+    jurnal_dibalik: rawOriginalJournal,
+    jurnal_pembalik: rawReversingJournal,
     dibuat_oleh: rawJurnal.dibuat_oleh,
     pembuat: (rawJurnal.pembuat as unknown as { id: string; nama_lengkap: string; email: string; peran: string }) || null,
     diposting_oleh: rawJurnal.diposting_oleh,
