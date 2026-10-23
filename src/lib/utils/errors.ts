@@ -180,6 +180,14 @@ export function getFriendlyErrorMessage(error: unknown): string {
     return "Akun yang dinonaktifkan tidak dapat dipilih pada baris jurnal baru (BR-01).";
   }
 
+  // 1.e Pesan eksplisit untuk Pengguna & Audit Log (BR-12)
+  if (msg.includes("Direktur dilarang mengubah peran atau status akunnya sendiri") || msg.includes("trg_direktur_self_mod")) {
+    return "Direktur tidak boleh mengubah peran atau status akunnya sendiri (BR-12).";
+  }
+  if (msg.includes("audit_log adalah tabel immutable") || msg.includes("trg_audit_log_immutable")) {
+    return "Catatan audit log bersifat permanen dan tidak dapat diubah atau dihapus.";
+  }
+
   // 2. Constraint PostgreSQL
   // Jurnal & Jurnal Baris (BR-02, BR-03, BR-04)
   if (msg.includes("chk_jurnal_posting_rules")) {
