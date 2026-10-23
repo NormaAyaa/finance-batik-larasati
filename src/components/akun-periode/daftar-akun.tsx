@@ -308,18 +308,19 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
           <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-600">
             <tr>
               <th scope="col" className="px-4 py-3">Kode</th>
-              <th scope="col" className="px-4 py-3">Nama Akun & Keterangan</th>
+              <th scope="col" className="px-4 py-3">Nama Akun</th>
               <th scope="col" className="px-4 py-3">Tipe</th>
               <th scope="col" className="px-4 py-3">Saldo Normal</th>
               <th scope="col" className="px-4 py-3">Kas / Bank</th>
               <th scope="col" className="px-4 py-3">Status</th>
+              <th scope="col" className="px-4 py-3">Keterangan</th>
               {isAkuntan && <th scope="col" className="px-4 py-3 text-right">Aksi</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {filteredAkun.length === 0 ? (
               <tr>
-                <td colSpan={isAkuntan ? 7 : 6} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={isAkuntan ? 8 : 7} className="px-4 py-8 text-center text-slate-400">
                   Tidak ada akun yang sesuai dengan filter pencarian.
                 </td>
               </tr>
@@ -340,14 +341,9 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                       {akun.kode}
                     </td>
 
-                    {/* Nama Akun & Keterangan */}
-                    <td className="px-4 py-3">
-                      <div className="font-semibold text-slate-900">{akun.nama}</div>
-                      {akun.keterangan && (
-                        <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
-                          {akun.keterangan}
-                        </div>
-                      )}
+                    {/* Nama Akun */}
+                    <td className="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">
+                      {akun.nama}
                     </td>
 
                     {/* Tipe Akun */}
@@ -387,6 +383,17 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                         <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-300 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
                           <span aria-hidden="true">✕</span> Nonaktif
                         </span>
+                      )}
+                    </td>
+
+                    {/* Kolom Keterangan Tersendiri (BR-01) */}
+                    <td className="px-4 py-3 text-slate-600 max-w-xs">
+                      {akun.keterangan ? (
+                        <span className="line-clamp-2 text-[11px]" title={akun.keterangan}>
+                          {akun.keterangan}
+                        </span>
+                      ) : (
+                        <span className="text-slate-300">-</span>
                       )}
                     </td>
 

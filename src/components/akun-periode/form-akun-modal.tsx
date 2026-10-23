@@ -75,9 +75,26 @@ function FormAkunDialog({
     };
   }, [isEdit, akunToEdit]);
 
-  // Saldo normal otomatis dihitung dari Tipe (BR-01)
+  // Saldo normal otomatis dihitung dari Tipe (BR-01: Aset & beban debit; lainnya kredit)
   const saldoNormal: SaldoNormalAkun =
     tipe === "aset" || tipe === "beban" ? "debit" : "kredit";
+
+  // Pengetikan kode: digit pertama otomatis menentukan tipe dan saldo normal (BR-01)
+  const handleKodeChange = (rawVal: string) => {
+    const clean = rawVal.replace(/\D/g, "").slice(0, 4);
+    setKode(clean);
+
+    if (clean.length > 0 && !isUsed) {
+      const firstDigit = clean[0];
+      const matched = TIPE_OPTIONS.find((t) => t.prefix === firstDigit);
+      if (matched && matched.value !== tipe) {
+        setTipe(matched.value);
+        if (matched.value !== "aset") {
+          setIsKasBank(false);
+        }
+      }
+    }
+  };
 
   // Perubahan tipe: sesuaikan digit pertama kode bila sedang dalam mode tambah
   const handleTipeChange = (newTipe: TipeAkun) => {
@@ -85,7 +102,7 @@ function FormAkunDialog({
     const selected = TIPE_OPTIONS.find((t) => t.value === newTipe);
     const prefix = selected?.prefix || "1";
 
-    if (!isEdit) {
+    if (!isUsed) {
       if (kode.length <= 1) {
         setKode(prefix);
       } else {
@@ -287,10 +304,7 @@ function FormAkunDialog({
                 type="text"
                 maxLength={4}
                 value={kode}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, "").slice(0, 4);
-                  setKode(val);
-                }}
+                onChange={(e) => handleKodeChange(e.target.value)}
                 placeholder="Contoh: 1101"
                 disabled={isSubmitting || isUsed}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-mono font-bold tracking-wider text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500"

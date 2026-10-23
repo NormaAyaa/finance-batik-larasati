@@ -14,6 +14,7 @@ export type PeriodeWithProfile = Database["public"]["Tables"]["periode"]["Row"] 
     email: string;
     peran: string;
   } | null;
+  jumlah_draf?: number;
 };
 
 interface DaftarPeriodeProps {
@@ -44,7 +45,7 @@ export function DaftarPeriode({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Refresh data periode dari Supabase
+  // Refresh data periode dan hitungan draf dari Supabase
   const refreshData = async () => {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -69,10 +70,38 @@ export function DaftarPeriode({
       .order("bulan", { ascending: false });
 
     if (!error && data) {
-      setPeriodeList(data as unknown as PeriodeWithProfile[]);
+      // Ambil jumlah jurnal draf per periode dengan head: true (tidak terpotong batas 1.000 baris)
+      const periodeWithDraf: PeriodeWithProfile[] = await Promise.all(
+        data.map(async (p) => {
+          const { count } = await supabase
+            .from("jurnal")
+            .select("id", { count: "exact", head: true })
+            .eq("periode_id", p.id)
+            .eq("status", "draf");
+
+          return {
+            ...p,
+            jumlah_draf: count ?? 0,
+          } as unknown as PeriodeWithProfile;
+        })
+      );
+      setPeriodeList(periodeWithDraf);
     }
     if (onRefresh) onRefresh();
   };
+
+  // Periode terakhir yang ditutup (urutan tahun lalu bulan)
+  // Aturan BR-06: Hanya periode terakhir yang ditutup yang boleh dibuka kembali
+  const latestClosedPeriode = useMemo(() => {
+    const closed = periodeList.filter((p) => p.status === "ditutup");
+    if (closed.length === 0) return null;
+    return closed.reduce((latest, current) => {
+      if (!latest) return current;
+      if (current.tahun > latest.tahun) return current;
+      if (current.tahun === latest.tahun && current.bulan > latest.bulan) return current;
+      return latest;
+    }, closed[0]);
+  }, [periodeList]);
 
   // Kumpulan tahun unik untuk filter
   const tahunOptions = useMemo(() => {
@@ -216,6 +245,7 @@ export function DaftarPeriode({
             <tr>
               <th scope="col" className="px-4 py-3">Periode</th>
               <th scope="col" className="px-4 py-3">Status Buku</th>
+              <th scope="col" className="px-4 py-3 text-center">Jurnal Draf</th>
               <th scope="col" className="px-4 py-3">Ditutup Oleh & Waktu</th>
               <th scope="col" className="px-4 py-3">Alasan Buka Ulang</th>
               <th scope="col" className="px-4 py-3 text-right">Aksi</th>
@@ -224,7 +254,7 @@ export function DaftarPeriode({
           <tbody className="divide-y divide-slate-100">
             {filteredPeriode.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
                   Tidak ada data periode akuntansi yang sesuai.
                 </td>
               </tr>
@@ -232,6 +262,7 @@ export function DaftarPeriode({
               filteredPeriode.map((item) => {
                 const label = formatBulanTahun(item.tahun, item.bulan);
                 const isTerbuka = item.status === "terbuka";
+                const isTerakhirDitutup = !isTerbuka && latestClosedPeriode?.id === item.id;
 
                 return (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition">
@@ -257,6 +288,20 @@ export function DaftarPeriode({
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-300 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
                           <span aria-hidden="true">🔒</span>
                           <span>Ditutup</span>
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Jumlah Jurnal Draf (BR-06) */}
+                    <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                      {item.jumlah_draf !== undefined && item.jumlah_draf > 0 ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">
+                          <span aria-hidden="true">⚠️</span>
+                          <span>{item.jumlah_draf} draf</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                          0 draf
                         </span>
                       )}
                     </td>
@@ -312,8 +357,8 @@ export function DaftarPeriode({
                         </button>
                       )}
 
-                      {/* Direktur: Tombol Buka Kembali bila status ditutup */}
-                      {isDirektur && !isTerbuka && (
+                      {/* Direktur: Tombol Buka Kembali HANYA bila periode terakhir yang ditutup (BR-06) */}
+                      {isDirektur && isTerakhirDitutup && (
                         <button
                           type="button"
                           onClick={() => {
@@ -322,14 +367,19 @@ export function DaftarPeriode({
                             setBukaModalPeriode(item);
                           }}
                           className="inline-flex items-center gap-1 rounded-lg bg-purple-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-800 transition shadow-xs"
-                          title="Buka kembali periode akuntansi ini (BR-06)"
+                          title="Buka kembali periode akuntansi terakhir yang ditutup ini (BR-06)"
                         >
                           <span aria-hidden="true">🔓</span>
                           <span>Buka Kembali</span>
                         </button>
                       )}
 
-                      {/* Jika tidak ada aksi yang sah untuk peran pengguna */}
+                      {/* Jika Direktur melihat periode ditutup tetapi bukan periode terakhir yang ditutup */}
+                      {isDirektur && !isTerbuka && !isTerakhirDitutup && (
+                        <span className="text-[11px] text-slate-400 italic">Ditutup</span>
+                      )}
+
+                      {/* Jika Akuntan melihat periode ditutup atau Direktur melihat periode terbuka */}
                       {((isAkuntan && !isTerbuka) || (isDirektur && isTerbuka)) && (
                         <span className="text-[11px] text-slate-400 italic">Selesai</span>
                       )}
@@ -352,6 +402,7 @@ export function DaftarPeriode({
           filteredPeriode.map((item) => {
             const label = formatBulanTahun(item.tahun, item.bulan);
             const isTerbuka = item.status === "terbuka";
+            const isTerakhirDitutup = !isTerbuka && latestClosedPeriode?.id === item.id;
 
             return (
               <div
@@ -372,6 +423,21 @@ export function DaftarPeriode({
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-300 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
                       <span>🔒 Ditutup</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Indikator Jumlah Jurnal Draf di Kartu Ponsel */}
+                <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+                  <span className="text-slate-600 font-medium text-[11px]">Jurnal Draf:</span>
+                  {item.jumlah_draf !== undefined && item.jumlah_draf > 0 ? (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                      <span aria-hidden="true">⚠️</span>
+                      <span>{item.jumlah_draf} draf tertunda</span>
+                    </span>
+                  ) : (
+                    <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">
+                      0 draf
                     </span>
                   )}
                 </div>
@@ -401,7 +467,7 @@ export function DaftarPeriode({
                   </div>
                 )}
 
-                {/* Aksi Mobile */}
+                {/* Aksi Mobile: Akuntan Tutup Periode */}
                 {isAkuntan && isTerbuka && (
                   <button
                     type="button"
@@ -417,7 +483,8 @@ export function DaftarPeriode({
                   </button>
                 )}
 
-                {isDirektur && !isTerbuka && (
+                {/* Aksi Mobile: Direktur Buka Kembali HANYA periode terakhir yang ditutup (BR-06) */}
+                {isDirektur && isTerakhirDitutup && (
                   <button
                     type="button"
                     onClick={() => {

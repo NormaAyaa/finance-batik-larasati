@@ -8,9 +8,13 @@ import type { Database } from "@/types/database";
 
 type PeriodeRow = Database["public"]["Tables"]["periode"]["Row"];
 
+export type PeriodeToClose = PeriodeRow & {
+  jumlah_draf?: number;
+};
+
 interface TutupPeriodeModalProps {
   isOpen: boolean;
-  periode: PeriodeRow | null;
+  periode: PeriodeToClose | null;
   onClose: () => void;
   onSuccess: (message: string) => void;
 }
@@ -103,6 +107,14 @@ export function TutupPeriodeModal({
           <p className="font-semibold">
             Anda akan menutup periode: <span className="text-slate-900 font-bold">{periodeLabel}</span>
           </p>
+          {periode.jumlah_draf !== undefined && periode.jumlah_draf > 0 && (
+            <div className="rounded-lg bg-rose-50 border border-rose-200 p-2.5 text-rose-800 text-xs font-medium flex items-center gap-2">
+              <span aria-hidden="true" className="font-bold text-rose-600">⚠️</span>
+              <span>
+                Periode ini masih memiliki <strong>{periode.jumlah_draf} jurnal draf</strong>. Database akan menolak penutupan sampai seluruh draf diposting atau dihapus (BR-06).
+              </span>
+            </div>
+          )}
           <ul className="list-disc pl-4 space-y-1 text-[11px] text-amber-800">
             <li>Periode sebelumnya harus sudah dalam keadaan ditutup (BR-06).</li>
             <li>Tidak boleh ada jurnal draf yang masih tersisa di periode ini (BR-06).</li>

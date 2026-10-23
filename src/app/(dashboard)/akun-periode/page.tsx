@@ -67,7 +67,22 @@ export default async function AkunPeriodePage({ searchParams }: PageProps) {
   }
 
   const akunList = rawAkun || [];
-  const periodeList = (rawPeriode || []) as unknown as PeriodeWithProfile[];
+
+  // Hitung jumlah jurnal draf per periode dengan head: true (tidak terpotong batas 1.000 baris Supabase)
+  const periodeList: PeriodeWithProfile[] = await Promise.all(
+    (rawPeriode || []).map(async (p) => {
+      const { count } = await supabase
+        .from("jurnal")
+        .select("id", { count: "exact", head: true })
+        .eq("periode_id", p.id)
+        .eq("status", "draf");
+
+      return {
+        ...p,
+        jumlah_draf: count ?? 0,
+      } as unknown as PeriodeWithProfile;
+    })
+  );
 
   return (
     <AkunPeriodeView
