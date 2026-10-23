@@ -1,35 +1,57 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import {
+  getNeracaSaldoData,
+  getDefaultTanggal,
+  type NeracaSaldoData,
+} from "@/lib/laporan";
+import { NeracaSaldoView } from "@/components/laporan/neraca-saldo-view";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Neraca Saldo",
+  description:
+    "Daftar saldo debit dan kredit seluruh akun CV Batik Larasati (PRD Bagian 7 & BR-11)",
 };
 
-export default async function NeracaSaldoPage() {
+interface PageProps {
+  searchParams: Promise<{
+    tanggal?: string;
+  }>;
+}
+
+export default async function NeracaSaldoPage({ searchParams }: PageProps) {
+  // 1. Guard autentikasi: Hanya Akuntan dan Direktur (PRD Bagian 7 & BR-11).
+  // Staf & pengunjung tanpa hak akses otomatis diarahkan ke /dashboard oleh requireAuth.
   await requireAuth(["akuntan", "direktur"]);
 
+  // 2. Client Supabase pengguna login (anon key + sesi cookie) -> RLS wajib berlaku
+  const supabase = await createClient();
+
+  // 3. Baca parameter URL
+  const params = await searchParams;
+  const tanggal = params.tanggal || getDefaultTanggal();
+
+  let data: NeracaSaldoData | null = null;
+  let errorMessage: string | null = null;
+
+  try {
+    data = await getNeracaSaldoData(supabase, tanggal);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    } else {
+      errorMessage = "Terjadi kendala saat memuat neraca saldo.";
+    }
+  }
+
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <Link href="/laporan" className="hover:text-slate-900">
-          ← Kembali ke Laporan Keuangan
-        </Link>
-      </div>
-
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">Neraca Saldo</h1>
-        <p className="text-xs text-slate-500 mt-1">
-          Daftar seluruh akun beserta total saldo debit dan kredit
-        </p>
-      </div>
-
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
-        <h2 className="text-sm font-semibold text-slate-700">Kerangka Neraca Saldo</h2>
-        <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-          Tabel neraca saldo terakumulasi untuk memastikan jumlah debit sama dengan kredit per periode akan dibangun di sini.
-        </p>
-      </div>
-    </div>
+    <NeracaSaldoView
+      data={data}
+      errorMessage={errorMessage}
+      initialTanggal={tanggal}
+    />
   );
 }

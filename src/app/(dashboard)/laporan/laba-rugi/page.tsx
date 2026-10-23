@@ -1,35 +1,61 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import {
+  getLabaRugiData,
+  getDefaultLabaRugiDates,
+  type LabaRugiData,
+} from "@/lib/laporan";
+import { LabaRugiView } from "@/components/laporan/laba-rugi-view";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Laporan Laba Rugi",
+  description:
+    "Laporan pendapatan, beban, dan laba (rugi) bersih CV Batik Larasati (PRD Bagian 7 & BR-11)",
 };
 
-export default async function LabaRugiPage() {
+interface PageProps {
+  searchParams: Promise<{
+    dari?: string;
+    sampai?: string;
+  }>;
+}
+
+export default async function LabaRugiPage({ searchParams }: PageProps) {
+  // 1. Guard autentikasi: Hanya Akuntan dan Direktur (PRD Bagian 7 & BR-11).
+  // Staf & pengunjung tanpa hak akses otomatis diarahkan ke /dashboard oleh requireAuth.
   await requireAuth(["akuntan", "direktur"]);
 
+  // 2. Client Supabase pengguna login (anon key + sesi cookie) -> RLS wajib berlaku
+  const supabase = await createClient();
+
+  // 3. Baca parameter URL
+  const params = await searchParams;
+  const defaultDates = getDefaultLabaRugiDates();
+  const dari = params.dari || defaultDates.dari;
+  const sampai = params.sampai || defaultDates.sampai;
+
+  let data: LabaRugiData | null = null;
+  let errorMessage: string | null = null;
+
+  try {
+    data = await getLabaRugiData(supabase, dari, sampai);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    } else {
+      errorMessage = "Terjadi kendala saat memuat laporan laba rugi.";
+    }
+  }
+
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <Link href="/laporan" className="hover:text-slate-900">
-          ← Kembali ke Laporan Keuangan
-        </Link>
-      </div>
-
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">Laporan Laba Rugi</h1>
-        <p className="text-xs text-slate-500 mt-1">
-          Kalkulasi pendapatan per akun, beban per akun, dan laba (rugi) bersih
-        </p>
-      </div>
-
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
-        <h2 className="text-sm font-semibold text-slate-700">Kerangka Laporan Laba Rugi</h2>
-        <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-          Filter periode/rentang tanggal, kalkulasi dari jurnal terposting, tampilan negatif berkurung, dan ekspor cetak/PDF akan berada di sini.
-        </p>
-      </div>
-    </div>
+    <LabaRugiView
+      data={data}
+      errorMessage={errorMessage}
+      initialDari={dari}
+      initialSampai={sampai}
+    />
   );
 }

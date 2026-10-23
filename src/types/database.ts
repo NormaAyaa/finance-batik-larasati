@@ -494,6 +494,35 @@ export interface Database {
         };
         Returns: Database["public"]["Tables"]["jurnal"]["Row"];
       };
+      saldo_akun_per_tanggal: {
+        Args: {
+          p_sampai: string;
+        };
+        Returns: {
+          akun_id: number;
+          kode: string;
+          nama: string;
+          tipe: TipeAkun;
+          saldo_normal: SaldoNormalAkun;
+          total_debit: number;
+          total_kredit: number;
+        }[];
+      };
+      mutasi_akun_rentang: {
+        Args: {
+          p_dari: string;
+          p_sampai: string;
+        };
+        Returns: {
+          akun_id: number;
+          kode: string;
+          nama: string;
+          tipe: TipeAkun;
+          saldo_normal: SaldoNormalAkun;
+          total_debit: number;
+          total_kredit: number;
+        }[];
+      };
     };
   };
 }
