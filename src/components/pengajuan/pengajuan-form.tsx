@@ -75,6 +75,162 @@ export function PengajuanForm({
   const [actionType, setActionType] = useState<"draf" | "kirim">("kirim");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // State fitur AI ekstraksi nota
+  const [isExtractingAi, setIsExtractingAi] = useState(false);
+  const [aiNotification, setAiNotification] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+  const [aiAppliedFields, setAiAppliedFields] = useState<{
+    tanggal: boolean;
+    jumlah: boolean;
+    keterangan: boolean;
+  }>({
+    tanggal: false,
+    jumlah: false,
+    keterangan: false,
+  });
+  const [aiSuggestions, setAiSuggestions] = useState<{
+    tanggal?: string;
+    jumlah?: number;
+    keterangan?: string;
+  }>({});
+
+  const applyAiSuggestion = (field: "tanggal" | "jumlah" | "keterangan") => {
+    if (field === "tanggal" && aiSuggestions.tanggal) {
+      setTanggalTransaksi(aiSuggestions.tanggal);
+      setAiAppliedFields((prev) => ({ ...prev, tanggal: true }));
+      setAiSuggestions((prev) => {
+        const copy = { ...prev };
+        delete copy.tanggal;
+        return copy;
+      });
+    } else if (field === "jumlah" && aiSuggestions.jumlah) {
+      setJumlah(String(aiSuggestions.jumlah));
+      setAiAppliedFields((prev) => ({ ...prev, jumlah: true }));
+      setAiSuggestions((prev) => {
+        const copy = { ...prev };
+        delete copy.jumlah;
+        return copy;
+      });
+    } else if (field === "keterangan" && aiSuggestions.keterangan) {
+      setKeterangan(aiSuggestions.keterangan);
+      setAiAppliedFields((prev) => ({ ...prev, keterangan: true }));
+      setAiSuggestions((prev) => {
+        const copy = { ...prev };
+        delete copy.keterangan;
+        return copy;
+      });
+    }
+  };
+
+  const handleExtractNota = async () => {
+    if (!file || isExtractingAi || isSubmitting) return;
+
+    setIsExtractingAi(true);
+    setAiNotification(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/ekstrak-nota", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok || !json?.success) {
+        const msg = json?.error || "Nota tidak dapat dibaca otomatis, silakan isi manual.";
+        setAiNotification({ type: "error", message: msg });
+        return;
+      }
+
+      const {
+        tanggal,
+        jumlah: aiJumlah,
+        keperluan,
+        nama_toko,
+        keyakinan,
+        pesan_jumlah,
+      } = json.data;
+
+      let filledCount = 0;
+      let pendingCount = 0;
+      const newSuggestions: { tanggal?: string; jumlah?: number; keterangan?: string } = {};
+
+      // 1. Kolom Tanggal: hanya isi jika kosong; jika sudah ada nilainya tampilkan tombol "Pakai hasil AI"
+      if (tanggal) {
+        if (!tanggalTransaksi) {
+          setTanggalTransaksi(tanggal);
+          setAiAppliedFields((prev) => ({ ...prev, tanggal: true }));
+          filledCount++;
+        } else if (tanggalTransaksi !== tanggal) {
+          newSuggestions.tanggal = tanggal;
+          pendingCount++;
+        }
+      }
+
+      // 2. Kolom Jumlah: hanya isi jika di dalam batas Rp 10.000 s/d Rp 25.000.000 (BR-07)
+      if (aiJumlah && aiJumlah >= 10000 && aiJumlah <= 25000000) {
+        if (!jumlah || jumlah.trim() === "") {
+          setJumlah(String(aiJumlah));
+          setAiAppliedFields((prev) => ({ ...prev, jumlah: true }));
+          filledCount++;
+        } else if (Number(jumlah) !== aiJumlah) {
+          newSuggestions.jumlah = aiJumlah;
+          pendingCount++;
+        }
+      }
+
+      // 3. Kolom Keperluan: hanya isi jika kosong; jika sudah ada nilainya tampilkan tombol "Pakai hasil AI"
+      if (keperluan) {
+        const combinedText = nama_toko ? `${nama_toko} - ${keperluan}` : keperluan;
+        if (!keterangan || keterangan.trim() === "") {
+          setKeterangan(combinedText);
+          setAiAppliedFields((prev) => ({ ...prev, keterangan: true }));
+          filledCount++;
+        } else if (keterangan.trim() !== combinedText.trim()) {
+          newSuggestions.keterangan = combinedText;
+          pendingCount++;
+        }
+      }
+
+      setAiSuggestions(newSuggestions);
+
+      const warningText = pesan_jumlah ? ` Catatan: ${pesan_jumlah}.` : "";
+
+      if (filledCount === 0 && pendingCount === 0) {
+        setAiNotification({
+          type: "info",
+          message: pesan_jumlah
+            ? `Nota berhasil dipindai: ${pesan_jumlah}.`
+            : "Nota berhasil dipindai, namun data transaksi (tanggal, jumlah, keperluan) tidak ditemukan dengan jelas. Silakan isi secara manual.",
+        });
+      } else {
+        const detailParts: string[] = [];
+        if (filledCount > 0) detailParts.push(`${filledCount} kolom diisi otomatis`);
+        if (pendingCount > 0)
+          detailParts.push(`${pendingCount} kolom sudah terisi (tersedia opsi "Pakai hasil AI")`);
+
+        setAiNotification({
+          type: "success",
+          message: `Ekstraksi AI selesai (Tingkat keyakinan: ${keyakinan}). ${detailParts.join(
+            ", "
+          )}.${warningText} Data hasil AI ditandai dengan teks, periksa dan sesuaikan sebelum disimpan.`,
+        });
+      }
+    } catch {
+      setAiNotification({
+        type: "error",
+        message: "Nota tidak dapat dibaca otomatis, silakan isi manual.",
+      });
+    } finally {
+      setIsExtractingAi(false);
+    }
+  };
+
   const parsedJumlah = parseInt(jumlah, 10) || 0;
 
   // Validasi lokal (sebagai kemudahan pengguna, aturan sebenarnya di database)
@@ -275,6 +431,51 @@ export function PengajuanForm({
         </div>
       )}
 
+      {/* Banner Status Ekstraksi AI */}
+      {aiNotification && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`rounded-xl border p-4 text-xs ${
+            aiNotification.type === "success"
+              ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+              : aiNotification.type === "error"
+              ? "border-rose-300 bg-rose-50 text-rose-800"
+              : "border-sky-300 bg-sky-50 text-sky-900"
+          }`}
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start gap-2">
+              <span aria-hidden="true" className="text-base leading-none">
+                {aiNotification.type === "success"
+                  ? "✨"
+                  : aiNotification.type === "error"
+                  ? "⚠️"
+                  : "ℹ️"}
+              </span>
+              <div>
+                <p className="font-bold">
+                  {aiNotification.type === "success"
+                    ? "Hasil Pembacaan Nota AI"
+                    : aiNotification.type === "error"
+                    ? "Pemberitahuan Ekstraksi Nota"
+                    : "Informasi Ekstraksi Nota"}
+                </p>
+                <p className="mt-0.5">{aiNotification.message}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAiNotification(null)}
+              className="text-xs font-bold opacity-60 hover:opacity-100 px-1 py-0.5 rounded"
+              aria-label="Tutup pemberitahuan"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -346,12 +547,29 @@ export function PengajuanForm({
 
         {/* Tanggal Transaksi */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="tanggal_transaksi"
-            className="block text-xs font-bold text-slate-900"
-          >
-            Tanggal Transaksi <span className="text-rose-600">*</span>
-          </label>
+          <div className="flex flex-wrap items-center justify-between gap-1">
+            <label
+              htmlFor="tanggal_transaksi"
+              className="text-xs font-bold text-slate-900 inline-flex items-center flex-wrap gap-1.5"
+            >
+              <span>Tanggal Transaksi</span>
+              <span className="text-rose-600">*</span>
+              {aiAppliedFields.tanggal && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span aria-hidden="true">✓</span> Diisi AI, periksa dulu
+                </span>
+              )}
+            </label>
+            {aiSuggestions.tanggal && (
+              <button
+                type="button"
+                onClick={() => applyAiSuggestion("tanggal")}
+                className="text-[11px] font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 py-0.5 rounded transition shadow-sm"
+              >
+                Pakai hasil AI: {aiSuggestions.tanggal}
+              </button>
+            )}
+          </div>
           <input
             id="tanggal_transaksi"
             type="date"
@@ -399,12 +617,29 @@ export function PengajuanForm({
 
         {/* Jumlah Rupiah */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="jumlah"
-            className="block text-xs font-bold text-slate-900"
-          >
-            Jumlah Pengajuan (Rupiah) <span className="text-rose-600">*</span>
-          </label>
+          <div className="flex flex-wrap items-center justify-between gap-1">
+            <label
+              htmlFor="jumlah"
+              className="text-xs font-bold text-slate-900 inline-flex items-center flex-wrap gap-1.5"
+            >
+              <span>Jumlah Pengajuan (Rupiah)</span>
+              <span className="text-rose-600">*</span>
+              {aiAppliedFields.jumlah && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span aria-hidden="true">✓</span> Diisi AI, periksa dulu
+                </span>
+              )}
+            </label>
+            {aiSuggestions.jumlah && (
+              <button
+                type="button"
+                onClick={() => applyAiSuggestion("jumlah")}
+                className="text-[11px] font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 py-0.5 rounded transition shadow-sm"
+              >
+                Pakai hasil AI: {formatRupiah(aiSuggestions.jumlah)}
+              </button>
+            )}
+          </div>
           <div className="relative">
             <span
               aria-hidden="true"
@@ -439,12 +674,30 @@ export function PengajuanForm({
 
         {/* Keperluan / Keterangan */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="keterangan"
-            className="block text-xs font-bold text-slate-900"
-          >
-            Keperluan Pengajuan <span className="text-rose-600">*</span>
-          </label>
+          <div className="flex flex-wrap items-center justify-between gap-1">
+            <label
+              htmlFor="keterangan"
+              className="text-xs font-bold text-slate-900 inline-flex items-center flex-wrap gap-1.5"
+            >
+              <span>Keperluan Pengajuan</span>
+              <span className="text-rose-600">*</span>
+              {aiAppliedFields.keterangan && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span aria-hidden="true">✓</span> Diisi AI, periksa dulu
+                </span>
+              )}
+            </label>
+            {aiSuggestions.keterangan && (
+              <button
+                type="button"
+                onClick={() => applyAiSuggestion("keterangan")}
+                className="text-[11px] font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 py-0.5 rounded transition shadow-sm truncate max-w-xs"
+                title={aiSuggestions.keterangan}
+              >
+                Pakai hasil AI: &quot;{aiSuggestions.keterangan.slice(0, 20)}...&quot;
+              </button>
+            )}
+          </div>
           <textarea
             id="keterangan"
             rows={3}
@@ -505,6 +758,40 @@ export function PengajuanForm({
           <p className="text-[11px] text-slate-500">
             Format yang didukung: JPG, PNG, atau PDF. Ukuran berkas maksimal 5 MB. Bukti disimpan secara privat dan aman di bucket penyimpanan (BR-07).
           </p>
+
+          {/* Tombol Isi Otomatis dari Nota (AI) */}
+          {file && (
+            <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50/70 p-3 space-y-2">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <p className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                    <span aria-hidden="true">✨</span> Isi Otomatis dari Nota (AI)
+                  </p>
+                  <p className="text-[11px] text-amber-800 mt-0.5">
+                    Foto dikirim ke layanan AI Google (tingkat gratis) untuk dibaca. Pembacaan hanya dijalankan saat tombol ditekan.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={isExtractingAi || isSubmitting}
+                  onClick={handleExtractNota}
+                  className="px-3 py-1.5 bg-amber-800 hover:bg-amber-900 text-white rounded-md text-xs font-semibold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5 shadow-sm"
+                >
+                  {isExtractingAi ? (
+                    <>
+                      <span
+                        className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
+                        aria-hidden="true"
+                      />
+                      Membaca nota...
+                    </>
+                  ) : (
+                    "Isi otomatis dari nota (AI)"
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tombol Aksi */}

@@ -14,8 +14,8 @@ export async function proxy(request: NextRequest) {
     return redirectResponse;
   };
 
-  // 1. Rute auth internal seperti /auth/keluar tidak boleh dicegat
-  if (pathname.startsWith("/auth/")) {
+  // 1. Rute auth internal (/auth/) dan rute spesifik /api/ekstrak-nota tidak dicegat (proxy meneruskan supabaseResponse tanpa redirect ke /login agar route handler merespons status HTTP sendiri)
+  if (pathname.startsWith("/auth/") || pathname === "/api/ekstrak-nota") {
     return supabaseResponse;
   }
 
