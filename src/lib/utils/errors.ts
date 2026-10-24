@@ -256,6 +256,44 @@ export function getFriendlyErrorMessage(error: unknown): string {
     return "Status penutupan periode tidak valid.";
   }
 
+  // Mutasi Bank
+  if (msg.includes("uq_mutasi_bank_transaksi") || msg.includes("duplikat") || (msg.includes("unique") && msg.includes("mutasi_bank"))) {
+    return "Baris transaksi mutasi bank ini sudah pernah diimpor sebelumnya (duplikat transaksi dilewati/ditolak).";
+  }
+  if (msg.includes("chk_mutasi_bank_jumlah_not_zero")) {
+    return "Jumlah mutasi bank tidak boleh bernilai 0.";
+  }
+  if (msg.includes("chk_mutasi_bank_deskripsi_not_empty")) {
+    return "Deskripsi mutasi bank wajib diisi.";
+  }
+  if (msg.includes("is_kas_bank = true") || msg.includes("harus merupakan akun kas atau bank")) {
+    return "Akun yang dipilih harus merupakan akun kas atau bank yang aktif.";
+  }
+  if (msg.includes("sudah dikaitkan dengan jurnal ID") || msg.includes("sudah memiliki jurnal terkait")) {
+    return "Baris mutasi bank ini sudah memiliki draf atau jurnal terkait dan tidak dapat dikaitkan ulang.";
+  }
+  if (msg.includes("Akun lawan tidak boleh sama dengan akun bank")) {
+    return "Akun lawan tidak boleh sama dengan akun kas atau bank transaksi.";
+  }
+  if (msg.includes("Hanya Akuntan yang berwenang membuat draf jurnal")) {
+    return "Hanya pengguna dengan peran Akuntan yang berwenang membuat draf jurnal dari mutasi bank.";
+  }
+  if (msg.includes("Hanya Akuntan yang berwenang mengimpor mutasi bank")) {
+    return "Hanya pengguna dengan peran Akuntan yang berwenang mengimpor mutasi bank.";
+  }
+  if (msg.includes("Periode akuntansi untuk tanggal mutasi") || (msg.includes("belum dibuat di sistem") && msg.includes("BR-05"))) {
+    return "Periode akuntansi untuk tanggal transaksi mutasi ini belum dibuat di sistem (BR-05).";
+  }
+  if (msg.includes("Jurnal hanya bisa dibuat pada periode yang berstatus terbuka") || (msg.includes("sudah ditutup") && msg.includes("BR-05"))) {
+    return "Periode akuntansi pada tanggal transaksi mutasi ini sudah ditutup (BR-05). Draf jurnal tidak dapat dibuat.";
+  }
+  if (msg.includes("bersifat permanen dan tidak dapat diubah")) {
+    return "Data mutasi bank yang sudah diimpor bersifat permanen dan tidak dapat diubah kecuali status jurnal.";
+  }
+  if (msg.includes("bersifat permanen dan tidak dapat dihapus")) {
+    return "Riwayat mutasi bank bersifat permanen dan tidak dapat dihapus.";
+  }
+
   // 3. RLS Policy Violation
   if (msg.includes("row-level security policy") || msg.includes("violates row-level security")) {
     return "Akses ditolak: Anda tidak memiliki izin untuk melakukan tindakan ini sesuai hak akses peran Anda.";

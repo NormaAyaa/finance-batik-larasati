@@ -33,6 +33,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
     description: "Mutasi dan saldo berjalan per akun",
   },
   {
+    title: "Mutasi Bank",
+    href: "/mutasi-bank",
+    allowedRoles: ["akuntan", "direktur"],
+    description: "Impor CSV rekening koran bank dan pencocokan jurnal",
+  },
+  {
     title: "Laporan Keuangan",
     href: "/laporan",
     allowedRoles: ["akuntan", "direktur"],

@@ -439,6 +439,67 @@ export interface Database {
           }
         ];
       };
+      mutasi_bank: {
+        Row: {
+          id: number;
+          akun_bank_id: number;
+          tanggal: string;
+          deskripsi: string;
+          jumlah: number;
+          saldo: number | null;
+          nama_file: string;
+          jurnal_id: number | null;
+          diimpor_oleh: string;
+          diimpor_pada: string;
+        };
+        Insert: {
+          id?: number;
+          akun_bank_id: number;
+          tanggal: string;
+          deskripsi: string;
+          jumlah: number;
+          saldo?: number | null;
+          nama_file: string;
+          jurnal_id?: number | null;
+          diimpor_oleh?: string;
+          diimpor_pada?: string;
+        };
+        Update: {
+          id?: number;
+          akun_bank_id?: number;
+          tanggal?: string;
+          deskripsi?: string;
+          jumlah?: number;
+          saldo?: number | null;
+          nama_file?: string;
+          jurnal_id?: number | null;
+          diimpor_oleh?: string;
+          diimpor_pada?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "mutasi_bank_akun_bank_id_fkey";
+            columns: ["akun_bank_id"];
+            isOneToOne: false;
+            referencedRelation: "akun";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "mutasi_bank_jurnal_id_fkey";
+            columns: ["jurnal_id"];
+            isOneToOne: false;
+            referencedRelation: "jurnal";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "mutasi_bank_diimpor_oleh_fkey";
+            columns: ["diimpor_oleh"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -522,6 +583,24 @@ export interface Database {
           total_debit: number;
           total_kredit: number;
         }[];
+      };
+      impor_mutasi_bank: {
+        Args: {
+          p_akun_bank_id: number;
+          p_nama_file: string;
+          p_baris: Json;
+        };
+        Returns: {
+          baru: number;
+          duplikat: number;
+        };
+      };
+      buat_draf_dari_mutasi: {
+        Args: {
+          p_mutasi_id: number;
+          p_akun_lawan_id: number;
+        };
+        Returns: Database["public"]["Tables"]["jurnal"]["Row"];
       };
     };
   };

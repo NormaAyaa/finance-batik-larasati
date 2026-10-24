@@ -115,6 +115,22 @@ export default async function DashboardLayout({
           </div>
         </header>
 
+        {/* Navigasi Mobile Responsif (PRD Bagian 7 & 10) */}
+        <nav
+          aria-label="Navigasi Menu Mobile"
+          className="md:hidden bg-white border-b border-slate-200 px-4 py-2 overflow-x-auto flex items-center gap-1.5"
+        >
+          {visibleNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-xs whitespace-nowrap px-3 py-1.5 rounded-lg font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition"
+            >
+              {item.title}
+            </Link>
+          ))}
+        </nav>
+
         {/* Konten Halaman */}
         <main className="flex-1 p-6">{children}</main>
       </div>
