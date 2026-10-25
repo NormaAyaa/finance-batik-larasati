@@ -2,7 +2,7 @@ import { updateSession } from "@/lib/supabase/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  const { pathname, searchParams } = request.nextUrl;
+  const { pathname } = request.nextUrl;
   const { supabaseResponse, user } = await updateSession(request);
 
   // Helper untuk mempertahankan cookies Supabase SSR saat melakukan redirect
@@ -21,23 +21,12 @@ export async function proxy(request: NextRequest) {
 
   // 2. Halaman /login
   if (pathname === "/login") {
-    // Jika ada parameter error (misal ?error=inactive), biarkan user di /login
-    if (searchParams.has("error")) {
-      return supabaseResponse;
-    }
-    // Jika user sudah login, arahkan langsung ke /dashboard
-    if (user) {
-      return createRedirectResponse(new URL("/dashboard", request.url));
-    }
     return supabaseResponse;
   }
 
-  // 3. Rute root (/) -> tidak ada halaman publik selain /login
+  // 3. Rute root (/) -> Halaman landing page publik
   if (pathname === "/") {
-    if (user) {
-      return createRedirectResponse(new URL("/dashboard", request.url));
-    }
-    return createRedirectResponse(new URL("/login", request.url));
+    return supabaseResponse;
   }
 
   // 4. Semua rute lainnya terproteksi: jika belum login, arahkan ke /login

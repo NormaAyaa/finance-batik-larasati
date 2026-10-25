@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 /* Gaya Cetak / Unduh PDF Rapi (PRD Seksi 7 & 9) */
 @media print {
   aside,
@@ -44,3 +50,92 @@
     display: none !important;
   }
 }
+
+/* Animasi & Efek Matahari Estetik (Landing Page) */
+@keyframes sunPulse {
+  0% {
+    opacity: 0.65;
+    transform: scale(0.96) translate(0, 0);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04) translate(-10px, 10px);
+  }
+  100% {
+    opacity: 0.65;
+    transform: scale(0.96) translate(0, 0);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(1000%);
+  }
+}
+
+.animate-sun-pulse {
+  animation: sunPulse 8s ease-in-out infinite;
+}
+
+.animate-scanline {
+  animation: scanline 12s linear infinite;
+}
+
+/* Efek teks stroke untuk tipografi brutalist / avant-garde */
+.text-stroke-gold {
+  -webkit-text-stroke: 1px rgba(245, 158, 11, 0.4);
+  color: transparent;
+}
+
+.text-stroke-white {
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.3);
+  color: transparent;
+}
+
+/* Gaya Kartu Login & Tombol Chamfer (Desktop) */
+.login-glass-card {
+  background-color: rgba(7, 6, 5, 0.94);
+}
+
+@supports (backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px)) {
+  .login-glass-card {
+    background-color: rgba(7, 6, 5, 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+.btn-chamfer-14 {
+  clip-path: polygon(
+    14px 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0 calc(100% - 14px),
+    0 14px
+  );
+}
+
+.mask-fade-left {
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 20%, black 50%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 20%, black 50%);
+}
+
+/* Mempertahankan warna gelap transparan saat browser mengaktifkan autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fef3c7 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #0a0806 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
+
+
+
