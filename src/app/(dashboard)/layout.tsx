@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { MAIN_NAVIGATION } from "@/lib/constants/navigation";
 import { requireAuth } from "@/lib/auth";
+import { SidebarSlim } from "@/components/layout/sidebar-slim";
 
 export default async function DashboardLayout({
   children,
@@ -12,127 +12,62 @@ export default async function DashboardLayout({
 
   // Filter menu navigasi sesuai peran pengguna (PRD Bagian 7)
   // Staf: Dashboard, Pengajuan (2 menu)
-  // Akuntan: Dashboard, Pengajuan, Jurnal, Buku Besar, Laporan, Akun & Periode (6 menu)
-  // Direktur: Semua 7 menu
+  // Akuntan: Dashboard, Pengajuan, Jurnal, Buku Besar, Mutasi Bank, Laporan, Akun & Periode (7 menu)
+  // Direktur: Semua 8 menu
   const visibleNav = MAIN_NAVIGATION.filter((item) =>
     item.allowedRoles.includes(profile.peran)
   );
 
-  const roleBadgeColor = {
-    direktur: "bg-purple-100 text-purple-800 border-purple-200",
-    akuntan: "bg-blue-100 text-blue-800 border-blue-200",
-    staf: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  const roleBadgeStyle = {
+    direktur: "bg-purple-950/70 text-purple-300 border-purple-500/40",
+    akuntan: "bg-blue-950/70 text-blue-300 border-blue-500/40",
+    staf: "bg-emerald-950/70 text-emerald-300 border-emerald-500/40",
   }[profile.peran];
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      {/* Sidebar Navigasi Sesuai Peran */}
-      <aside className="w-64 border-r border-slate-200 bg-white p-4 flex flex-col justify-between hidden md:flex shrink-0">
-        <div>
-          <div className="mb-6 px-3 py-2 border-b border-slate-100 pb-4">
-            <h2 className="text-base font-bold text-slate-900 tracking-tight">
-              CV Batik Larasati
-            </h2>
-            <p className="text-xs text-slate-500 font-medium">
-              Internal Finance & Accounting
-            </p>
-          </div>
+    <div className="flex min-h-screen bg-[#070605] text-[#fbf7f0] selection:bg-amber-500 selection:text-black">
+      {/* Sidebar Ramping Vertikal Ikonik (Sesuai Referensi 2) */}
+      <SidebarSlim items={visibleNav} profile={profile} />
 
-          <nav className="space-y-1">
-            {visibleNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
-              >
-                <span>{item.title}</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-
-        {/* Profil Pengguna & Tombol Keluar (Sisi Bawah Sidebar) */}
-        <div className="border-t border-slate-200 pt-4 px-2 space-y-3">
-          <div>
-            <div className="flex items-center justify-between gap-1 mb-1">
-              <span className="text-xs font-bold text-slate-900 truncate">
-                {profile.nama_lengkap}
-              </span>
-              <span
-                className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border ${roleBadgeColor}`}
-              >
-                {profile.peran}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 truncate">
-              {profile.jabatan}
-            </p>
-          </div>
-
-          {/* Form POST ke Route Handler /auth/keluar (Sesuai Revisi 2) */}
-          <form action="/auth/keluar" method="POST">
-            <button
-              type="submit"
-              className="w-full text-left rounded-md px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition"
-            >
-              🚪 Keluar dari Sistem
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      {/* Konten Utama */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header Atas */}
-        <header className="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between">
+      {/* Konten Utama (Offset kiri w-20 pada desktop untuk mengakomodasi sidebar tetap) */}
+      <div className="flex-1 flex flex-col min-w-0 md:pl-20 pb-20 md:pb-8">
+        {/* Header Kontekstual Sogan Obsidian */}
+        <header className="h-16 border-b border-amber-900/20 bg-[#090807]/85 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 select-none">
+          {/* Sisi Kiri: Identitas Brand & Sistem */}
           <div className="flex items-center gap-3">
-            <span className="text-sm font-bold text-slate-900 md:hidden">
-              CV Batik Larasati
-            </span>
-            <span className="text-xs text-slate-600 bg-slate-100 px-2.5 py-1 rounded font-medium">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse" />
+              <h1 className="text-sm font-bold tracking-tight text-[#fdfaf6]">
+                CV Batik Larasati
+              </h1>
+            </div>
+            <span className="hidden sm:inline-block text-[11px] text-amber-200/60 bg-amber-950/40 border border-amber-800/30 px-2.5 py-0.5 rounded-full font-medium">
               Sistem Keuangan Internal
             </span>
           </div>
 
-          {/* Identitas Pengguna & Tombol Keluar di Header */}
-          <div className="flex items-center gap-4">
+          {/* Sisi Kanan: Informasi Pengguna & Badge Peran */}
+          <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-xs font-bold text-slate-900">
+              <p className="text-xs font-semibold text-[#fdfaf6]">
                 {profile.nama_lengkap}
               </p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
-                {profile.peran} • {profile.jabatan}
+              <p className="text-[10px] text-[#a89f91]">
+                {profile.jabatan}
               </p>
             </div>
-            <form action="/auth/keluar" method="POST">
-              <button
-                type="submit"
-                className="text-xs font-medium text-slate-600 hover:text-red-600 px-2.5 py-1.5 rounded hover:bg-slate-50 border border-slate-200 transition"
-              >
-                Keluar
-              </button>
-            </form>
+            <span
+              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${roleBadgeStyle}`}
+            >
+              {profile.peran}
+            </span>
           </div>
         </header>
 
-        {/* Navigasi Mobile Responsif (PRD Bagian 7 & 10) */}
-        <nav
-          aria-label="Navigasi Menu Mobile"
-          className="md:hidden bg-white border-b border-slate-200 px-4 py-2 overflow-x-auto flex items-center gap-1.5"
-        >
-          {visibleNav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-xs whitespace-nowrap px-3 py-1.5 rounded-lg font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition"
-            >
-              {item.title}
-            </Link>
-          ))}
-        </nav>
-
         {/* Konten Halaman */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
+          {children}
+        </main>
       </div>
     </div>
   );
