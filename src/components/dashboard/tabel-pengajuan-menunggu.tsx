@@ -37,34 +37,34 @@ export function TabelPengajuanMenunggu({
 
   const keterangan =
     peran === "akuntan"
-      ? "Daftar pengajuan berstatus 'Diajukan' (menunggu verifikasi) dan 'Disetujui' (menunggu pembayaran)"
-      : "Daftar pengajuan berstatus 'Menunggu Direktur' (membutuhkan persetujuan)";
+      ? "Daftar pengajuan berstatus 'Diajukan' (verifikasi) dan 'Disetujui' (pembayaran kas/bank)"
+      : "Daftar pengajuan berstatus 'Menunggu Direktur' (nilai > Rp 1 jt atau milik Akuntan)";
 
   return (
     <section
       id="tabel-pengajuan-menunggu"
-      className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm"
+      className="sogan-card p-5 sm:p-6 select-none"
       aria-labelledby="tabel-pengajuan-title"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-amber-900/20">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 id="tabel-pengajuan-title" className="text-base font-bold text-slate-900">
+          <div className="flex items-center gap-2.5">
+            <h3 id="tabel-pengajuan-title" className="text-base font-bold text-[#fdfaf6] tracking-tight">
               {judul}
-            </h2>
+            </h3>
             <span
-              className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200"
+              className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-950/70 text-amber-300 border border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.2)]"
               aria-label={`${totalMenunggu} berkas menunggu`}
             >
               {totalMenunggu} antrean
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">{keterangan}</p>
+          <p className="text-xs text-[#a89f91] mt-0.5">{keterangan}</p>
         </div>
 
         <Link
           href="/pengajuan"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-900 transition self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 transition self-start sm:self-auto"
         >
           <span>Lihat Semua Pengajuan</span>
           <span aria-hidden="true">→</span>
@@ -75,21 +75,21 @@ export function TabelPengajuanMenunggu({
         <div className="py-12 text-center">
           <div
             aria-hidden="true"
-            className="w-12 h-12 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mb-3 border border-emerald-100"
+            className="w-12 h-12 mx-auto rounded-full bg-emerald-950/60 text-emerald-400 flex items-center justify-center text-xl font-bold mb-3 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
           >
             ✓
           </div>
-          <h3 className="text-sm font-semibold text-slate-700">
+          <h4 className="text-sm font-semibold text-[#fdfaf6]">
             Tidak Ada Pengajuan Menunggu
-          </h3>
-          <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-            Semua pengajuan telah diproses sesuai alur kerja. Pengajuan baru yang membutuhkan
+          </h4>
+          <p className="text-xs text-[#a89f91] mt-1 max-w-sm mx-auto">
+            Semua pengajuan telah diproses sesuai alur kerja. Berkas baru yang membutuhkan
             tindakan Anda akan otomatis tampil di sini.
           </p>
           <div className="mt-4">
             <Link
               href="/pengajuan"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-amber-900/40 bg-[#161310] text-xs font-medium text-amber-300 hover:bg-[#1e1a16] transition"
             >
               Buka Riwayat Pengajuan
             </Link>
@@ -97,13 +97,13 @@ export function TabelPengajuanMenunggu({
         </div>
       ) : (
         <>
-          {/* Tampilan Desktop & Tablet: Tabel HTML Semantik */}
+          {/* Tampilan Desktop & Tablet: Tabel Dark Semantik */}
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-700">
+            <table className="w-full text-left text-xs text-[#fdfaf6]">
               <caption className="sr-only">
                 Daftar pengajuan biaya yang menunggu verifikasi atau persetujuan Anda
               </caption>
-              <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+              <thead className="bg-[#141210] text-[#a89f91] font-semibold border-b border-amber-900/30 uppercase tracking-wider text-[11px]">
                 <tr>
                   <th scope="col" className="px-4 py-3">Nomor & Tanggal</th>
                   <th scope="col" className="px-4 py-3">Pengaju</th>
@@ -112,31 +112,31 @@ export function TabelPengajuanMenunggu({
                   <th scope="col" className="px-4 py-3 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-amber-900/15">
                 {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition">
+                  <tr key={item.id} className="hover:bg-[#1a1613] transition">
                     {/* Nomor & Tanggal */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-bold text-slate-900 font-mono text-xs">
+                      <div className="font-bold text-[#fdfaf6] font-mono text-xs">
                         {item.nomor}
                       </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
+                      <div className="text-[11px] text-[#78716c] mt-0.5">
                         {formatDate(item.tanggal_transaksi)}
                       </div>
                     </td>
 
                     {/* Pengaju */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-medium text-slate-900">
+                      <div className="font-medium text-[#fdfaf6]">
                         {item.pengaju?.nama_lengkap || "-"}
                       </div>
-                      <div className="text-[11px] text-slate-400 capitalize">
+                      <div className="text-[11px] text-[#a89f91] capitalize">
                         {item.pengaju?.peran || "Staf"}
                       </div>
                     </td>
 
                     {/* Jumlah */}
-                    <td className="px-4 py-3 whitespace-nowrap text-right font-mono font-semibold text-slate-900">
+                    <td className="px-4 py-3 whitespace-nowrap text-right font-mono font-bold text-amber-300">
                       {formatRupiah(item.jumlah)}
                     </td>
 
@@ -145,11 +145,11 @@ export function TabelPengajuanMenunggu({
                       <StatusBadge status={item.status} />
                     </td>
 
-                    {/* Aksi: Tombol Tinjau */}
+                    {/* Aksi: Tombol Tinjau Emas Chamfer */}
                     <td className="px-4 py-3 whitespace-nowrap text-right">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-sky-700 hover:bg-sky-800 transition shadow-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_10px_rgba(245,158,11,0.25)] hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]"
                         aria-label={`Tinjau pengajuan nomor ${item.nomor} sebesar ${formatRupiah(item.jumlah)}`}
                       >
                         <span>Tinjau</span>
@@ -163,13 +163,13 @@ export function TabelPengajuanMenunggu({
           </div>
 
           {/* Footer Info & Tautan Selengkapnya */}
-          <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
+          <div className="mt-4 pt-3 border-t border-amber-900/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#a89f91]">
             <span>
               Menampilkan {items.length} dari {totalMenunggu} antrean pengajuan
             </span>
             <Link
               href="/pengajuan"
-              className="text-sky-700 hover:text-sky-900 font-semibold inline-flex items-center gap-1"
+              className="text-amber-400 hover:text-amber-300 font-semibold inline-flex items-center gap-1 transition"
             >
               <span>Lihat semua {totalMenunggu} pengajuan</span>
               <span aria-hidden="true">→</span>

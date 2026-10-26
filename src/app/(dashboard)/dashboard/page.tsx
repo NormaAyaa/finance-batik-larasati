@@ -332,12 +332,21 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* 1. Header Dashboard Keuangan */}
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">Dashboard Keuangan</h1>
-        <p className="text-xs text-slate-500 mt-1">
-          Selamat datang, <span className="font-semibold text-slate-700">{profile.nama_lengkap}</span> (
-          {profile.jabatan}). Ringkasan posisi kas & bank, hasil usaha bulan berjalan, serta antrean pengajuan tertunda.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-amber-900/20">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-amber-400/80">
+              Overview Finansial • Batik Larasati
+            </span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-[#fdfaf6] tracking-tight">
+            Dashboard Keuangan
+          </h2>
+          <p className="text-xs text-[#a89f91] mt-0.5">
+            Selamat datang, <span className="font-semibold text-amber-300">{profile.nama_lengkap}</span> ({profile.jabatan}). Ringkasan posisi kas, mutasi pendapatan & beban, dan antrean verifikasi.
+          </p>
+        </div>
       </div>
 
       {/* 2. Kartu Ringkasan (5 Kartu Utama) */}

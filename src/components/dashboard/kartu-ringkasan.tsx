@@ -28,164 +28,168 @@ export function KartuRingkasan({
 }: KartuRingkasanProps) {
   const isRugi = labaBulanIni < 0;
 
+  // Format laba rugi sesuai PRD Bagian 9: Angka negatif ditampilkan dalam kurung (Rp ...)
+  const formattedLabaRugi = isRugi
+    ? `(${formatRupiah(Math.abs(labaBulanIni))})`
+    : formatRupiah(labaBulanIni);
+
   return (
-    <section aria-labelledby="ringkasan-keuangan-title">
-      <h2 id="ringkasan-keuangan-title" className="sr-only">
-        Ringkasan Keuangan dan Posisi Kas Bulan Berjalan
-      </h2>
+    <section aria-labelledby="ringkasan-keuangan-title" className="select-none">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 id="ringkasan-keuangan-title" className="text-base font-bold text-[#fdfaf6] tracking-tight flex items-center gap-2">
+            <span>Ringkasan Posisi Keuangan</span>
+            <span className="text-xs font-normal text-amber-400/70 bg-amber-950/40 border border-amber-900/40 px-2 py-0.5 rounded-full">
+              Bulan {namaBulan}
+            </span>
+          </h2>
+          <p className="text-xs text-[#a89f91] mt-0.5">
+            Posisi kas, pendapatan, beban, dan antrean verifikasi terkini (WIB)
+          </p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* 1. Total Saldo Kas & Bank */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow transition flex flex-col justify-between">
+        <div className="sogan-card sogan-card-hover p-5 flex flex-col justify-between group">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[#a89f91] uppercase tracking-wider">
               Total Kas & Bank
             </span>
-            <span
-              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-sky-50 text-sky-700 text-sm font-bold border border-sky-100"
-              aria-hidden="true"
-            >
-              🏦
-            </span>
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-300 text-sm group-hover:scale-105 transition-transform">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M7 15h0M2 9.5h20" />
+              </svg>
+            </div>
           </div>
-          <div className="mt-3">
-            <p className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          <div className="mt-4">
+            <p className="text-xl sm:text-2xl font-extrabold text-[#fdfaf6] tracking-tight">
               {formatRupiah(totalKasBank)}
             </p>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              Per hari ini (WIB)
-            </p>
+            <div className="text-[11px] text-[#a89f91] mt-1.5 flex items-center gap-1.5">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" aria-hidden="true" />
+              <span>Kas Kecil & Bank Mandiri</span>
+            </div>
           </div>
         </div>
 
         {/* 2. Pendapatan Bulan Berjalan */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow transition flex flex-col justify-between">
+        <div className="sogan-card sogan-card-hover p-5 flex flex-col justify-between group">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[#a89f91] uppercase tracking-wider">
               Pendapatan
             </span>
-            <span
-              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-bold border border-emerald-100"
-              aria-hidden="true"
-            >
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 text-sm font-bold group-hover:scale-105 transition-transform">
               ↗
-            </span>
+            </div>
           </div>
-          <div className="mt-3">
-            <p className="text-xl sm:text-2xl font-bold text-emerald-700 tracking-tight">
+          <div className="mt-4">
+            <p className="text-xl sm:text-2xl font-extrabold text-emerald-400 tracking-tight">
               {formatRupiah(pendapatanBulanIni)}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
-              Bulan {namaBulan}
+            <p className="text-[11px] text-[#a89f91] mt-1.5 flex items-center gap-1">
+              <span className="text-emerald-400/80 font-medium">Bulan berjalan</span>
+              <span>• Akun 4xxx</span>
             </p>
           </div>
         </div>
 
         {/* 3. Beban Bulan Berjalan */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow transition flex flex-col justify-between">
+        <div className="sogan-card sogan-card-hover p-5 flex flex-col justify-between group">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[#a89f91] uppercase tracking-wider">
               Beban
             </span>
-            <span
-              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-700 text-sm font-bold border border-amber-100"
-              aria-hidden="true"
-            >
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 text-sm font-bold group-hover:scale-105 transition-transform">
               ↘
-            </span>
+            </div>
           </div>
-          <div className="mt-3">
-            <p className="text-xl sm:text-2xl font-bold text-amber-800 tracking-tight">
+          <div className="mt-4">
+            <p className="text-xl sm:text-2xl font-extrabold text-amber-300 tracking-tight">
               {formatRupiah(bebanBulanIni)}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
-              Bulan {namaBulan}
+            <p className="text-[11px] text-[#a89f91] mt-1.5 flex items-center gap-1">
+              <span className="text-amber-400/80 font-medium">Bulan berjalan</span>
+              <span>• Akun 5xxx</span>
             </p>
           </div>
         </div>
 
-        {/* 4. Laba / Rugi Bulan Berjalan */}
+        {/* 4. Laba / Rugi Bulan Berjalan (Format Negatif dalam Kurung Sesuai PRD Seksi 9) */}
         <div
-          className={`rounded-xl border p-5 shadow-sm hover:shadow transition flex flex-col justify-between ${
+          className={`sogan-card sogan-card-hover p-5 flex flex-col justify-between group ${
             isRugi
-              ? "bg-rose-50/40 border-rose-200"
-              : "bg-emerald-50/40 border-emerald-200"
+              ? "border-rose-900/40 bg-gradient-to-b from-rose-950/20 to-[#0f0d0b]"
+              : "border-emerald-900/40 bg-gradient-to-b from-emerald-950/20 to-[#0f0d0b]"
           }`}
         >
           <div className="flex items-center justify-between gap-2">
-            <span
-              className={`text-xs font-semibold uppercase tracking-wider ${
-                isRugi ? "text-rose-900" : "text-emerald-900"
-              }`}
-            >
-              {isRugi ? "Rugi Bulan Berjalan" : "Laba Bulan Berjalan"}
+            <span className="text-xs font-semibold text-[#a89f91] uppercase tracking-wider">
+              {isRugi ? "Rugi Bersih" : "Laba Bersih"}
             </span>
             {isRugi ? (
               <span
                 role="status"
-                className="inline-flex items-center gap-1 rounded bg-rose-100 text-rose-800 font-bold px-2 py-0.5 text-xs border border-rose-300"
+                className="inline-flex items-center gap-1 rounded-full bg-rose-950/70 text-rose-300 font-bold px-2 py-0.5 text-[10px] border border-rose-500/40"
               >
-                <span aria-hidden="true">⚠️</span>
+                <span aria-hidden="true">⚠</span>
                 <span>Rugi</span>
               </span>
             ) : (
               <span
                 role="status"
-                className="inline-flex items-center gap-1 rounded bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 text-xs border border-emerald-300"
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-950/70 text-emerald-300 font-bold px-2 py-0.5 text-[10px] border border-emerald-500/40"
               >
                 <span aria-hidden="true">✓</span>
                 <span>Laba</span>
               </span>
             )}
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <p
-              className={`text-xl sm:text-2xl font-bold tracking-tight ${
-                isRugi ? "text-rose-700" : "text-emerald-700"
+              className={`text-xl sm:text-2xl font-extrabold tracking-tight ${
+                isRugi ? "text-rose-400" : "text-emerald-400"
               }`}
             >
-              {formatRupiah(labaBulanIni)}
+              {formattedLabaRugi}
             </p>
-            <p className="text-xs text-slate-600 mt-1">
-              {isRugi ? "Beban melebihi pendapatan" : "Pendapatan melampaui beban"}
+            <p className="text-[11px] text-[#a89f91] mt-1.5">
+              {isRugi ? "Beban melampaui pendapatan" : "Pendapatan melampaui beban"}
             </p>
           </div>
         </div>
 
-        {/* 5. Pengajuan Menunggu */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow transition flex flex-col justify-between">
+        {/* 5. Pengajuan Menunggu (Action Alert Card) */}
+        <div className="sogan-card sogan-card-hover p-5 flex flex-col justify-between border-amber-500/30 bg-gradient-to-b from-amber-950/20 to-[#0f0d0b] group">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              {peran === "akuntan" ? "Menunggu Akuntan" : "Menunggu Direktur"}
+            <span className="text-xs font-semibold text-amber-300 uppercase tracking-wider">
+              {peran === "akuntan" ? "Antrean Akuntan" : "Antrean Direktur"}
             </span>
-            <span
-              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-purple-50 text-purple-700 text-sm font-bold border border-purple-100"
-              aria-hidden="true"
-            >
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-300 text-xs font-bold group-hover:scale-105 transition-transform">
               ⏳
-            </span>
+            </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <div className="flex items-baseline gap-2">
-              <p className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+              <p className="text-xl sm:text-2xl font-extrabold text-[#fdfaf6] tracking-tight">
                 {jumlahPengajuanMenunggu}
               </p>
-              <span className="text-xs text-slate-500">berkas</span>
+              <span className="text-xs text-[#a89f91]">pengajuan</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1 line-clamp-1">
+            <p className="text-[11px] text-[#a89f91] mt-1 line-clamp-1">
               {peran === "akuntan" && detailAkuntan
-                ? `${detailAkuntan.diajukan} verifikasi, ${detailAkuntan.disetujui} pembayaran`
+                ? `${detailAkuntan.diajukan} verifikasi, ${detailAkuntan.disetujui} bayar`
                 : "Menunggu persetujuan Direktur"}
             </p>
           </div>
-          <div className="mt-2 pt-2 border-t border-slate-100">
+          <div className="mt-3 pt-2.5 border-t border-amber-900/30">
             <Link
               href="#tabel-pengajuan-menunggu"
-              className="text-[11px] font-medium text-sky-700 hover:text-sky-900 transition flex items-center justify-between"
+              className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition flex items-center justify-between"
             >
-              <span>Tinjau pengajuan</span>
-              <span aria-hidden="true">↓</span>
+              <span>Tinjau berkas</span>
+              <span aria-hidden="true" className="group-hover:translate-y-0.5 transition-transform">↓</span>
             </Link>
           </div>
         </div>

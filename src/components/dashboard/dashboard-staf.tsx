@@ -26,9 +26,8 @@ interface StatusConfigItem {
   key: StatusPengajuan;
   label: string;
   icon: string;
-  bgColor: string;
-  textColor: string;
   borderColor: string;
+  glowColor: string;
   description: string;
 }
 
@@ -37,72 +36,64 @@ const STATUS_ITEMS: StatusConfigItem[] = [
     key: "draf",
     label: "Draf",
     icon: "✎",
-    bgColor: "bg-slate-50",
-    textColor: "text-slate-700",
-    borderColor: "border-slate-200",
+    borderColor: "border-stone-800",
+    glowColor: "text-stone-400",
     description: "Belum diajukan",
   },
   {
     key: "diajukan",
     label: "Diajukan",
     icon: "↑",
-    bgColor: "bg-sky-50",
-    textColor: "text-sky-800",
-    borderColor: "border-sky-200",
+    borderColor: "border-amber-500/30",
+    glowColor: "text-amber-300",
     description: "Menunggu verifikasi Akuntan",
   },
   {
     key: "perlu_revisi",
     label: "Perlu Revisi",
     icon: "↩",
-    bgColor: "bg-amber-50",
-    textColor: "text-amber-800",
-    borderColor: "border-amber-200",
-    description: "Harus direvisi oleh pengaju",
+    borderColor: "border-orange-500/40",
+    glowColor: "text-orange-400",
+    description: "Perlu revisi nota",
   },
   {
     key: "menunggu_direktur",
     label: "Menunggu Direktur",
     icon: "⏳",
-    bgColor: "bg-purple-50",
-    textColor: "text-purple-800",
-    borderColor: "border-purple-200",
-    description: "Menunggu persetujuan Direktur",
+    borderColor: "border-purple-500/40",
+    glowColor: "text-purple-300",
+    description: "Menunggu Direktur",
   },
   {
     key: "disetujui",
     label: "Disetujui",
     icon: "✓",
-    bgColor: "bg-emerald-50",
-    textColor: "text-emerald-800",
-    borderColor: "border-emerald-200",
-    description: "Disetujui, siap dibayar",
+    borderColor: "border-emerald-500/40",
+    glowColor: "text-emerald-300",
+    description: "Siap dibayar",
   },
   {
     key: "ditolak",
     label: "Ditolak",
     icon: "✕",
-    bgColor: "bg-rose-50",
-    textColor: "text-rose-800",
-    borderColor: "border-rose-200",
+    borderColor: "border-rose-500/40",
+    glowColor: "text-rose-400",
     description: "Ditolak peninjau",
   },
   {
     key: "dibayar",
     label: "Dibayar",
     icon: "💳",
-    bgColor: "bg-teal-50",
-    textColor: "text-teal-800",
-    borderColor: "border-teal-200",
-    description: "Telah dibayar & terjurnal",
+    borderColor: "border-teal-500/40",
+    glowColor: "text-teal-300",
+    description: "Telah dicairkan",
   },
   {
     key: "dibatalkan",
     label: "Dibatalkan",
     icon: "⊘",
-    bgColor: "bg-gray-100",
-    textColor: "text-gray-700",
-    borderColor: "border-gray-200",
+    borderColor: "border-stone-800",
+    glowColor: "text-stone-500",
     description: "Dibatalkan pengaju",
   },
 ];
@@ -115,35 +106,44 @@ export function DashboardStaf({
   totalSubmissions,
 }: DashboardStafProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 select-none">
       {/* 1. Header Sambutan & Tombol Buat Pengajuan */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <div className="sogan-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-amber-900/30 bg-gradient-to-r from-amber-950/20 via-[#0f0d0b] to-[#0f0d0b]">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Dashboard Staf</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Selamat datang, <span className="font-semibold text-slate-700">{namaLengkap}</span> ({jabatan}).
-            Pantau status proses pengajuan biaya operasional dan reimburse Anda.
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+            <span className="text-xs font-bold uppercase tracking-widest text-amber-400/80">
+              Portal Staf • CV Batik Larasati
+            </span>
+          </div>
+          <h2 className="text-xl font-bold text-[#fdfaf6] tracking-tight">
+            Sugeng Rawuh, <span className="text-amber-300">{namaLengkap}</span>
+          </h2>
+          <p className="text-xs text-[#a89f91] mt-1">
+            {jabatan} • Pantau status pengajuan biaya operasional & penggantian (reimburse) Anda secara real-time.
           </p>
         </div>
 
         <div>
           <Link
             href="/pengajuan/baru"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold shadow-xs transition focus:ring-2 focus:ring-sky-500 focus:outline-none"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black text-xs font-bold shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition"
           >
-            <span aria-hidden="true">+</span>
-            <span>Buat Pengajuan Baru</span>
+            <span aria-hidden="true" className="text-sm font-black">+</span>
+            <span>Ajukan Biaya / Reimburse</span>
           </Link>
         </div>
       </div>
 
-      {/* 2. Ringkasan 8 Status Pengajuan Milik Sendiri */}
+      {/* 2. Ringkasan 8 Status Pengajuan Milik Sendiri (Funnel Bento) */}
       <section aria-labelledby="status-pengajuan-title">
         <div className="flex items-center justify-between mb-3">
-          <h2 id="status-pengajuan-title" className="text-sm font-bold text-slate-900">
-            Ringkasan Status Pengajuan Saya
-          </h2>
-          <span className="text-xs text-slate-400">Total {totalSubmissions} pengajuan</span>
+          <h3 id="status-pengajuan-title" className="text-sm font-bold text-[#fdfaf6] tracking-tight">
+            Status Pengajuan Saya
+          </h3>
+          <span className="text-xs text-[#a89f91] bg-[#141210] border border-amber-900/30 px-2.5 py-0.5 rounded-full">
+            Total {totalSubmissions} pengajuan
+          </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
@@ -153,21 +153,21 @@ export function DashboardStaf({
               <Link
                 key={cfg.key}
                 href={`/pengajuan?status=${cfg.key}`}
-                className={`p-3.5 rounded-xl border transition flex flex-col justify-between hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 ${cfg.bgColor} ${cfg.borderColor}`}
+                className={`sogan-card sogan-card-hover p-3.5 flex flex-col justify-between ${cfg.borderColor}`}
                 title={`Lihat pengajuan status ${cfg.label}`}
               >
                 <div className="flex items-center justify-between">
                   <span
                     aria-hidden="true"
-                    className="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[11px]"
+                    className={`font-bold text-xs ${cfg.glowColor}`}
                   >
                     {cfg.icon}
                   </span>
-                  <span className="text-lg font-bold font-mono text-slate-900">{count}</span>
+                  <span className="text-lg font-extrabold font-mono text-[#fdfaf6]">{count}</span>
                 </div>
-                <div className="mt-2">
-                  <div className={`text-xs font-bold ${cfg.textColor}`}>{cfg.label}</div>
-                  <div className="text-[10px] text-slate-400 line-clamp-1 mt-0.5" title={cfg.description}>
+                <div className="mt-2.5">
+                  <div className="text-xs font-bold text-[#fdfaf6] truncate">{cfg.label}</div>
+                  <div className="text-[10px] text-[#78716c] line-clamp-1 mt-0.5" title={cfg.description}>
                     {cfg.description}
                   </div>
                 </div>
@@ -179,24 +179,24 @@ export function DashboardStaf({
 
       {/* 3. Daftar Pengajuan Terbaru Milik Sendiri */}
       <section
-        className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm"
+        className="sogan-card p-5 sm:p-6"
         aria-labelledby="riwayat-terbaru-title"
       >
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-4 border-b border-amber-900/20">
           <div>
-            <h2 id="riwayat-terbaru-title" className="text-base font-bold text-slate-900">
+            <h3 id="riwayat-terbaru-title" className="text-base font-bold text-[#fdfaf6] tracking-tight">
               Pengajuan Terbaru Saya
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              10 pengajuan terakhir yang Anda ajukan di sistem
+            </h3>
+            <p className="text-xs text-[#a89f91] mt-0.5">
+              10 berkas pengajuan terakhir yang Anda ajukan di sistem
             </p>
           </div>
 
           <Link
             href="/pengajuan"
-            className="text-xs font-semibold text-sky-700 hover:text-sky-900 transition inline-flex items-center gap-1"
+            className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition inline-flex items-center gap-1"
           >
-            <span>Lihat Semua Pengajuan Saya</span>
+            <span>Semua Pengajuan</span>
             <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -205,18 +205,18 @@ export function DashboardStaf({
           <div className="py-12 text-center">
             <div
               aria-hidden="true"
-              className="w-12 h-12 mx-auto rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-xl font-bold mb-3"
+              className="w-12 h-12 mx-auto rounded-full bg-amber-950/40 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 border border-amber-500/30"
             >
               ✎
             </div>
-            <h3 className="text-sm font-semibold text-slate-700">Belum Ada Pengajuan</h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+            <h4 className="text-sm font-semibold text-[#fdfaf6]">Belum Ada Pengajuan</h4>
+            <p className="text-xs text-[#a89f91] mt-1 max-w-sm mx-auto">
               Anda belum pernah membuat pengajuan biaya operasional atau reimburse karyawan.
             </p>
             <div className="mt-4">
               <Link
                 href="/pengajuan/baru"
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-700 text-white text-xs font-semibold hover:bg-sky-800 transition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-bold shadow-[0_0_12px_rgba(245,158,11,0.25)] transition"
               >
                 <span>+ Buat Pengajuan Pertama</span>
               </Link>
@@ -224,9 +224,9 @@ export function DashboardStaf({
           </div>
         ) : (
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-700">
+            <table className="w-full text-left text-xs text-[#fdfaf6]">
               <caption className="sr-only">Daftar pengajuan operasional terbaru milik Anda</caption>
-              <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+              <thead className="bg-[#141210] text-[#a89f91] font-semibold border-b border-amber-900/30 uppercase tracking-wider text-[11px]">
                 <tr>
                   <th scope="col" className="px-4 py-3">Nomor & Tanggal</th>
                   <th scope="col" className="px-4 py-3">Keperluan</th>
@@ -236,38 +236,38 @@ export function DashboardStaf({
                   <th scope="col" className="px-4 py-3 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-amber-900/15">
                 {recentItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/70 transition">
+                  <tr key={item.id} className="hover:bg-[#1a1613] transition">
                     {/* Nomor & Tanggal */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-bold text-slate-900 font-mono text-xs">
+                      <div className="font-bold text-amber-300 font-mono text-xs">
                         <Link
                           href={`/pengajuan/${item.id}`}
-                          className="hover:text-sky-700 underline focus:outline-none"
+                          className="hover:underline focus:outline-none"
                         >
                           {item.nomor}
                         </Link>
                       </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
+                      <div className="text-[11px] text-[#78716c] mt-0.5">
                         {formatDate(item.tanggal_transaksi)}
                       </div>
                     </td>
 
                     {/* Keperluan */}
                     <td className="px-4 py-3">
-                      <p className="line-clamp-1 max-w-xs text-slate-800 font-medium">
+                      <p className="line-clamp-1 max-w-xs text-[#fdfaf6] font-medium">
                         {item.keterangan || "-"}
                       </p>
                     </td>
 
                     {/* Jenis */}
-                    <td className="px-4 py-3 whitespace-nowrap capitalize text-slate-600">
+                    <td className="px-4 py-3 whitespace-nowrap capitalize text-[#a89f91]">
                       {item.jenis}
                     </td>
 
                     {/* Jumlah */}
-                    <td className="px-4 py-3 whitespace-nowrap text-right font-mono font-semibold text-slate-900">
+                    <td className="px-4 py-3 whitespace-nowrap text-right font-mono font-bold text-amber-300">
                       {formatRupiah(item.jumlah)}
                     </td>
 
@@ -280,7 +280,7 @@ export function DashboardStaf({
                     <td className="px-4 py-3 whitespace-nowrap text-right">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 transition"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-300 bg-amber-950/40 hover:bg-amber-900/40 border border-amber-500/30 transition"
                       >
                         <span>Lihat</span>
                         <span aria-hidden="true">→</span>
