@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/auth";
@@ -92,11 +93,11 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-7">
+    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
       {errorMessage && (
         <div
           role="alert"
-          className="rounded-2xl bg-red-950/70 border border-red-800/80 p-4 text-sm text-red-200 flex items-start gap-3"
+          className="rounded-xl bg-red-950/70 border border-red-800/80 p-3 text-xs text-red-200 flex items-start gap-2.5"
         >
           <span className="font-bold text-red-400 mt-0.5" aria-hidden="true">
             ⚠️
@@ -108,7 +109,7 @@ export function LoginForm() {
       <div>
         <label
           htmlFor="email"
-          className="block text-sm md:text-base font-semibold uppercase tracking-wider text-amber-200/90 mb-2.5"
+          className="block text-xs font-semibold uppercase tracking-wider text-amber-200/90 mb-1.5"
         >
           Email Pengguna
         </label>
@@ -120,19 +121,19 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="nama@larasati.test"
-          className="w-full rounded-2xl bg-black/60 border border-amber-500/30 px-6 py-4 text-base md:text-lg text-amber-100 placeholder:text-amber-200/40 focus:outline-none focus:border-amber-400 focus-visible:ring-[3px] focus-visible:ring-amber-400/50 transition shadow-inner"
+          className="w-full rounded-xl bg-black/60 border border-amber-500/30 px-4 py-2.5 text-sm text-amber-100 placeholder:text-amber-200/40 focus:outline-none focus:border-amber-400 focus-visible:ring-2 focus-visible:ring-amber-400/50 transition shadow-inner"
         />
       </div>
 
       <div>
-        <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center justify-between mb-1.5">
           <label
             htmlFor="password"
-            className="text-sm md:text-base font-semibold uppercase tracking-wider text-amber-200/90"
+            className="text-xs font-semibold uppercase tracking-wider text-amber-200/90"
           >
             Kata Sandi
           </label>
-          <span className="text-xs md:text-sm text-amber-300/80 select-none font-mono">
+          <span className="text-[11px] text-amber-300/80 select-none font-mono">
             Lupa kata sandi? Hubungi Direktur.
           </span>
         </div>
@@ -145,14 +146,14 @@ export function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-2xl bg-black/60 border border-amber-500/30 px-6 py-4 pr-16 text-base md:text-lg text-amber-100 placeholder:text-amber-200/40 focus:outline-none focus:border-amber-400 focus-visible:ring-[3px] focus-visible:ring-amber-400/50 transition shadow-inner"
+            className="w-full rounded-xl bg-black/60 border border-amber-500/30 px-4 py-2.5 pr-11 text-sm text-amber-100 placeholder:text-amber-200/40 focus:outline-none focus:border-amber-400 focus-visible:ring-2 focus-visible:ring-amber-400/50 transition shadow-inner"
           />
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
             aria-pressed={showPassword}
-            className="absolute right-4 p-2 text-amber-400/70 hover:text-amber-200 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-amber-400 rounded-lg transition"
+            className="absolute right-2.5 p-1.5 text-amber-400/70 hover:text-amber-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-lg transition"
           >
             {showPassword ? (
               <svg
@@ -161,7 +162,7 @@ export function LoginForm() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-5 h-5"
                 aria-hidden="true"
               >
                 <path
@@ -177,7 +178,7 @@ export function LoginForm() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-5 h-5"
                 aria-hidden="true"
               >
                 <path
@@ -199,11 +200,11 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full relative flex items-center rounded-full p-2.5 bg-[#0b0f14] border border-[#c5a059] shadow-[0_0_30px_rgba(197,160,89,0.3)] hover:border-[#e5c07b] hover:shadow-[0_0_40px_rgba(212,175,55,0.45)] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-[3px] focus-visible:ring-amber-400 transition-all group"
+        className="w-full relative flex items-center rounded-full p-1.5 bg-[#0b0f14] border border-[#c5a059] shadow-[0_0_20px_rgba(197,160,89,0.25)] hover:border-[#e5c07b] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 transition-all group"
       >
         {/* Medali Lingkaran Sidik Jari (Kiri) */}
         <span
-          className="w-16 h-16 rounded-full border border-[#c5a059] bg-[#12171f] flex items-center justify-center shrink-0 shadow-[inset_0_1px_4px_rgba(0,0,0,0.85)] group-hover:border-[#e5c07b] transition-colors"
+          className="w-11 h-11 rounded-full border border-[#c5a059] bg-[#12171f] flex items-center justify-center shrink-0 shadow-[inset_0_1px_3px_rgba(0,0,0,0.85)] group-hover:border-[#e5c07b] transition-colors"
           aria-hidden="true"
         >
           <svg
@@ -214,7 +215,7 @@ export function LoginForm() {
             strokeWidth="1.7"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-9 h-9 text-[#d4af37] group-hover:text-[#f3d997] transition-colors"
+            className="w-5 h-5 text-[#d4af37] group-hover:text-[#f3d997] transition-colors"
             aria-hidden="true"
           >
             <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
@@ -230,10 +231,23 @@ export function LoginForm() {
         </span>
 
         {/* Label Tombol di Tengah */}
-        <span className="flex-1 text-center font-serif text-base md:text-lg font-semibold tracking-[0.28em] text-[#d4af37] pr-16 uppercase group-hover:text-[#f3d997] transition-colors">
+        <span className="flex-1 text-center font-serif text-xs md:text-sm font-semibold tracking-[0.22em] text-[#d4af37] pr-11 uppercase group-hover:text-[#f3d997] transition-colors">
           {loading ? "Memproses..." : "Masuk ke Sistem"}
         </span>
       </button>
+
+      {/* Navigasi ke Halaman Registrasi */}
+      <div className="pt-2 text-center">
+        <p className="text-xs text-amber-200/80">
+          Belum memiliki akun?{" "}
+          <Link
+            href="/register"
+            className="text-amber-400 font-semibold underline underline-offset-4 hover:text-amber-300 transition-colors"
+          >
+            Daftar akun baru
+          </Link>
+        </p>
+      </div>
     </form>
   );
 }

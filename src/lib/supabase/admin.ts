@@ -1,0 +1,24 @@
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
+
+/**
+ * Supabase admin client dengan Service Role Key.
+ * HANYA digunakan di lingkungan sisi server yang aman (Route Handlers / Server Actions).
+ */
+export function createAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error(
+      "Missing Supabase admin environment variables: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be defined."
+    );
+  }
+
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}

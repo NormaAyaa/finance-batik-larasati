@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
@@ -102,31 +103,55 @@ export default function LoginPage() {
       {/* 3. FLOATING CARD: TATA LETAK DESKTOP (LEBAR >= 1024 PX)      */}
       {/* Kartu Hitam Transparan dengan Mix Emas / Kuning Landing Page */}
       {/* ============================================================ */}
-      <div className="relative z-10 w-full max-w-[1260px] rounded-[2.5rem] border border-amber-500/35 shadow-[0_0_90px_rgba(245,158,11,0.2),0_35px_100px_rgba(0,0,0,0.95)] overflow-hidden login-glass-card grid grid-cols-12 min-h-[720px]">
+      <div className="relative z-10 w-full max-w-[960px] rounded-3xl border border-amber-500/35 shadow-[0_0_80px_rgba(245,158,11,0.18),0_25px_80px_rgba(0,0,0,0.95)] overflow-hidden login-glass-card grid grid-cols-12 min-h-[540px]">
         {/* Pendaran Cahaya Emas Lembut di Bagian Atas Kartu */}
         <div
           aria-hidden="true"
-          className="absolute -top-32 left-1/4 w-[28rem] h-[28rem] rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/15 blur-3xl pointer-events-none"
+          className="absolute -top-28 left-1/4 w-80 h-80 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/15 blur-3xl pointer-events-none"
         />
 
         {/* Kolom Kiri: Formulir Masuk */}
-        <div className="col-span-6 p-14 lg:p-16 flex flex-col justify-between z-10 relative">
-          <div>
-            <div className="inline-block px-4 py-2 mb-5 rounded-md text-xs md:text-sm font-mono font-bold tracking-widest uppercase bg-amber-500/15 text-amber-300 border border-amber-500/40">
-              CV BATIK LARASATI · FINANCE
+        <div className="col-span-6 p-8 lg:p-10 flex flex-col justify-between z-10 relative">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="inline-block px-3 py-1 mb-3 rounded text-[11px] font-mono font-bold tracking-widest uppercase bg-amber-500/15 text-amber-300 border border-amber-500/40">
+                CV BATIK LARASATI · FINANCE
+              </div>
+              <h1 className="text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                Masuk Sistem
+              </h1>
+              <p className="text-sm text-amber-200/80 mt-1">
+                Lanjutkan untuk mengakses panel keuangan
+              </p>
             </div>
-            <h1 className="text-3xl lg:text-[2.6rem] font-extrabold text-white tracking-tight leading-tight">
-              Masuk Sistem
-            </h1>
-            <p className="text-base lg:text-lg text-amber-200/80 mt-3">
-              Lanjutkan untuk mengakses panel keuangan
-            </p>
+
+            {/* Tombol X Kembali ke Halaman Utama */}
+            <Link
+              href="/"
+              aria-label="Kembali ke halaman utama"
+              title="Kembali ke halaman utama"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 border border-amber-500/30 text-amber-300 hover:text-white hover:bg-amber-500/20 hover:border-amber-400 active:scale-95 transition-all shrink-0 ml-3 group"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4 transition-transform group-hover:rotate-90 duration-200"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </Link>
           </div>
 
-          <div className="my-auto py-6">
+          <div className="my-auto py-4">
             <Suspense
               fallback={
-                <div className="py-8 text-center text-base text-amber-200/50">
+                <div className="py-6 text-center text-sm text-amber-200/50">
                   Memuat formulir masuk...
                 </div>
               }
@@ -135,8 +160,8 @@ export default function LoginPage() {
             </Suspense>
           </div>
 
-          <div className="border-t border-amber-500/20 pt-6 text-center">
-            <p className="text-sm text-amber-200/70 font-mono">
+          <div className="border-t border-amber-500/20 pt-4 text-center">
+            <p className="text-xs text-amber-200/70 font-mono">
               Portal internal CV Batik Larasati. Akses hanya untuk karyawan.
             </p>
           </div>
@@ -150,11 +175,11 @@ export default function LoginPage() {
         >
           {/* Pendaran Cahaya Sinar Matahari Golden Hour di Belakang Motif Batik */}
           <div
-            className="absolute -right-12 top-1/3 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none"
+            className="absolute -right-12 top-1/3 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none"
             style={{
               background:
                 "radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, rgba(245, 158, 11, 0.28) 40%, rgba(217, 119, 6, 0.12) 70%, transparent 85%)",
-              filter: "blur(50px)",
+              filter: "blur(40px)",
               mixBlendMode: "screen",
             }}
           />
@@ -163,8 +188,8 @@ export default function LoginPage() {
           <Image
             src="/images/batik-golden-hour.webp"
             alt=""
-            width={640}
-            height={720}
+            width={480}
+            height={560}
             priority
             className="object-cover object-center h-full w-full mask-fade-left"
           />

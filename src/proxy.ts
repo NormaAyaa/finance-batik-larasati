@@ -14,13 +14,17 @@ export async function proxy(request: NextRequest) {
     return redirectResponse;
   };
 
-  // 1. Rute auth internal (/auth/) dan rute spesifik /api/ekstrak-nota tidak dicegat (proxy meneruskan supabaseResponse tanpa redirect ke /login agar route handler merespons status HTTP sendiri)
-  if (pathname.startsWith("/auth/") || pathname === "/api/ekstrak-nota") {
+  // 1. Rute auth internal (/auth/), rute API publik (/api/auth/), dan /api/ekstrak-nota tidak dicegat
+  if (
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/api/auth/") ||
+    pathname === "/api/ekstrak-nota"
+  ) {
     return supabaseResponse;
   }
 
-  // 2. Halaman /login
-  if (pathname === "/login") {
+  // 2. Halaman publik /login dan /register
+  if (pathname === "/login" || pathname === "/register") {
     return supabaseResponse;
   }
 

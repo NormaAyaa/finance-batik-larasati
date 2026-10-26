@@ -1,5 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Yeseva_One, Cinzel_Decorative } from "next/font/google";
+
+const yesevaOne = Yeseva_One({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const cinzelDecorative = Cinzel_Decorative({
+  weight: "700",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "CV\\BATIK LARASATI | Sogan Heritage & Financial Governance",
@@ -106,8 +119,11 @@ export default function LandingPage() {
               <span className="font-mono text-xs md:text-sm tracking-wider uppercase text-amber-400 font-semibold">
                 [ SURAKARTA · EST. 2024 ]
               </span>
-              <h1 className="text-xl md:text-2xl font-black tracking-widest text-white uppercase font-sans">
-                CV\BATIK LARASATI
+              <h1 className="text-xl md:text-2xl font-bold tracking-widest text-white uppercase font-sans">
+                CV\BATIK{" "}
+                <span className={`${yesevaOne.className} text-amber-300 tracking-normal text-2xl md:text-3xl font-normal`}>
+                  Larasati
+                </span>
               </h1>
             </div>
             <div className="hidden sm:flex items-center gap-2.5 pl-4 border-l border-amber-500/30 font-mono text-xs md:text-sm text-amber-200 font-medium">
@@ -128,7 +144,7 @@ export default function LandingPage() {
           </div>
         </header>
 
-        {/* --- HERO AREA: TIPOGRAFI KINETIK ELEGAN & TATA LETAK LEGA --- */}
+        {/* --- HERO AREA: TIPOGRAFI VINTAGE RETRO ELEGANT (MODEL ALISGA) --- */}
         <main className="my-auto py-4 relative flex flex-col justify-center">
           
           {/* Metadata Ticker Bar */}
@@ -147,26 +163,22 @@ export default function LandingPage() {
             {/* Layer Teks Stroke Transparan di Belakang (Ghost Lettering) */}
             <div
               aria-hidden="true"
-              className="absolute -top-12 sm:-top-16 md:-top-24 left-0 text-stroke-white text-6xl sm:text-8xl md:text-[10rem] lg:text-[12rem] font-black tracking-tighter opacity-10 select-none pointer-events-none uppercase"
+              className={`absolute -top-10 sm:-top-16 md:-top-20 left-0 text-stroke-white text-6xl sm:text-8xl md:text-[10rem] lg:text-[12rem] tracking-tight opacity-10 select-none pointer-events-none font-normal ${yesevaOne.className}`}
             >
-              LARASATI
+              Larasati
             </div>
 
-            {/* Headline Utama: Broken Kinetic Style (LA- RA- SATI) */}
+            {/* Headline Utama: Unified Vintage Serif Wordmark (Model Alisga) */}
             <div className="relative space-y-2">
-              <div className="flex flex-wrap items-baseline gap-x-4 sm:gap-x-6 md:gap-x-8">
-                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-white uppercase drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
-                  LA-
-                </span>
-                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-amber-400 uppercase drop-shadow-[0_4px_30px_rgba(245,158,11,0.35)]">
-                  RA-
-                </span>
-                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-white uppercase drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
-                  SATI
-                </span>
+              <div className="flex flex-wrap items-baseline gap-x-5 sm:gap-x-7 md:gap-x-9">
+                <h2
+                  className={`text-6xl sm:text-8xl md:text-9xl lg:text-[9.5rem] tracking-tight text-[#fef9ee] drop-shadow-[0_6px_35px_rgba(0,0,0,0.95)] leading-none select-none font-normal ${yesevaOne.className}`}
+                >
+                  <span className="text-amber-400">L</span>arasati
+                </h2>
                 
                 {/* Badge Disiplin Finansial */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs md:text-sm font-mono uppercase tracking-wider backdrop-blur-sm font-semibold">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs md:text-sm font-mono uppercase tracking-wider backdrop-blur-sm font-semibold self-center sm:self-auto mb-2">
                   <span className="h-2 w-2 rounded-full bg-amber-400"></span>
                   FINANCIAL DISCIPLINE
                 </div>
@@ -215,14 +227,6 @@ export default function LandingPage() {
             <span className="text-white font-semibold">© 2024–2026 CV BATIK LARASATI</span>
             <span>·</span>
             <span>SURAKARTA, JAWA TENGAH</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-amber-300 font-semibold">
-            <span>MULTI-TIER APPROVAL</span>
-            <span>·</span>
-            <span>AUTO BANK RECON</span>
-            <span>·</span>
-            <span>AI VISION EXTRACTION</span>
           </div>
         </footer>
 
