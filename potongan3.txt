@@ -1,0 +1,60 @@
+﻿    }
+  }
+
+  if (pengajuan.status === "menunggu_direktur") {
+    const activeDirektur = direkturProfiles.filter((d) => d.aktif && d.id !== actorId);
+    if (activeDirektur.length === 0) {
+      console.warn("[email] Tidak ada direktur aktif selain pelaku untuk menerima notifikasi");
+      return {
+        success: false,
+        count: 0,
+        notice: "Tidak ada direktur aktif yang menerima notifikasi",
+      };
+    }
+  }
+
+  const recipients = filterEmailRecipients({
+    statusBaru: pengajuan.status,
+    actorId,
+    pengaju: pengajuProfile,
+    direkturList: direkturProfiles,
+  });
+
+  console.log("[email] Jumlah penerima setelah filter:", recipients.length);
+
+  if (recipients.length === 0) {
+    return { success: true, count: 0 };
+  }
+
+  const appBaseUrl = normalizeAppBaseUrl(
+    process.env.APP_BASE_URL?.trim().replace(/^["']+|["']+$/g, "")
+  );
+
+  let successCount = 0;
+  let notice: string | undefined = undefined;
+  const details: EmailSendResult[] = [];
+
+  // Kirim berurutan (bukan paralel) untuk menjaga kestabilan Netlify serverless & rate-limit
+  for (const recipient of recipients) {
+    const result = await sendSingleEmail({
+      recipient,
+      pengajuan,
+      appBaseUrl,
+    });
+
+    details.push(result);
+
+    console.log("[email] Hasil kirim penerima:", {
+      penerima: recipient.email,
+      status: result.status,
+      errorType: result.errorType ?? "-",
+      messageId: result.messageId ?? "-",
+    });
+
+    if (result.status === "sent" || result.status === "logged") {
+      successCount++;
+    }
+
+    if (result.notice && !notice) {
+      notice = result.notice;
+    }

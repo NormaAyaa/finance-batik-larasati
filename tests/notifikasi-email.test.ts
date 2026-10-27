@@ -10,7 +10,9 @@ import {
   generateEmailContent,
   filterEmailRecipients,
   sendSingleEmail,
+  kirimNotifikasiPengajuan,
   parseEmailMapping,
+  maskEmail,
   type PengajuanEmailData,
   type ProfileRecipient,
 } from "@/lib/notifikasi-email";
@@ -406,6 +408,256 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
       assert.equal(mapping.get("dimas@larasati.test"), "dimaslrst@gmail.com");
       assert.equal(mapping.get("laras@larasati.test"), "larasatiyw@gmail.com");
       assert.equal(mapping.get("unknown@larasati.test"), undefined);
+    });
+  });
+
+  describe("8. Kasus Persetujuan Rina oleh Diimas & Penanganan Error", () => {
+    const dimasActorId = "user-dimas-akuntan";
+    const rinaPengaju: ProfileRecipient = {
+      id: "user-rina-staf",
+      nama_lengkap: "Rina Anggraini",
+      email: "rinalrsti@gmail.com",
+      aktif: true,
+    };
+    const pengajuanDisetujui: PengajuanEmailData = {
+      id: 47,
+      nomor: "PG-202610-0047",
+      jenis: "biaya",
+      jumlah: 500000,
+      status: "disetujui",
+      catatan_peninjau: null,
+    };
+
+    it("Diimas menyetujui pengajuan milik Rina: email ditujukan kepada Rina", async () => {
+      process.env.EMAIL_MODE = "log";
+      (process.env as Record<string, string | undefined>).NODE_ENV = "development";
+
+      // 1. Filter penerima memasukkan Rina
+      const recipients = filterEmailRecipients({
+        statusBaru: "disetujui",
+        actorId: dimasActorId,
+        pengaju: rinaPengaju,
+      });
+      assert.equal(recipients.length, 1);
+      assert.equal(recipients[0].id, rinaPengaju.id);
+      assert.equal(recipients[0].email, "rinalrsti@gmail.com");
+
+      // 2. Eksekusi pengiriman notifikasi pengajuan
+      const result = await kirimNotifikasiPengajuan({
+        pengajuan: pengajuanDisetujui,
+        actorId: dimasActorId,
+        pengajuProfile: rinaPengaju,
+      });
+
+      assert.equal(result.success, true);
+      assert.equal(result.count, 1);
+      assert.equal(result.notice, "Email terkirim ke ri***@gmail.com");
+    });
+
+    it("Pengaju tidak ditemukan: kirimNotifikasiPengajuan mengembalikan success: false dengan notice yang jelas", async () => {
+      const result = await kirimNotifikasiPengajuan({
+        pengajuan: pengajuanDisetujui,
+        actorId: dimasActorId,
+        pengajuProfile: null,
+      });
+
+      assert.equal(result.success, false);
+      assert.equal(result.count, 0);
+      assert.ok(result.notice?.includes("Profil pengaju tidak ditemukan"));
+    });
+
+    it("Pengaju nonaktif: kirimNotifikasiPengajuan mengembalikan success: false dengan notice akun nonaktif", async () => {
+      const rinaNonaktif: ProfileRecipient = {
+        ...rinaPengaju,
+        aktif: false,
+      };
+
+      const result = await kirimNotifikasiPengajuan({
+        pengajuan: pengajuanDisetujui,
+        actorId: dimasActorId,
+        pengajuProfile: rinaNonaktif,
+      });
+
+      assert.equal(result.success, false);
+      assert.equal(result.count, 0);
+      assert.ok(result.notice?.includes("nonaktif"));
+    });
+
+    it("Pengaju dan penyetuju adalah orang yang sama: email dilewati tanpa error", async () => {
+      const result = await kirimNotifikasiPengajuan({
+        pengajuan: pengajuanDisetujui,
+        actorId: rinaPengaju.id, // Rina pelaku transisi
+        pengajuProfile: rinaPengaju,
+      });
+
+      assert.equal(result.success, true);
+      assert.equal(result.count, 0);
+      assert.equal(result.notice, undefined);
+    });
+
+    it("Email mode mati: sendSingleEmail memberi tahu bahwa email dinonaktifkan", async () => {
+      process.env.EMAIL_MODE = "mati";
+
+      const res = await sendSingleEmail({
+        recipient: rinaPengaju,
+        pengajuan: pengajuanDisetujui,
+        appBaseUrl: "https://larasati.com",
+      });
+
+      assert.equal(res.status, "skipped");
+      assert.ok(res.notice?.includes("EMAIL_MODE=mati"));
+    });
+
+    it("Konfigurasi belum lengkap (CONFIG_MISSING): mengembalikan failed dengan notice konfigurasi", async () => {
+      process.env.EMAIL_MODE = "kirim";
+      delete process.env.RESEND_API_KEY;
+      delete process.env.EMAIL_PENGIRIM;
+      delete process.env.EMAIL_FROM;
+
+      const res = await sendSingleEmail({
+        recipient: rinaPengaju,
+        pengajuan: pengajuanDisetujui,
+        appBaseUrl: "https://larasati.com",
+      });
+
+      assert.equal(res.status, "failed");
+      assert.equal(res.errorType, "CONFIG_MISSING");
+      assert.ok(res.notice?.includes("Konfigurasi"));
+    });
+
+    it("Resend mengembalikan error: sendSingleEmail mencatat error provider dan notice kegagalan", async () => {
+      const origFetch = globalThis.fetch;
+      try {
+        process.env.EMAIL_MODE = "kirim";
+        process.env.RESEND_API_KEY = "re_dummy_test_key";
+        process.env.EMAIL_PENGIRIM = "notifikasi@mail.normasuci.site";
+
+        globalThis.fetch = async () =>
+          new Response("Domain not verified", {
+            status: 403,
+            statusText: "Forbidden",
+          });
+
+        const res = await sendSingleEmail({
+          recipient: rinaPengaju,
+          pengajuan: pengajuanDisetujui,
+          appBaseUrl: "https://larasati.com",
+        });
+
+        assert.equal(res.status, "failed");
+        assert.equal(res.errorType, "PROVIDER_ERROR");
+        assert.ok(res.notice?.includes("ditolak"));
+      } finally {
+        globalThis.fetch = origFetch;
+      }
+    });
+
+    it("Resend rate limit (429): errorType RATE_LIMIT dan notice penundaan tercatat", async () => {
+      const origFetch = globalThis.fetch;
+      try {
+        process.env.EMAIL_MODE = "kirim";
+        process.env.RESEND_API_KEY = "re_dummy_test_key";
+        process.env.EMAIL_PENGIRIM = "notifikasi@mail.normasuci.site";
+
+        globalThis.fetch = async () =>
+          new Response("Too Many Requests", {
+            status: 429,
+            statusText: "Too Many Requests",
+          });
+
+        const res = await sendSingleEmail({
+          recipient: rinaPengaju,
+          pengajuan: pengajuanDisetujui,
+          appBaseUrl: "https://larasati.com",
+        });
+
+        assert.equal(res.status, "failed");
+        assert.equal(res.errorType, "RATE_LIMIT");
+        assert.ok(res.notice?.includes("rate limit"));
+      } finally {
+        globalThis.fetch = origFetch;
+      }
+    });
+
+    it("Resend sukses: status HTTP 200 dan message ID Resend tercatat dengan benar", async () => {
+      const origFetch = globalThis.fetch;
+      try {
+        process.env.EMAIL_MODE = "kirim";
+        process.env.RESEND_API_KEY = "re_dummy_test_key";
+        process.env.EMAIL_PENGIRIM = "notifikasi@mail.normasuci.site";
+
+        globalThis.fetch = async () =>
+          new Response(JSON.stringify({ id: "msg_resend_success_999" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+
+        const result = await kirimNotifikasiPengajuan({
+          pengajuan: pengajuanDisetujui,
+          actorId: dimasActorId,
+          pengajuProfile: rinaPengaju,
+        });
+
+        assert.equal(result.success, true);
+        assert.equal(result.count, 1);
+        assert.equal(result.details?.[0].status, "sent");
+        assert.equal(result.details?.[0].messageId, "msg_resend_success_999");
+        assert.equal(result.details?.[0].recipientEmail, "rinalrsti@gmail.com");
+        assert.equal(result.notice, "Email terkirim ke ri***@gmail.com (ID: msg_rese)");
+      } finally {
+        globalThis.fetch = origFetch;
+      }
+    });
+
+    it("Resend sukses dengan EMAIL_UJI_PETA: ringkasan notice memakai recipientEmail yang dialihkan dan disamarkan", async () => {
+      const origFetch = globalThis.fetch;
+      try {
+        process.env.EMAIL_MODE = "kirim";
+        process.env.RESEND_API_KEY = "re_dummy_test_key";
+        process.env.EMAIL_PENGIRIM = "notifikasi@mail.normasuci.site";
+        process.env.EMAIL_UJI_PETA = "rinalrsti@gmail.com:dimas.redirect@gmail.com";
+
+        globalThis.fetch = async () =>
+          new Response(JSON.stringify({ id: "msg_peta_success_12345" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+
+        const result = await kirimNotifikasiPengajuan({
+          pengajuan: pengajuanDisetujui,
+          actorId: dimasActorId,
+          pengajuProfile: rinaPengaju,
+        });
+
+        assert.equal(result.success, true);
+        assert.equal(result.count, 1);
+        assert.equal(result.details?.[0].status, "sent");
+        assert.equal(result.details?.[0].recipientEmail, "dimas.redirect@gmail.com");
+        assert.equal(
+          result.notice,
+          "Email terkirim ke di***@gmail.com (ID: msg_peta)"
+        );
+      } finally {
+        globalThis.fetch = origFetch;
+      }
+    });
+  });
+
+  describe("9. Penyamaran Email (maskEmail)", () => {
+    it("menampilkan 2 huruf pertama nama pengguna sebelum @ lalu *** dan domainnya", () => {
+      assert.equal(maskEmail("rinalrsti@gmail.com"), "ri***@gmail.com");
+      assert.equal(maskEmail("dimas.testing@gmail.com"), "di***@gmail.com");
+      assert.equal(maskEmail("suci@perusahaan.co.id"), "su***@perusahaan.co.id");
+    });
+
+    it("menangani nama pengguna pendek (<= 2 huruf)", () => {
+      assert.equal(maskEmail("ab@domain.com"), "ab***@domain.com");
+      assert.equal(maskEmail("a@domain.com"), "a***@domain.com");
+    });
+
+    it("menangani string kosong atau format tanpa @", () => {
+      assert.equal(maskEmail(""), "");
+      assert.equal(maskEmail("plaintext"), "plaintext");
     });
   });
 });

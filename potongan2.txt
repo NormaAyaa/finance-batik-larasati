@@ -1,0 +1,120 @@
+﻿        // response might not be JSON
+      }
+
+      console.log("[email] Berhasil diterima Resend API:", {
+        status: response.status,
+        messageId: messageId || "-",
+        penerima: activeRecipient,
+      });
+
+      return {
+        status: "sent",
+        messageId,
+        recipientEmail: activeRecipient,
+      };
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        console.error("Gagal mengirim notifikasi email: TIMEOUT");
+        return {
+          status: "failed",
+          errorType: "TIMEOUT",
+          notice: "Pengiriman email melebihi batas waktu (timeout)",
+        };
+      }
+
+      console.error(
+        "Gagal mengirim notifikasi email: NETWORK_ERROR",
+        err instanceof Error ? err.message : err
+      );
+      return {
+        status: "failed",
+        errorType: "NETWORK_ERROR",
+        notice: "Gagal terhubung ke layanan email",
+      };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  console.warn("[email] dilewati: nilai EMAIL_MODE tidak dikenali:", mode);
+  return {
+    status: "skipped",
+    notice: `Nilai EMAIL_MODE tidak valid: ${mode}`,
+  };
+}
+
+/**
+ * Orkestrasi pengiriman notifikasi pengajuan:
+ * - Menentukan penerima yang valid
+ * - Mengirim secara berurutan (sequential)
+ * - Mengembalikan catatan non-blok jika ada kegagalan atau alamat contoh dilewati
+ */
+export async function kirimNotifikasiPengajuan(params: {
+  pengajuan: PengajuanEmailData;
+  actorId: string;
+  pengajuProfile?: ProfileRecipient | null;
+  direkturProfiles?: ProfileRecipient[];
+}): Promise<KirimNotifikasiResult> {
+  const { pengajuan, actorId, pengajuProfile, direkturProfiles = [] } = params;
+
+  console.log("[email] kirimNotifikasiPengajuan dipanggil:", {
+    pengajuanId: pengajuan.id,
+    nomor: pengajuan.nomor,
+    status: pengajuan.status,
+    actorId,
+    adaPengaju: !!pengajuProfile,
+    pengajuAktif: pengajuProfile?.aktif ?? false,
+    jumlahDirektur: direkturProfiles.length,
+  });
+
+  const isPengajuTarget =
+    pengajuan.status === "disetujui" ||
+    pengajuan.status === "perlu_revisi" ||
+    pengajuan.status === "ditolak" ||
+    pengajuan.status === "dibayar";
+
+  if (isPengajuTarget) {
+    if (!pengajuProfile) {
+      console.warn("[email] Profil pengaju tidak ditemukan untuk pengajuan:", pengajuan.id);
+      return {
+        success: false,
+        count: 0,
+        notice: "Profil pengaju tidak ditemukan, email notifikasi tidak dikirim",
+      };
+    }
+
+    if (!pengajuProfile.aktif) {
+      console.warn("[email] Akun pengaju nonaktif:", pengajuProfile.id);
+      return {
+        success: false,
+        count: 0,
+        notice: "Akun pengaju nonaktif, email notifikasi dilewati",
+      };
+    }
+
+    if (pengajuProfile.id === actorId) {
+      console.log("[email] Pelaku sama dengan pengaju, notifikasi dilewati");
+      return {
+        success: true,
+        count: 0,
+      };
+    }
+  }
+
+  if (pengajuan.status === "menunggu_direktur") {
+    const activeDirektur = direkturProfiles.filter((d) => d.aktif && d.id !== actorId);
+    if (activeDirektur.length === 0) {
+      console.warn("[email] Tidak ada direktur aktif selain pelaku untuk menerima notifikasi");
+      return {
+        success: false,
+        count: 0,
+        notice: "Tidak ada direktur aktif yang menerima notifikasi",
+      };
+    }
+  }
+
+  const recipients = filterEmailRecipients({
+    statusBaru: pengajuan.status,
+    actorId,
+    pengaju: pengajuProfile,
+    direkturList: direkturProfiles,

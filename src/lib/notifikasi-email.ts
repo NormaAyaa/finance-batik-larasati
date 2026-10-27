@@ -25,12 +25,15 @@ export interface EmailSendResult {
   status: EmailSendStatus;
   errorType?: "TIMEOUT" | "RATE_LIMIT" | "CONFIG_MISSING" | "DUMMY_DOMAIN" | "PROVIDER_ERROR" | "NETWORK_ERROR";
   notice?: string;
+  messageId?: string;
+  recipientEmail?: string;
 }
 
 export interface KirimNotifikasiResult {
   success: boolean;
   count: number;
   notice?: string;
+  details?: EmailSendResult[];
 }
 
 /**
@@ -76,6 +79,22 @@ export function isDummyDomain(email: string): boolean {
   if (!email) return false;
   const trimmed = email.trim().toLowerCase();
   return /\.(test|example|invalid|localhost)$/i.test(trimmed);
+}
+
+/**
+ * Menyamarkan alamat email untuk tampilan UI / log:
+ * Menampilkan 2 huruf pertama sebelum @ lalu "***", dan domainnya.
+ * Contoh: "rinalrsti@gmail.com" -> "ri***@gmail.com"
+ */
+export function maskEmail(email: string): string {
+  if (!email) return "";
+  const trimmed = email.trim();
+  const atIndex = trimmed.lastIndexOf("@");
+  if (atIndex <= 0) return trimmed;
+  const user = trimmed.slice(0, atIndex);
+  const domain = trimmed.slice(atIndex + 1);
+  const prefix = user.slice(0, 2);
+  return `${prefix}***@${domain}`;
 }
 
 /**
@@ -350,8 +369,11 @@ export async function sendSingleEmail(params: {
   });
 
   if (mode === "mati") {
-    console.log("[email] dilewati: EMAIL_MODE=mati (atau EMAIL_MODE tidak terbaca di server)");
-    return { status: "skipped" };
+    console.log("[email] dilewati: EMAIL_MODE=mati atau belum disetel di server");
+    return {
+      status: "skipped",
+      notice: "Notifikasi email dinonaktifkan (EMAIL_MODE=mati)",
+    };
   }
 
   // Cek pemetaan email per penerima (EMAIL_UJI_PETA) terlebih dahulu
@@ -367,6 +389,7 @@ export async function sendSingleEmail(params: {
   const redirectTarget = mappedTarget || globalRedirect || fallbackDummy;
 
   console.log("[email] tujuan", {
+    penerimaAsli: recipient.email,
     adaPemetaan: !!mappedTarget,
     adaRedirect: !!redirectTarget,
     penerimaDummy: isOriginalDummy,
@@ -408,7 +431,7 @@ export async function sendSingleEmail(params: {
   if (mode === "log") {
     if (process.env.NODE_ENV === "production") {
       console.log("[email] dilewati: mode log tidak berlaku di production");
-      return { status: "skipped" };
+      return { status: "skipped", notice: "Mode log tidak berlaku di production" };
     }
 
     try {
@@ -445,10 +468,10 @@ ${html}
 </html>`;
 
       await fs.writeFile(filePath, fileContent, "utf-8");
-      return { status: "logged" };
+      return { status: "logged", recipientEmail: activeRecipient };
     } catch {
       console.error("Gagal menulis berkas outbox log: FILE_WRITE_ERROR");
-      return { status: "failed", errorType: "PROVIDER_ERROR" };
+      return { status: "failed", errorType: "PROVIDER_ERROR", notice: "Gagal menulis file log outbox" };
     }
   }
 
@@ -460,11 +483,15 @@ ${html}
     );
 
     if (!apiKey || !emailFrom) {
-      console.error("[email] CONFIG_MISSING", {
+      console.error("[email] Konfigurasi email tidak lengkap di server (RESEND_API_KEY atau EMAIL_PENGIRIM kosong)", {
         adaApiKey: !!apiKey,
         adaEmailFrom: !!emailFrom,
       });
-      return { status: "skipped", errorType: "CONFIG_MISSING" };
+      return {
+        status: "failed",
+        errorType: "CONFIG_MISSING",
+        notice: "Konfigurasi pengiriman email belum lengkap di server",
+      };
     }
 
     // Idempotency-Key: terbentuk dari pengajuan id, status baru, dan penerima (maks 256 karakter)
@@ -478,7 +505,7 @@ ${html}
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     try {
-      console.log("[email] memanggil Resend...");
+      console.log("[email] Mengirim notifikasi via Resend REST API ke:", activeRecipient);
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -498,14 +525,17 @@ ${html}
 
       if (!response.ok) {
         const detail = await response.text().catch(() => "(tidak bisa membaca body)");
-        console.error("[email] Resend menolak:", response.status, detail);
+        console.error("[email] Resend menolak pengiriman:", {
+          status: response.status,
+          detail,
+        });
 
         if (response.status === 429) {
           console.error("Gagal mengirim notifikasi email: RATE_LIMIT");
           return {
             status: "failed",
             errorType: "RATE_LIMIT",
-            notice: "Notifikasi email tidak terkirim",
+            notice: "Batas pengiriman provider tercapai (rate limit)",
           };
         }
 
@@ -513,19 +543,38 @@ ${html}
         return {
           status: "failed",
           errorType: "PROVIDER_ERROR",
-          notice: "Notifikasi email tidak terkirim",
+          notice: "Pengiriman ditolak oleh provider email (periksa domain pengirim / API key)",
         };
       }
 
-      console.log("[email] terkirim via Resend, status HTTP:", response.status);
-      return { status: "sent" };
+      let messageId: string | undefined = undefined;
+      try {
+        const resJson = (await response.json()) as { id?: string } | null;
+        if (resJson?.id) {
+          messageId = resJson.id;
+        }
+      } catch {
+        // response might not be JSON
+      }
+
+      console.log("[email] Berhasil diterima Resend API:", {
+        status: response.status,
+        messageId: messageId || "-",
+        penerima: activeRecipient,
+      });
+
+      return {
+        status: "sent",
+        messageId,
+        recipientEmail: activeRecipient,
+      };
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") {
         console.error("Gagal mengirim notifikasi email: TIMEOUT");
         return {
           status: "failed",
           errorType: "TIMEOUT",
-          notice: "Notifikasi email tidak terkirim",
+          notice: "Pengiriman email melebihi batas waktu (timeout)",
         };
       }
 
@@ -536,15 +585,18 @@ ${html}
       return {
         status: "failed",
         errorType: "NETWORK_ERROR",
-        notice: "Notifikasi email tidak terkirim",
+        notice: "Gagal terhubung ke layanan email",
       };
     } finally {
       clearTimeout(timeoutId);
     }
   }
 
-  console.log("[email] dilewati: nilai EMAIL_MODE tidak dikenali:", mode);
-  return { status: "skipped" };
+  console.warn("[email] dilewati: nilai EMAIL_MODE tidak dikenali:", mode);
+  return {
+    status: "skipped",
+    notice: `Nilai EMAIL_MODE tidak valid: ${mode}`,
+  };
 }
 
 /**
@@ -561,12 +613,61 @@ export async function kirimNotifikasiPengajuan(params: {
 }): Promise<KirimNotifikasiResult> {
   const { pengajuan, actorId, pengajuProfile, direkturProfiles = [] } = params;
 
-  console.log("[email] kirimNotifikasiPengajuan dipanggil", {
+  console.log("[email] kirimNotifikasiPengajuan dipanggil:", {
     pengajuanId: pengajuan.id,
+    nomor: pengajuan.nomor,
     status: pengajuan.status,
+    actorId,
     adaPengaju: !!pengajuProfile,
+    pengajuAktif: pengajuProfile?.aktif ?? false,
     jumlahDirektur: direkturProfiles.length,
   });
+
+  const isPengajuTarget =
+    pengajuan.status === "disetujui" ||
+    pengajuan.status === "perlu_revisi" ||
+    pengajuan.status === "ditolak" ||
+    pengajuan.status === "dibayar";
+
+  if (isPengajuTarget) {
+    if (!pengajuProfile) {
+      console.warn("[email] Profil pengaju tidak ditemukan untuk pengajuan:", pengajuan.id);
+      return {
+        success: false,
+        count: 0,
+        notice: "Profil pengaju tidak ditemukan, email notifikasi tidak dikirim",
+      };
+    }
+
+    if (!pengajuProfile.aktif) {
+      console.warn("[email] Akun pengaju nonaktif:", pengajuProfile.id);
+      return {
+        success: false,
+        count: 0,
+        notice: "Akun pengaju nonaktif, email notifikasi dilewati",
+      };
+    }
+
+    if (pengajuProfile.id === actorId) {
+      console.log("[email] Pelaku sama dengan pengaju, notifikasi dilewati");
+      return {
+        success: true,
+        count: 0,
+      };
+    }
+  }
+
+  if (pengajuan.status === "menunggu_direktur") {
+    const activeDirektur = direkturProfiles.filter((d) => d.aktif && d.id !== actorId);
+    if (activeDirektur.length === 0) {
+      console.warn("[email] Tidak ada direktur aktif selain pelaku untuk menerima notifikasi");
+      return {
+        success: false,
+        count: 0,
+        notice: "Tidak ada direktur aktif yang menerima notifikasi",
+      };
+    }
+  }
 
   const recipients = filterEmailRecipients({
     statusBaru: pengajuan.status,
@@ -575,16 +676,19 @@ export async function kirimNotifikasiPengajuan(params: {
     direkturList: direkturProfiles,
   });
 
-  console.log("[email] jumlah penerima setelah filter:", recipients.length);
+  console.log("[email] Jumlah penerima setelah filter:", recipients.length);
 
   if (recipients.length === 0) {
     return { success: true, count: 0 };
   }
 
-  const appBaseUrl = normalizeAppBaseUrl(process.env.APP_BASE_URL?.trim().replace(/^["']+|["']+$/g, ""));
+  const appBaseUrl = normalizeAppBaseUrl(
+    process.env.APP_BASE_URL?.trim().replace(/^["']+|["']+$/g, "")
+  );
 
   let successCount = 0;
   let notice: string | undefined = undefined;
+  const details: EmailSendResult[] = [];
 
   // Kirim berurutan (bukan paralel) untuk menjaga kestabilan Netlify serverless & rate-limit
   for (const recipient of recipients) {
@@ -594,7 +698,14 @@ export async function kirimNotifikasiPengajuan(params: {
       appBaseUrl,
     });
 
-    console.log("[email] hasil kirim:", result.status, result.errorType ?? "");
+    details.push(result);
+
+    console.log("[email] Hasil kirim penerima:", {
+      penerima: recipient.email,
+      status: result.status,
+      errorType: result.errorType ?? "-",
+      messageId: result.messageId ?? "-",
+    });
 
     if (result.status === "sent" || result.status === "logged") {
       successCount++;
@@ -605,9 +716,31 @@ export async function kirimNotifikasiPengajuan(params: {
     }
   }
 
+  const anyFailed = details.some((d) => d.status === "failed");
+
+  let successNotice: string | undefined = undefined;
+  if (successCount > 0) {
+    const successItems = details
+      .filter((d) => d.status === "sent" || d.status === "logged")
+      .map((d) => {
+        const email = d.recipientEmail || "";
+        const masked = maskEmail(email);
+        const idPart = d.messageId ? ` (ID: ${d.messageId.slice(0, 8)})` : "";
+        return `${masked}${idPart}`;
+      });
+
+    if (successItems.length > 0) {
+      successNotice = `Email terkirim ke ${successItems.join(", ")}`;
+    }
+  }
+
   return {
-    success: true,
+    success: successCount > 0 && !anyFailed,
     count: successCount,
-    notice,
+    notice:
+      successCount > 0
+        ? successNotice
+        : notice || (recipients.length === 0 ? undefined : "Notifikasi email tidak terkirim"),
+    details,
   };
 }

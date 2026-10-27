@@ -1,0 +1,80 @@
+﻿export async function sendSingleEmail(params: {
+  recipient: ProfileRecipient;
+  pengajuan: PengajuanEmailData;
+  appBaseUrl: string;
+}): Promise<EmailSendResult> {
+  const { recipient, pengajuan, appBaseUrl } = params;
+
+  // Buang tanda kutip yang mungkin ikut tersimpan di nilai env (mis. dari .env atau Netlify)
+  const stripQuotes = (v?: string) => v?.trim().replace(/^["']+|["']+$/g, "").trim();
+
+  const mode = (stripQuotes(process.env.EMAIL_MODE) || "mati").toLowerCase();
+
+  console.log("[email] mulai", {
+    mode,
+    status: pengajuan.status,
+    pengajuanId: pengajuan.id,
+    penerimaId: recipient.id,
+  });
+
+  if (mode === "mati") {
+    console.log("[email] dilewati: EMAIL_MODE=mati atau belum disetel di server");
+    return {
+      status: "skipped",
+      notice: "Notifikasi email dinonaktifkan (EMAIL_MODE=mati)",
+    };
+  }
+
+  // Cek pemetaan email per penerima (EMAIL_UJI_PETA) terlebih dahulu
+  const emailPeta = parseEmailMapping(stripQuotes(process.env.EMAIL_UJI_PETA));
+  const mappedTarget = emailPeta.get(recipient.email.trim().toLowerCase());
+  const isOriginalDummy = isDummyDomain(recipient.email);
+
+  // Pengalihan umum:
+  // - EMAIL_TEST_REDIRECT: pengalihan paksa global (jika sengaja dipasang untuk staging)
+  // - EMAIL_UJI_PENERIMA: fallback khusus HANYA jika penerima adalah domain contoh/dummy (.test) yang belum terdaftar di EMAIL_UJI_PETA
+  const globalRedirect = stripQuotes(process.env.EMAIL_TEST_REDIRECT);
+  const fallbackDummy = isOriginalDummy ? stripQuotes(process.env.EMAIL_UJI_PENERIMA) : undefined;
+  const redirectTarget = mappedTarget || globalRedirect || fallbackDummy;
+
+  console.log("[email] tujuan", {
+    penerimaAsli: recipient.email,
+    adaPemetaan: !!mappedTarget,
+    adaRedirect: !!redirectTarget,
+    penerimaDummy: isOriginalDummy,
+  });
+
+  // Jika mode kirim dan tidak ada redirect, cek domain dummy penerima
+  if (mode === "kirim" && !redirectTarget && isOriginalDummy) {
+    console.warn("[email] dilewati: penerima domain dummy dan tidak ada redirect/pemetaan");
+    return {
+      status: "skipped",
+      errorType: "DUMMY_DOMAIN",
+      notice: "Penerima memakai alamat contoh, email tidak dikirim.",
+    };
+  }
+
+  // Tentukan subjek dan penerima aktual
+  const activeRecipient = redirectTarget || recipient.email;
+  const redirectNoticeRecipient = redirectTarget ? recipient.email : undefined;
+
+  // Jangan pernah mengirim ke domain dummy bahkan jika redirectTarget yang dipasang salah ketik
+  if (isDummyDomain(activeRecipient)) {
+    console.warn("[email] dilewati: alamat tujuan akhir berdomain dummy");
+    return {
+      status: "skipped",
+      errorType: "DUMMY_DOMAIN",
+      notice: "Penerima memakai alamat contoh, email tidak dikirim.",
+    };
+  }
+
+  const subject = generateEmailSubject(
+    pengajuan.nomor,
+    pengajuan.status,
+    redirectNoticeRecipient
+  );
+
+  const { text, html } = generateEmailContent({ pengajuan, appBaseUrl });
+
+  // Mode "log": simpan sebagai file HTML di folder .outbox/ (hanya non-production)
+  if (mode === "log") {
