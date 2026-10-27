@@ -349,7 +349,7 @@ export function DaftarPeriode({
                             setSuccessMessage(null);
                             setTutupModalPeriode(item);
                           }}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-3.5 py-1.5 text-xs font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition active:scale-95"
+                          className="btn-3d-gold px-3.5 py-1.5 text-xs font-bold gap-1.5"
                           title="Tutup periode pembukuan ini (BR-06)"
                         >
                           <span aria-hidden="true">🔒</span>
@@ -366,7 +366,7 @@ export function DaftarPeriode({
                             setSuccessMessage(null);
                             setBukaModalPeriode(item);
                           }}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-600 hover:to-purple-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-purple-950/40 transition active:scale-95"
+                          className="btn-3d-dark px-3.5 py-1.5 text-xs font-bold gap-1.5"
                           title="Buka kembali periode akuntansi terakhir yang ditutup ini (BR-06)"
                         >
                           <span aria-hidden="true">🔓</span>
@@ -476,7 +476,7 @@ export function DaftarPeriode({
                       setSuccessMessage(null);
                       setTutupModalPeriode(item);
                     }}
-                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 py-2.5 text-xs font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition active:scale-95"
+                    className="btn-3d-gold w-full py-2.5 text-xs font-bold gap-1.5"
                   >
                     <span>🔒</span>
                     <span>Tutup Periode</span>
@@ -492,7 +492,7 @@ export function DaftarPeriode({
                       setSuccessMessage(null);
                       setBukaModalPeriode(item);
                     }}
-                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-600 hover:to-purple-700 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-950/40 transition active:scale-95"
+                    className="btn-3d-dark w-full py-2.5 text-xs font-bold gap-1.5"
                   >
                     <span>🔓</span>
                     <span>Buka Kembali Periode</span>

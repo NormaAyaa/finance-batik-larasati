@@ -124,7 +124,7 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
         {canCreate && (
           <Link
             href="/pengajuan/baru"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-5 py-2.5 text-sm sm:text-base font-bold text-black shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition shrink-0"
+            className="btn-3d-gold px-5 py-2.5 text-sm sm:text-base font-bold gap-2 shrink-0"
           >
             <span aria-hidden="true" className="font-black text-base">
               +
@@ -275,7 +275,7 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
                     <td className="px-5 py-4.5 text-center whitespace-nowrap">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm sm:text-base font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_12px_rgba(245,158,11,0.25)] hover:shadow-[0_0_18px_rgba(245,158,11,0.4)]"
+                        className="btn-3d-gold px-4.5 py-2 text-sm sm:text-base font-bold gap-1.5"
                       >
                         <span>Detail</span>
                         <span aria-hidden="true">→</span>
@@ -351,7 +351,7 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
                 </div>
                 <Link
                   href={`/pengajuan/${item.id}`}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm sm:text-base font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_10px_rgba(245,158,11,0.25)]"
+                  className="btn-3d-gold px-4 py-2 text-sm font-bold gap-1.5"
                 >
                   <span>Detail</span>
                   <span aria-hidden="true">→</span>

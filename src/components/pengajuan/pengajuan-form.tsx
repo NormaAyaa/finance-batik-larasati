@@ -773,7 +773,7 @@ export function PengajuanForm({
                   type="button"
                   disabled={isExtractingAi || isSubmitting}
                   onClick={handleExtractNota}
-                  className="px-4 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black rounded-xl text-xs sm:text-sm font-bold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5 shadow-[0_0_10px_rgba(245,158,11,0.25)]"
+                  className="btn-3d-orange px-4 py-2.5 text-xs sm:text-sm font-bold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                 >
                   {isExtractingAi ? (
                     <>
@@ -797,7 +797,7 @@ export function PengajuanForm({
           <Link
             href="/pengajuan"
             tabIndex={isSubmitting ? -1 : 0}
-            className={`w-full sm:w-auto px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] text-center transition ${
+            className={`btn-3d-dark w-full sm:w-auto px-5 py-2.5 text-sm sm:text-base font-semibold text-center ${
               isSubmitting ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
             }`}
           >
@@ -809,7 +809,7 @@ export function PengajuanForm({
             type="button"
             disabled={isSubmitting}
             onClick={() => handleSubmit("draf")}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-amber-300 hover:bg-[#1e1a16] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none transition"
+            className="btn-3d-dark w-full sm:w-auto px-5 py-2.5 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
           >
             {isSubmitting && actionType === "draf"
               ? "Menyimpan Draf..."
@@ -820,7 +820,7 @@ export function PengajuanForm({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-sm sm:text-base font-bold text-black shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none transition"
+            className="btn-3d-gold w-full sm:w-auto px-6 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
           >
             {isSubmitting && actionType === "kirim"
               ? "Mengirim..."

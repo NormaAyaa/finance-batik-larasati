@@ -127,7 +127,7 @@ export function DashboardStaf({
         <div>
           <Link
             href="/pengajuan/baru"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black text-xs font-bold shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition"
+            className="btn-3d-gold px-4 py-2.5 text-xs sm:text-sm font-bold gap-2"
           >
             <span aria-hidden="true" className="text-sm font-black">+</span>
             <span>Ajukan Biaya / Reimburse</span>
@@ -216,7 +216,7 @@ export function DashboardStaf({
             <div className="mt-4">
               <Link
                 href="/pengajuan/baru"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-bold shadow-[0_0_12px_rgba(245,158,11,0.25)] transition"
+                className="btn-3d-gold px-4 py-2 text-xs font-bold gap-1.5"
               >
                 <span>+ Buat Pengajuan Pertama</span>
               </Link>
@@ -280,7 +280,7 @@ export function DashboardStaf({
                     <td className="px-4 py-3.5 whitespace-nowrap text-right">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-amber-300 bg-[#141210] hover:bg-amber-950/40 border border-amber-500/30 hover:border-amber-500/50 shadow-sm transition"
+                        className="btn-3d-dark px-3.5 py-1.5 text-xs sm:text-sm font-bold gap-1.5"
                       >
                         <span>Lihat</span>
                         <span aria-hidden="true">→</span>

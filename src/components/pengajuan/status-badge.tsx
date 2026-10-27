@@ -94,7 +94,7 @@ export function StatusBadge({ status, size = "md", className = "" }: StatusBadge
     <span
       role="status"
       aria-label={config.description}
-      className={`inline-flex items-center rounded-full border tracking-wide whitespace-nowrap transition-all ${sizeStyle.wrapper} ${config.className} ${className}`}
+      className={`badge-3d-tactile inline-flex items-center rounded-full border tracking-wide whitespace-nowrap transition-all ${sizeStyle.wrapper} ${config.className} ${className}`}
     >
       <span aria-hidden="true" className={sizeStyle.icon}>
         {config.icon}

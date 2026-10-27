@@ -191,6 +191,165 @@ input:-webkit-autofill:focus {
   background: #78350f;
 }
 
+/* ============================================================ */
+/* 3D TACTILE / NEUMORPHIC BUTTONS & PILLS (HITAM - ORANGE - EMAS) */
+/* ============================================================ */
+
+/* 1. Primary Gold / Orange 3D Tactile Button */
+.btn-3d-gold {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #fcd34d 0%, #f59e0b 38%, #d97706 75%, #b45309 100%);
+  color: #070605;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(254, 240, 138, 0.45);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -1.5px 2px rgba(146, 64, 14, 0.6),
+    0 3.5px 0 #78350f,
+    0 6px 14px rgba(0, 0, 0, 0.45);
+  transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  cursor: pointer;
+}
+
+.btn-3d-gold:hover {
+  background: linear-gradient(180deg, #fef08a 0%, #fbbf24 38%, #ea580c 75%, #c2410c 100%);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -1.5px 2px rgba(146, 64, 14, 0.5),
+    0 4.5px 0 #78350f,
+    0 8px 18px rgba(245, 158, 11, 0.35);
+}
+
+.btn-3d-gold:active {
+  transform: translateY(2.5px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 1px 0 #78350f,
+    0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* 2. Vibrant Orange 3D Tactile Button */
+.btn-3d-orange {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #fdba74 0%, #fb923c 35%, #ea580c 75%, #c2410c 100%);
+  color: #070605;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(254, 215, 170, 0.5);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -1.5px 2px rgba(154, 52, 18, 0.6),
+    0 3.5px 0 #7c2d12,
+    0 6px 14px rgba(0, 0, 0, 0.45);
+  transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  cursor: pointer;
+}
+
+.btn-3d-orange:hover {
+  background: linear-gradient(180deg, #fed7aa 0%, #f97316 35%, #ea580c 75%, #9a3412 100%);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    0 4.5px 0 #7c2d12,
+    0 8px 18px rgba(234, 88, 12, 0.4);
+}
+
+.btn-3d-orange:active {
+  transform: translateY(2.5px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 1px 0 #7c2d12,
+    0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* 3. Obsidian Dark Keycap 3D Button (Secondary & Table Action) */
+.btn-3d-dark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #241f1a 0%, #17130f 45%, #0e0c0a 100%);
+  color: #fdfaf6;
+  font-weight: 600;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  box-shadow: 
+    inset 0 1px 1px rgba(251, 191, 36, 0.22),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.7),
+    0 3.5px 0 #050403,
+    0 5px 12px rgba(0, 0, 0, 0.55);
+  transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  cursor: pointer;
+}
+
+.btn-3d-dark:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 1px rgba(251, 191, 36, 0.35),
+    0 4.5px 0 #050403,
+    0 8px 18px rgba(0, 0, 0, 0.7),
+    0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+.btn-3d-dark:active {
+  transform: translateY(2.5px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    0 1px 0 #050403,
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 4. Pill Variant of 3D Buttons */
+.btn-3d-pill-gold {
+  border-radius: 9999px !important;
+}
+
+.btn-3d-pill-dark {
+  border-radius: 9999px !important;
+}
+
+/* 5. Tactile Recessed Trough (Groove for toggles / segment controls) */
+.trough-3d {
+  background: #090806;
+  border: 1px solid rgba(245, 158, 11, 0.18);
+  border-radius: 9999px;
+  box-shadow: 
+    inset 0 2px 5px rgba(0, 0, 0, 0.8),
+    inset 0 1px 2px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(251, 191, 36, 0.08);
+}
+
+/* 6. Soft 3D Chiclet for Status Badges */
+.badge-3d-tactile {
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.45),
+    0 2px 0 rgba(0, 0, 0, 0.5),
+    0 3px 6px rgba(0, 0, 0, 0.35);
+  transition: all 0.12s ease;
+}
+
+.badge-3d-tactile:hover {
+  transform: translateY(-0.5px);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    0 2.5px 0 rgba(0, 0, 0, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
 
 
 

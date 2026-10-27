@@ -89,7 +89,7 @@ export function TabelPengajuanMenunggu({
           <div className="mt-4">
             <Link
               href="/pengajuan"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-amber-900/40 bg-[#161310] text-xs font-medium text-amber-300 hover:bg-[#1e1a16] transition"
+              className="btn-3d-dark px-3.5 py-1.5 text-xs font-semibold gap-1.5"
             >
               Buka Riwayat Pengajuan
             </Link>
@@ -149,7 +149,7 @@ export function TabelPengajuanMenunggu({
                     <td className="px-4 py-3.5 whitespace-nowrap text-right">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_10px_rgba(245,158,11,0.25)] hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+                        className="btn-3d-gold px-3.5 py-1.5 text-xs sm:text-sm font-bold gap-1.5"
                         aria-label={`Tinjau pengajuan nomor ${item.nomor} sebesar ${formatRupiah(item.jumlah)}`}
                       >
                         <span>Tinjau</span>

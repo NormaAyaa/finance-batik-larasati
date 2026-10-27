@@ -9,7 +9,7 @@ export function JurnalStatusBadge({ status, className = "" }: JurnalStatusBadgeP
   if (status === "diposting") {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border tracking-wide whitespace-nowrap bg-emerald-950/60 text-emerald-300 border-emerald-500/30 ${className}`}
+        className={`badge-3d-tactile inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border tracking-wide whitespace-nowrap bg-emerald-950/60 text-emerald-300 border-emerald-500/30 ${className}`}
         title="Jurnal sudah diposting dan mengunci saldo buku besar"
         aria-label="Status: Diposting"
       >
@@ -22,7 +22,7 @@ export function JurnalStatusBadge({ status, className = "" }: JurnalStatusBadgeP
   if (status === "dibalik") {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border tracking-wide whitespace-nowrap bg-purple-950/60 text-purple-300 border-purple-500/30 ${className}`}
+        className={`badge-3d-tactile inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border tracking-wide whitespace-nowrap bg-purple-950/60 text-purple-300 border-purple-500/30 ${className}`}
         title="Jurnal telah dibalik oleh jurnal pembalik koreksi"
         aria-label="Status: Dibalik"
       >
@@ -35,7 +35,7 @@ export function JurnalStatusBadge({ status, className = "" }: JurnalStatusBadgeP
   // Draf
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border tracking-wide whitespace-nowrap bg-amber-950/60 text-amber-300 border-amber-500/30 ${className}`}
+      className={`badge-3d-tactile inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border tracking-wide whitespace-nowrap bg-amber-950/60 text-amber-300 border-amber-500/30 ${className}`}
       title="Draf jurnal belum diposting ke buku besar"
       aria-label="Status: Draf"
     >

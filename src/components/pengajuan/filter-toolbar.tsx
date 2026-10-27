@@ -136,7 +136,7 @@ export function FilterToolbar({
           <button
             type="submit"
             disabled={isPending}
-            className="flex-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black px-4 py-3 text-sm sm:text-base font-bold transition shadow-[0_0_12px_rgba(245,158,11,0.25)] disabled:opacity-50"
+            className="btn-3d-gold flex-1 px-4 py-3 text-sm sm:text-base font-bold disabled:opacity-50"
           >
             {isPending ? "Memuat..." : "Terapkan"}
           </button>
@@ -146,7 +146,7 @@ export function FilterToolbar({
               onClick={handleReset}
               disabled={isPending}
               title="Reset seluruh filter"
-              className="rounded-xl border border-amber-900/40 bg-[#161310] text-amber-300 hover:bg-[#1e1a16] px-4 py-3 text-sm sm:text-base font-semibold transition"
+              className="btn-3d-dark px-4 py-3 text-sm sm:text-base font-semibold"
             >
               Reset
             </button>

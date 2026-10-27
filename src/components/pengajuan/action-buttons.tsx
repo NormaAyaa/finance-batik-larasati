@@ -220,7 +220,7 @@ export function ActionButtons({
                   userRole === "akuntan" ? "menunggu_direktur" : "diajukan";
                 handleTransition(targetStatus);
               }}
-              className="rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(245,158,11,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+              className="btn-3d-gold px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               {loading
                 ? "Memproses..."
@@ -235,7 +235,7 @@ export function ActionButtons({
             <Link
               href={`/pengajuan/${pengajuanId}/ubah`}
               tabIndex={loading ? -1 : 0}
-              className={`rounded-xl border border-amber-900/40 bg-[#161310] hover:bg-[#1e1a16] text-amber-300 px-5 py-2.5 text-sm sm:text-base font-semibold shadow-sm transition ${
+              className={`btn-3d-dark px-5 py-2.5 text-sm sm:text-base font-semibold ${
                 loading ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
               }`}
             >
@@ -249,7 +249,7 @@ export function ActionButtons({
               type="button"
               disabled={loading}
               onClick={() => setModalMode("batal")}
-              className="rounded-xl border border-rose-900/40 bg-rose-950/30 hover:bg-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+              className="btn-3d-dark border-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               ⊘ Batalkan Pengajuan
             </button>
@@ -263,7 +263,7 @@ export function ActionButtons({
                   type="button"
                   disabled={loading}
                   onClick={() => handleTransition("disetujui")}
-                  className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(16,185,129,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                  className="btn-3d-gold px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
                 >
                   {loading ? "Memproses..." : "✓ Setujui Pengajuan (≤ Rp 1 Jt)"}
                 </button>
@@ -272,7 +272,7 @@ export function ActionButtons({
                   type="button"
                   disabled={loading}
                   onClick={() => handleTransition("menunggu_direktur")}
-                  className="rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(168,85,247,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                  className="btn-3d-gold px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
                 >
                   {loading ? "Memproses..." : "⏳ Teruskan ke Direktur (> Rp 1 Jt)"}
                 </button>
@@ -282,7 +282,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("revisi")}
-                className="rounded-xl border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/40 text-orange-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="btn-3d-orange px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ↩ Minta Revisi
               </button>
@@ -291,7 +291,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("tolak")}
-                className="rounded-xl border border-rose-500/40 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="btn-3d-dark border-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ✕ Tolak Pengajuan
               </button>
@@ -305,7 +305,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => handleTransition("disetujui")}
-                className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(16,185,129,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="btn-3d-gold px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 {loading ? "Memproses..." : "✓ Setujui Pengajuan"}
               </button>
@@ -314,7 +314,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("revisi")}
-                className="rounded-xl border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/40 text-orange-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="btn-3d-orange px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ↩ Minta Revisi
               </button>
@@ -323,7 +323,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("tolak")}
-                className="rounded-xl border border-rose-500/40 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="btn-3d-dark border-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ✕ Tolak Pengajuan
               </button>
@@ -336,7 +336,7 @@ export function ActionButtons({
               type="button"
               disabled={loading}
               onClick={() => setModalMode("bayar")}
-              className="rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-300 hover:to-teal-400 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(20,184,166,0.3)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+              className="btn-3d-gold px-6 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               💳 Bayar Pengajuan Sekarang
             </button>

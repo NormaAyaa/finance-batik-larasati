@@ -215,7 +215,7 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
             <button
               type="button"
               onClick={handleOpenTambah}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-[#070605] transition shadow-lg shadow-amber-950/40 shrink-0 active:scale-95"
+              className="btn-3d-gold px-4 py-2.5 text-xs sm:text-sm font-bold gap-2 shrink-0"
             >
               <span aria-hidden="true" className="text-base font-extrabold">
                 +
