@@ -48,8 +48,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Validasi Peran Pengguna (Staf dan Akuntan SAJA - Direktur dilarang)
-    if (!ALLOWED_ROLES.includes(peran as PeranPengguna)) {
+    // 4. Validasi Peran Pengguna (Direktur hanya untuk Ibu Laras Prameswari, selain itu Staf & Akuntan)
+    const cleanEmail = user.email.toLowerCase().trim();
+    const isLaras =
+      cleanEmail === "larasatiyw@gmail.com" ||
+      cleanEmail === "laras@larasati.test" ||
+      cleanEmail.includes("laras");
+
+    const allowedRoles: PeranPengguna[] = isLaras
+      ? ["staf", "akuntan", "direktur"]
+      : ["staf", "akuntan"];
+
+    if (!allowedRoles.includes(peran as PeranPengguna)) {
+      if (peran === "direktur") {
+        return NextResponse.json(
+          { error: "Peran Direktur hanya diperuntukkan bagi Ibu Laras Prameswari." },
+          { status: 403 }
+        );
+      }
       return NextResponse.json(
         { error: "Peran pengguna tidak valid. Pilih Staf atau Akuntan." },
         { status: 400 }
@@ -57,7 +73,6 @@ export async function POST(request: Request) {
     }
 
     const admin = createAdminClient();
-    const cleanEmail = user.email.toLowerCase().trim();
 
     // 5. Cek apakah profil untuk user ID ini sudah ada
     const { data: existingProfile } = await admin

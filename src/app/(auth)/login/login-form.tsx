@@ -25,6 +25,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const rawNext = searchParams.get("next");
   const errorParam = searchParams.get("error");
+  const reasonParam = searchParams.get("reason");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +36,9 @@ export function LoginForm() {
     errorParam === "inactive"
       ? "Akun Anda dinonaktifkan. Sesi telah diakhiri. Silakan hubungi Direktur."
       : errorParam === "oauth_error"
-      ? "Gagal melakukan autentikasi dengan Google. Silakan coba kembali."
+      ? reasonParam
+        ? `Gagal autentikasi Google: ${reasonParam}. Anda dapat masuk menggunakan Email & Kata Sandi (Latihan#2026).`
+        : "Gagal melakukan autentikasi dengan Google. Silakan coba kembali atau masuk langsung menggunakan Email & Kata Sandi (Latihan#2026)."
       : null
   );
 

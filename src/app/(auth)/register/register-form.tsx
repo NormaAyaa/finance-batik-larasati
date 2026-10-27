@@ -216,6 +216,13 @@ export function RegisterForm() {
               onChange={(e) => setPeran(e.target.value as PeranPengguna)}
               className="w-full rounded-xl bg-black/80 border border-amber-500/30 px-3.5 py-2 text-sm text-amber-100 focus:outline-none focus:border-amber-400 focus-visible:ring-2 focus-visible:ring-amber-400/50 transition shadow-inner"
             >
+              {(email.toLowerCase().includes("laras") ||
+                email.toLowerCase() === "larasatiyw@gmail.com" ||
+                peran === "direktur") && (
+                <option value="direktur" className="bg-[#0b0f14] text-purple-200">
+                  Direktur (Khusus Ibu Laras Prameswari)
+                </option>
+              )}
               <option value="staf" className="bg-[#0b0f14] text-amber-100">
                 Staf (Pengajuan &amp; Operasional)
               </option>

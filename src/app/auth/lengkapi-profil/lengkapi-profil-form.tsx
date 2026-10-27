@@ -21,9 +21,20 @@ export function LengkapiProfilForm({
 }: LengkapiProfilFormProps) {
   const router = useRouter();
 
-  const [namaLengkap, setNamaLengkap] = useState(initialName);
-  const [jabatan, setJabatan] = useState("");
-  const [peran, setPeran] = useState<PeranPengguna>("staf");
+  const isLaras =
+    initialEmail.toLowerCase() === "larasatiyw@gmail.com" ||
+    initialEmail.toLowerCase() === "laras@larasati.test" ||
+    initialEmail.toLowerCase().includes("laras");
+
+  const [namaLengkap, setNamaLengkap] = useState(
+    initialName || (isLaras ? "Laras Prameswari" : "")
+  );
+  const [jabatan, setJabatan] = useState(
+    isLaras ? "Direktur dan Pemilik" : ""
+  );
+  const [peran, setPeran] = useState<PeranPengguna>(
+    isLaras ? "direktur" : "staf"
+  );
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -176,32 +187,34 @@ export function LengkapiProfilForm({
         </p>
       </div>
 
-      {/* Peran Sistem (Hanya Staf & Akuntan) */}
+      {/* Peran Sistem */}
       <div>
         <label className="block text-xs font-semibold uppercase tracking-wider text-amber-200/90 mb-2">
           Pilih Peran Akses Sistem
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Opsi Staf */}
-          <button
-            type="button"
-            onClick={() => setPeran("staf")}
-            className={`p-3 rounded-xl border text-left transition-all ${
-              peran === "staf"
-                ? "bg-amber-500/20 border-amber-400 ring-2 ring-amber-400/40 shadow-lg"
-                : "bg-black/40 border-amber-500/20 hover:border-amber-500/50 hover:bg-white/5"
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-bold text-amber-100">Staf</span>
-              {peran === "staf" && (
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
-              )}
-            </div>
-            <p className="text-[11px] text-amber-200/70 leading-relaxed">
-              Pengajuan reimburse, nota bukti pengeluaran, dan operasional lapangan.
-            </p>
-          </button>
+        <div className={`grid grid-cols-1 ${isLaras ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-3`}>
+          {/* Opsi Direktur (Khusus Akun Ibu Laras Prameswari) */}
+          {isLaras && (
+            <button
+              type="button"
+              onClick={() => setPeran("direktur")}
+              className={`p-3 rounded-xl border text-left transition-all ${
+                peran === "direktur"
+                  ? "bg-purple-950/50 border-purple-400 ring-2 ring-purple-400/50 shadow-lg"
+                  : "bg-black/40 border-purple-500/20 hover:border-purple-500/50 hover:bg-white/5"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-bold text-purple-200">Direktur</span>
+                {peran === "direktur" && (
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(192,132,252,0.8)]" />
+                )}
+              </div>
+              <p className="text-[11px] text-purple-200/70 leading-relaxed">
+                Persetujuan pengeluaran besar, laporan eksekutif (Laba Rugi &amp; Neraca), dan tutup buku.
+              </p>
+            </button>
+          )}
 
           {/* Opsi Akuntan */}
           <button
@@ -223,9 +236,32 @@ export function LengkapiProfilForm({
               Verifikasi pengajuan, pencatatan jurnal, buku besar, dan laporan keuangan.
             </p>
           </button>
+
+          {/* Opsi Staf */}
+          <button
+            type="button"
+            onClick={() => setPeran("staf")}
+            className={`p-3 rounded-xl border text-left transition-all ${
+              peran === "staf"
+                ? "bg-amber-500/20 border-amber-400 ring-2 ring-amber-400/40 shadow-lg"
+                : "bg-black/40 border-amber-500/20 hover:border-amber-500/50 hover:bg-white/5"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm font-bold text-amber-100">Staf</span>
+              {peran === "staf" && (
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+              )}
+            </div>
+            <p className="text-[11px] text-amber-200/70 leading-relaxed">
+              Pengajuan reimburse, nota bukti pengeluaran, dan operasional lapangan.
+            </p>
+          </button>
         </div>
         <p className="text-[10px] text-amber-300/60 mt-1.5 font-mono">
-          * Hak akses Direktur dikelola langsung secara internal oleh manajemen.
+          {isLaras
+            ? "* Hak akses Direktur aktif khusus untuk akun Ibu Laras Prameswari."
+            : "* Hak akses Direktur dikelola langsung secara internal oleh manajemen."}
         </p>
       </div>
 

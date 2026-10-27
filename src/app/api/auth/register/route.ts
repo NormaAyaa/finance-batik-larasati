@@ -39,20 +39,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Validasi Peran Pengguna
-    if (!VALID_ROLES.includes(peran as PeranPengguna)) {
-      return NextResponse.json(
-        { error: "Peran pengguna tidak valid. Pilih Staf atau Akuntan." },
-        { status: 400 }
-      );
-    }
-
-    // 4. Validasi Format Email
+    // 3. Validasi Format Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const cleanEmail = email.trim().toLowerCase();
     if (!emailRegex.test(cleanEmail)) {
       return NextResponse.json(
         { error: "Format email tidak valid." },
+        { status: 400 }
+      );
+    }
+
+    // 4. Validasi Peran Pengguna (Direktur hanya untuk Ibu Laras Prameswari)
+    const isLaras =
+      cleanEmail === "larasatiyw@gmail.com" ||
+      cleanEmail === "laras@larasati.test" ||
+      cleanEmail.includes("laras");
+
+    const allowedRoles: PeranPengguna[] = isLaras
+      ? ["staf", "akuntan", "direktur"]
+      : ["staf", "akuntan"];
+
+    if (!allowedRoles.includes(peran as PeranPengguna)) {
+      if (peran === "direktur") {
+        return NextResponse.json(
+          { error: "Peran Direktur hanya diperuntukkan bagi Ibu Laras Prameswari." },
+          { status: 403 }
+        );
+      }
+      return NextResponse.json(
+        { error: "Peran pengguna tidak valid. Pilih Staf atau Akuntan." },
         { status: 400 }
       );
     }
