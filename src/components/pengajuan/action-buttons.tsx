@@ -364,7 +364,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={resetModals}
-                className="px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] transition"
+                className="btn-3d-dark px-5 py-2.5 text-sm sm:text-base font-semibold"
               >
                 Kembali
               </button>
@@ -372,7 +372,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => handleTransition("dibatalkan")}
-                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm sm:text-base font-bold transition disabled:opacity-50 shadow-[0_0_10px_rgba(225,29,72,0.3)]"
+                className="btn-3d-dark border-rose-500/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50"
               >
                 {loading ? "Membatalkan..." : "Ya, Batalkan"}
               </button>
@@ -445,7 +445,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={resetModals}
-                className="px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] transition"
+                className="btn-3d-dark px-5 py-2.5 text-sm sm:text-base font-semibold"
               >
                 Batal
               </button>
@@ -457,10 +457,10 @@ export function ActionButtons({
                     modalMode === "revisi" ? "perlu_revisi" : "ditolak";
                   handleTransition(targetStatus, catatan.trim());
                 }}
-                className={`px-5 py-2.5 rounded-xl text-sm sm:text-base font-bold transition disabled:opacity-50 ${
+                className={`px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 ${
                   modalMode === "revisi"
-                    ? "bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black shadow-[0_0_10px_rgba(245,158,11,0.25)]"
-                    : "bg-rose-600 hover:bg-rose-500 text-white shadow-[0_0_10px_rgba(225,29,72,0.3)]"
+                    ? "btn-3d-orange"
+                    : "btn-3d-dark border-rose-500/40 text-rose-300"
                 }`}
               >
                 {loading
@@ -585,7 +585,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={resetModals}
-                className="px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="btn-3d-dark px-5 py-2.5 text-sm sm:text-base font-semibold disabled:opacity-50"
               >
                 Batal
               </button>
@@ -593,7 +593,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading || !selectedAkunKasId || !tanggalBayar}
                 onClick={handleBayar}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-300 hover:to-teal-400 text-black text-sm sm:text-base font-bold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none shadow-[0_0_12px_rgba(20,184,166,0.3)]"
+                className="btn-3d-gold px-5 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50"
               >
                 {loading ? "Memproses Pembayaran..." : "Konfirmasi & Bayar"}
               </button>

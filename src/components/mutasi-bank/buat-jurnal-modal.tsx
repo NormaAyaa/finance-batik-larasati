@@ -280,14 +280,14 @@ export function BuatJurnalModal({
               type="button"
               onClick={onClose}
               disabled={isPending}
-              className="px-4 py-2.5 text-xs font-bold text-[#d6cfc7] bg-[#141210] border border-amber-900/30 rounded-xl hover:bg-amber-950/40 hover:text-[#fdfaf6] transition disabled:opacity-50"
+              className="btn-3d-dark px-4 py-2.5 text-xs font-bold disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isPending || !selectedLawanId}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-[#070605] bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 rounded-xl shadow-lg shadow-amber-950/40 transition disabled:opacity-50"
+              className="btn-3d-gold inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold disabled:opacity-50"
             >
               {isPending ? (
                 <>

@@ -58,11 +58,11 @@ export function AkunPeriodeView({
       </div>
 
       {/* Navigasi Tab */}
-      <div className="border-b border-amber-900/25">
+      <div className="flex items-center">
         <nav
           role="tablist"
           aria-label="Pilihan tampilan akun dan periode"
-          className="-mb-px flex space-x-6 sm:space-x-8"
+          className="trough-3d inline-flex p-1.5 gap-2"
         >
           <button
             type="button"
@@ -71,10 +71,10 @@ export function AkunPeriodeView({
             aria-selected={activeTab === "akun"}
             aria-controls="panel-akun"
             onClick={() => setActiveTab("akun")}
-            className={`flex items-center gap-2.5 border-b-2 py-3.5 text-xs sm:text-sm font-bold transition ${
+            className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
               activeTab === "akun"
-                ? "border-amber-400 text-amber-300"
-                : "border-transparent text-[#a89f91] hover:border-amber-500/30 hover:text-[#fdfaf6]"
+                ? "btn-3d-gold text-[#070605]"
+                : "text-stone-400 hover:text-stone-200 hover:bg-[#1a1714]"
             }`}
           >
             <span aria-hidden="true" className="text-base">
@@ -84,7 +84,7 @@ export function AkunPeriodeView({
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                 activeTab === "akun"
-                  ? "bg-amber-950/60 text-amber-300 border border-amber-500/30"
+                  ? "bg-amber-950/20 text-[#070605] border border-amber-900/30"
                   : "bg-[#141210] text-[#a89f91] border border-amber-900/30"
               }`}
             >
@@ -99,10 +99,10 @@ export function AkunPeriodeView({
             aria-selected={activeTab === "periode"}
             aria-controls="panel-periode"
             onClick={() => setActiveTab("periode")}
-            className={`flex items-center gap-2.5 border-b-2 py-3.5 text-xs sm:text-sm font-bold transition ${
+            className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
               activeTab === "periode"
-                ? "border-amber-400 text-amber-300"
-                : "border-transparent text-[#a89f91] hover:border-amber-500/30 hover:text-[#fdfaf6]"
+                ? "btn-3d-gold text-[#070605]"
+                : "text-stone-400 hover:text-stone-200 hover:bg-[#1a1714]"
             }`}
           >
             <span aria-hidden="true" className="text-base">
@@ -112,7 +112,7 @@ export function AkunPeriodeView({
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                 activeTab === "periode"
-                  ? "bg-amber-950/60 text-amber-300 border border-amber-500/30"
+                  ? "bg-amber-950/20 text-[#070605] border border-amber-900/30"
                   : "bg-[#141210] text-[#a89f91] border border-amber-900/30"
               }`}
             >

@@ -105,15 +105,15 @@ function UbahPenggunaFormContent({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-      <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="sogan-card bg-[#0e0c0a] border border-amber-500/25 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fdfaf6]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-amber-900/20 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold text-slate-800">
+            <h3 className="text-base font-bold text-[#fdfaf6]">
               Ubah Peran & Status Pengguna
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#a89f91] mt-0.5">
               Kelola hak akses dan status operasional akun pengguna
             </p>
           </div>
@@ -121,7 +121,7 @@ function UbahPenggunaFormContent({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
+            className="p-1.5 text-[#a89f91] hover:text-[#fdfaf6] rounded-xl hover:bg-amber-950/40 transition disabled:opacity-50"
             aria-label="Tutup modal"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -133,24 +133,24 @@ function UbahPenggunaFormContent({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Info Pengguna */}
-          <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200/80 space-y-1">
+          <div className="p-3.5 bg-[#141210] rounded-xl border border-amber-900/30 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nama Pengguna</span>
-              <span className="text-xs text-slate-400 font-mono">{user.email}</span>
+              <span className="text-xs font-bold text-[#8a7e72] uppercase tracking-wider">Nama Pengguna</span>
+              <span className="text-xs text-amber-400 font-mono">{user.email}</span>
             </div>
-            <p className="text-sm font-semibold text-slate-800">{user.nama_lengkap}</p>
-            <p className="text-xs text-slate-500">{user.jabatan}</p>
+            <p className="text-sm font-bold text-[#fdfaf6]">{user.nama_lengkap}</p>
+            <p className="text-xs text-[#a89f91]">{user.jabatan}</p>
           </div>
 
           {/* BR-12 Warning if self */}
           {isSelf && (
-            <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
-              <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/40 text-amber-200 flex items-start gap-3">
+              <svg className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div className="text-xs">
-                <p className="font-semibold text-amber-800">Pembatasan Integritas BR-12</p>
-                <p className="mt-0.5 text-amber-700">
+                <p className="font-bold text-amber-300">Pembatasan Integritas BR-12</p>
+                <p className="mt-0.5 text-amber-200/80">
                   Direktur tidak boleh mengubah peran atau status akunnya sendiri (BR-12). Hubungi administrator basis data jika diperlukan rotasi peran.
                 </p>
               </div>
@@ -159,8 +159,8 @@ function UbahPenggunaFormContent({
 
           {/* Error Message */}
           {errorMessage && (
-            <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
-              <svg className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-2">
+              <svg className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{errorMessage}</span>
@@ -169,7 +169,7 @@ function UbahPenggunaFormContent({
 
           {/* Pilihan Peran */}
           <div className="space-y-1.5">
-            <label htmlFor="pilih-peran" className="block text-xs font-semibold text-slate-700">
+            <label htmlFor="pilih-peran" className="block text-xs font-bold text-[#d6cfc7]">
               Peran Pengguna (Role)
             </label>
             <select
@@ -177,28 +177,28 @@ function UbahPenggunaFormContent({
               value={peran}
               onChange={(e) => setPeran(e.target.value as PeranPengguna)}
               disabled={loading || isSelf}
-              className="w-full text-sm rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 shadow-xs focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400"
+              className="w-full text-xs sm:text-sm rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2.5 text-[#fdfaf6] focus:border-amber-500/80 focus:outline-none focus:ring-1 focus:ring-amber-500/50 disabled:opacity-50"
             >
-              <option value="staf">Staf (Pengajuan belanja kas kecil & dashboard)</option>
-              <option value="akuntan">Akuntan (Posting jurnal, tutup buku, verifikasi/bayar pengajuan)</option>
-              <option value="direktur">Direktur (Persetujuan pengajuan, buka buku, manajemen pengguna & audit)</option>
+              <option value="staf" className="bg-[#141210] text-[#fdfaf6]">Staf (Pengajuan belanja kas kecil & dashboard)</option>
+              <option value="akuntan" className="bg-[#141210] text-[#fdfaf6]">Akuntan (Posting jurnal, tutup buku, verifikasi/bayar pengajuan)</option>
+              <option value="direktur" className="bg-[#141210] text-[#fdfaf6]">Direktur (Persetujuan pengajuan, buka buku, manajemen pengguna & audit)</option>
             </select>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#a89f91] mt-1">
               {PERAN_STYLES[peran]?.desc}
             </p>
           </div>
 
           {/* Pilihan Status Aktif */}
           <div className="space-y-1.5">
-            <span className="block text-xs font-semibold text-slate-700">
+            <span className="block text-xs font-bold text-[#d6cfc7]">
               Status Akun
             </span>
             <div className="grid grid-cols-2 gap-3">
               <label
-                className={`flex items-center gap-2.5 p-3 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
+                className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs font-semibold cursor-pointer transition ${
                   aktif
-                    ? "border-emerald-500 bg-emerald-50/50 text-emerald-900"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    ? "border-emerald-500/50 bg-emerald-950/40 text-emerald-200"
+                    : "border-amber-900/30 bg-[#141210] text-[#a89f91] hover:bg-[#1c1815]"
                 } ${isSelf ? "cursor-not-allowed opacity-60" : ""}`}
               >
                 <input
@@ -207,10 +207,10 @@ function UbahPenggunaFormContent({
                   checked={aktif === true}
                   onChange={() => setAktif(true)}
                   disabled={loading || isSelf}
-                  className="text-emerald-600 focus:ring-emerald-500"
+                  className="text-emerald-500 focus:ring-emerald-400 bg-[#0e0c0a] border-amber-900/50"
                 />
                 <div className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>Aktif</span>
@@ -218,10 +218,10 @@ function UbahPenggunaFormContent({
               </label>
 
               <label
-                className={`flex items-center gap-2.5 p-3 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
+                className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs font-semibold cursor-pointer transition ${
                   !aktif
-                    ? "border-rose-500 bg-rose-50/50 text-rose-900"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    ? "border-rose-500/50 bg-rose-950/40 text-rose-200"
+                    : "border-amber-900/30 bg-[#141210] text-[#a89f91] hover:bg-[#1c1815]"
                 } ${isSelf ? "cursor-not-allowed opacity-60" : ""}`}
               >
                 <input
@@ -230,10 +230,10 @@ function UbahPenggunaFormContent({
                   checked={aktif === false}
                   onChange={() => setAktif(false)}
                   disabled={loading || isSelf}
-                  className="text-rose-600 focus:ring-rose-500"
+                  className="text-rose-500 focus:ring-rose-400 bg-[#0e0c0a] border-amber-900/50"
                 />
                 <div className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                   <span>Nonaktif</span>
@@ -241,7 +241,7 @@ function UbahPenggunaFormContent({
               </label>
             </div>
             {!aktif && (
-              <p className="text-xs text-rose-600 mt-1">
+              <p className="text-xs text-rose-400 mt-1">
                 ⚠️ Pengguna nonaktif akan langsung ditolak saat mencoba login atau membuka menu sistem.
               </p>
             )}
@@ -249,9 +249,9 @@ function UbahPenggunaFormContent({
 
           {/* Kotak Dampak Perubahan */}
           {hasChanges && !isSelf && (
-            <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-xs space-y-1">
-              <p className="font-semibold text-blue-900">Ringkasan Dampak Perubahan:</p>
-              <ul className="list-disc list-inside text-blue-800 space-y-0.5">
+            <div className="p-3.5 bg-amber-950/30 border border-amber-500/30 rounded-xl text-xs space-y-1">
+              <p className="font-bold text-amber-300">Ringkasan Dampak Perubahan:</p>
+              <ul className="list-disc list-inside text-amber-200/90 space-y-0.5">
                 {isRoleChanged && (
                   <li>
                     Peran diubah dari <strong className="capitalize">{user.peran}</strong> menjadi{" "}
@@ -272,23 +272,23 @@ function UbahPenggunaFormContent({
           )}
 
           {/* Action Buttons */}
-          <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+          <div className="pt-3 flex items-center justify-end gap-3 border-t border-amber-900/20">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+              className="btn-3d-dark px-4 py-2 text-xs font-semibold disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={loading || isSelf || !hasChanges}
-              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+              className="btn-3d-gold px-5 py-2 text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
             >
               {loading ? (
                 <>
-                  <svg className="w-3.5 h-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 animate-spin text-[#070605]" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>

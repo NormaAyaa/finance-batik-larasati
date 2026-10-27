@@ -251,14 +251,14 @@ export function PembalikModal({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-xl border border-amber-900/40 bg-[#141210] px-5 py-2.5 font-bold text-sm sm:text-base text-[#d6cfc7] hover:bg-[#1c1815] hover:text-[#fdfaf6] transition disabled:opacity-50"
+              className="btn-3d-dark px-5 py-2.5 font-bold text-sm sm:text-base disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting || isPeriodClosed || isPeriodMissing}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-2.5 font-bold text-sm sm:text-base text-[#070605] shadow-lg shadow-amber-950/50 hover:from-amber-500 hover:to-amber-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-3d-gold inline-flex items-center gap-2 px-6 py-2.5 font-bold text-sm sm:text-base disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

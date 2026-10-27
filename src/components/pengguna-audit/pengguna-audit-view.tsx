@@ -41,55 +41,55 @@ export function PenggunaAuditView({
     <div className="space-y-6">
       {/* Kartu Ringkasan Statistik */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
+        <div className="sogan-card bg-[#0e0c0a] border border-amber-900/30 p-4 rounded-2xl shadow-lg">
+          <span className="text-[11px] font-bold text-[#8a7e72] uppercase tracking-wider block">
             Total Pengguna
           </span>
           <div className="flex items-baseline gap-1.5 mt-1">
-            <span className="text-xl font-bold text-slate-900">{totalUsers}</span>
-            <span className="text-xs text-slate-400">({aktifCount} aktif)</span>
+            <span className="text-xl sm:text-2xl font-bold text-[#fdfaf6]">{totalUsers}</span>
+            <span className="text-xs text-amber-400 font-semibold">({aktifCount} aktif)</span>
           </div>
         </div>
 
-        <div className="p-3.5 bg-white rounded-xl border border-purple-100 bg-purple-50/20 shadow-xs">
-          <span className="text-[11px] font-medium text-purple-700 uppercase tracking-wider block">
+        <div className="sogan-card bg-[#0e0c0a] border border-purple-900/30 p-4 rounded-2xl shadow-lg">
+          <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider block">
             Direktur
           </span>
-          <span className="text-xl font-bold text-purple-900 mt-1 block">{direkturCount}</span>
+          <span className="text-xl sm:text-2xl font-bold text-purple-300 mt-1 block">{direkturCount}</span>
         </div>
 
-        <div className="p-3.5 bg-white rounded-xl border border-blue-100 bg-blue-50/20 shadow-xs">
-          <span className="text-[11px] font-medium text-blue-700 uppercase tracking-wider block">
+        <div className="sogan-card bg-[#0e0c0a] border border-amber-500/30 p-4 rounded-2xl shadow-lg">
+          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">
             Akuntan
           </span>
-          <span className="text-xl font-bold text-blue-900 mt-1 block">{akuntanCount}</span>
+          <span className="text-xl sm:text-2xl font-bold text-amber-300 mt-1 block">{akuntanCount}</span>
         </div>
 
-        <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
+        <div className="sogan-card bg-[#0e0c0a] border border-orange-900/30 p-4 rounded-2xl shadow-lg">
+          <span className="text-[11px] font-bold text-orange-400 uppercase tracking-wider block">
             Staf
           </span>
-          <span className="text-xl font-bold text-slate-800 mt-1 block">{stafCount}</span>
+          <span className="text-xl sm:text-2xl font-bold text-orange-300 mt-1 block">{stafCount}</span>
         </div>
 
-        <div className="p-3.5 bg-white rounded-xl border border-emerald-100 bg-emerald-50/20 shadow-xs col-span-2 sm:col-span-1">
-          <span className="text-[11px] font-medium text-emerald-800 uppercase tracking-wider block">
+        <div className="sogan-card bg-[#0e0c0a] border border-emerald-900/30 p-4 rounded-2xl shadow-lg col-span-2 sm:col-span-1">
+          <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
             Total Log Audit
           </span>
-          <span className="text-xl font-bold text-emerald-900 mt-1 block">{initialAuditTotal}</span>
+          <span className="text-xl sm:text-2xl font-bold text-emerald-300 mt-1 block">{initialAuditTotal}</span>
         </div>
       </div>
 
-      {/* Tab Switcher */}
-      <div className="border-b border-slate-200 flex items-center justify-between">
-        <div className="flex gap-2 -mb-px">
+      {/* Tab Switcher: Recessed 3D Trough dengan 3D Pill Buttons */}
+      <div className="flex items-center justify-start">
+        <div className="trough-3d p-1.5 inline-flex items-center gap-2">
           <button
             type="button"
             onClick={() => setActiveTab("pengguna")}
-            className={`inline-flex items-center gap-2 py-3 px-4 text-xs font-semibold border-b-2 transition-colors ${
+            className={`inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${
               activeTab === "pengguna"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                ? "btn-3d-gold"
+                : "text-[#a89f91] hover:text-[#fdfaf6]"
             }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,8 +97,8 @@ export function PenggunaAuditView({
             </svg>
             <span>Daftar Pengguna & Peran</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                activeTab === "pengguna" ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-600"
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                activeTab === "pengguna" ? "bg-black/20 text-[#070605]" : "bg-[#141210] text-amber-300 border border-amber-900/40"
               }`}
             >
               {totalUsers}
@@ -108,10 +108,10 @@ export function PenggunaAuditView({
           <button
             type="button"
             onClick={() => setActiveTab("audit")}
-            className={`inline-flex items-center gap-2 py-3 px-4 text-xs font-semibold border-b-2 transition-colors ${
+            className={`inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${
               activeTab === "audit"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                ? "btn-3d-gold"
+                : "text-[#a89f91] hover:text-[#fdfaf6]"
             }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,8 +119,8 @@ export function PenggunaAuditView({
             </svg>
             <span>Audit Log Sistem</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                activeTab === "audit" ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-600"
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                activeTab === "audit" ? "bg-black/20 text-[#070605]" : "bg-[#141210] text-amber-300 border border-amber-900/40"
               }`}
             >
               {initialAuditTotal}

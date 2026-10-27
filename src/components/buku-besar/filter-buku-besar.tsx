@@ -218,7 +218,7 @@ export function FilterBukuBesar({
               type="button"
               onClick={() => handlePreset("bulan_ini")}
               disabled={isPending}
-              className="rounded-xl border border-amber-900/30 bg-[#141210] hover:bg-[#1c1815] hover:border-amber-500/40 px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#d6cfc7] transition active:scale-95 disabled:opacity-40"
+              className="btn-3d-dark px-3.5 py-1.5 text-xs sm:text-sm font-semibold disabled:opacity-40"
             >
               Bulan Berjalan
             </button>
@@ -226,7 +226,7 @@ export function FilterBukuBesar({
               type="button"
               onClick={() => handlePreset("bulan_lalu")}
               disabled={isPending}
-              className="rounded-xl border border-amber-900/30 bg-[#141210] hover:bg-[#1c1815] hover:border-amber-500/40 px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#d6cfc7] transition active:scale-95 disabled:opacity-40"
+              className="btn-3d-dark px-3.5 py-1.5 text-xs sm:text-sm font-semibold disabled:opacity-40"
             >
               Bulan Lalu
             </button>
@@ -234,7 +234,7 @@ export function FilterBukuBesar({
               type="button"
               onClick={() => handlePreset("tahun_ini")}
               disabled={isPending}
-              className="rounded-xl border border-amber-900/30 bg-[#141210] hover:bg-[#1c1815] hover:border-amber-500/40 px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#d6cfc7] transition active:scale-95 disabled:opacity-40"
+              className="btn-3d-dark px-3.5 py-1.5 text-xs sm:text-sm font-semibold disabled:opacity-40"
             >
               Tahun Ini
             </button>
@@ -246,7 +246,7 @@ export function FilterBukuBesar({
               type="submit"
               disabled={isPending || isDateInvalid}
               id="btn-terapkan-filter-buku-besar"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-2.5 text-sm sm:text-base font-bold text-[#070605] shadow-lg shadow-amber-950/50 hover:from-amber-500 hover:to-amber-600 transition disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
+              className="btn-3d-gold inline-flex items-center gap-2 px-6 py-2.5 text-sm sm:text-base font-bold disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPending ? (
                 <>

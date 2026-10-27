@@ -99,19 +99,19 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
       )}
 
       {/* Penjelasan Penambahan Pengguna Baru (Informasi Operasional) */}
-      <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-xl flex items-start justify-between gap-4">
+      <div className="sogan-card bg-[#0e0c0a] border border-amber-900/30 p-4 rounded-xl flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+          <div className="w-8 h-8 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-slate-800">Alur Penambahan Akun Pengguna Baru</h4>
-            <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+            <h4 className="text-xs font-bold text-[#fdfaf6]">Alur Penambahan Akun Pengguna Baru</h4>
+            <p className="text-xs text-[#a89f91] mt-0.5 leading-relaxed">
               Pembuatan akun login baru (kredensial email & kata sandi) dilakukan melalui{" "}
-              <strong>Dashboard Supabase Auth</strong> oleh administrator teknis karena membutuhkan kunci admin/service role.
-              Setelah akun autentikasi dibuat, profil pengguna ditambahkan ke tabel <code className="font-mono text-slate-700 bg-slate-200 px-1 py-0.5 rounded text-[11px]">profiles</code>.
+              <strong className="text-amber-300">Dashboard Supabase Auth</strong> oleh administrator teknis karena membutuhkan kunci admin/service role.
+              Setelah akun autentikasi dibuat, profil pengguna ditambahkan ke tabel <code className="font-mono text-amber-300 bg-[#141210] border border-amber-900/40 px-1 py-0.5 rounded text-[11px]">profiles</code>.
               Di halaman ini, Direktur berwenang mengelola peran (Staf, Akuntan, Direktur) dan mengaktifkan/menonaktifkan akun yang sudah terdaftar.
             </p>
           </div>
@@ -120,7 +120,7 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
           type="button"
           onClick={refreshUsers}
           disabled={isRefreshing}
-          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
+          className="btn-3d-dark shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold disabled:opacity-50"
           title="Muat ulang daftar pengguna"
         >
           <svg className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,10 +131,10 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
       </div>
 
       {/* Tampilan Desktop (Tabel) */}
-      <div className="hidden md:block bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="hidden md:block sogan-card bg-[#0e0c0a] border border-amber-900/20 rounded-2xl shadow-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold uppercase tracking-wider text-[11px]">
+          <table className="w-full text-left text-xs text-[#d6cfc7]">
+            <thead className="bg-[#141210] border-b border-amber-900/20 text-[#a89f91] font-semibold uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="py-3 px-4">Pengguna</th>
                 <th className="py-3 px-4">Jabatan</th>
@@ -144,38 +144,38 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
                 <th className="py-3 px-4 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-amber-900/10">
               {users.map((u) => {
                 const isSelf = u.id === currentUserId;
                 const roleMeta = PERAN_STYLES[u.peran] || {
                   label: u.peran,
-                  badgeClass: "bg-slate-100 text-slate-700 border-slate-200",
+                  badgeClass: "bg-amber-950/40 text-amber-300 border-amber-900/30",
                 };
 
                 return (
-                  <tr key={u.id} className={`hover:bg-slate-50/70 transition-colors ${isSelf ? "bg-amber-50/30" : ""}`}>
+                  <tr key={u.id} className={`hover:bg-[#161311] transition-colors ${isSelf ? "bg-amber-950/20" : ""}`}>
                     {/* Nama & Email */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-600 text-[11px]">
+                        <div className="w-7 h-7 rounded-full bg-[#141210] border border-amber-900/40 flex items-center justify-center font-bold text-amber-300 text-[11px]">
                           {u.nama_lengkap.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-slate-900">{u.nama_lengkap}</span>
+                            <span className="font-semibold text-[#fdfaf6]">{u.nama_lengkap}</span>
                             {isSelf && (
-                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-950/70 text-amber-300 border border-amber-500/40">
                                 Akun Anda
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] text-slate-400 font-mono">{u.email}</span>
+                          <span className="text-[11px] text-[#a89f91] font-mono">{u.email}</span>
                         </div>
                       </div>
                     </td>
 
                     {/* Jabatan */}
-                    <td className="py-3 px-4 text-slate-700">{u.jabatan || "-"}</td>
+                    <td className="py-3 px-4 text-[#d6cfc7]">{u.jabatan || "-"}</td>
 
                     {/* Peran */}
                     <td className="py-3 px-4">
@@ -187,15 +187,15 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
                     {/* Status Aktif: Teks + Ikon (bukan hanya warna) */}
                     <td className="py-3 px-4">
                       {u.aktif ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-950/50 text-emerald-300 border border-emerald-500/30">
+                          <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                           </svg>
                           <span>Aktif</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-300">
-                          <svg className="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#141210] text-[#a89f91] border border-amber-900/30">
+                          <svg className="w-3.5 h-3.5 text-[#a89f91] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                           <span>Nonaktif</span>
@@ -204,15 +204,15 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
                     </td>
 
                     {/* Dibuat Pada */}
-                    <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">
+                    <td className="py-3 px-4 text-[#8a7e72] font-mono text-[11px]">
                       {formatTanggalWIB(u.dibuat_pada)}
                     </td>
 
                     {/* Aksi */}
                     <td className="py-3 px-4 text-right">
                       {isSelf ? (
-                        <div className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-medium italic" title="Direktur tidak boleh mengubah peran atau status akunnya sendiri (BR-12)">
-                          <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="inline-flex items-center gap-1 text-[11px] text-[#8a7e72] font-medium italic" title="Direktur tidak boleh mengubah peran atau status akunnya sendiri (BR-12)">
+                          <svg className="w-3.5 h-3.5 text-[#8a7e72]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                           </svg>
                           <span>Terkunci (BR-12)</span>
@@ -221,7 +221,7 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
                         <button
                           type="button"
                           onClick={() => handleEditClick(u)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                          className="btn-3d-gold inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -244,38 +244,38 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
           const isSelf = u.id === currentUserId;
           const roleMeta = PERAN_STYLES[u.peran] || {
             label: u.peran,
-            badgeClass: "bg-slate-100 text-slate-700 border-slate-200",
+            badgeClass: "bg-amber-950/40 text-amber-300 border-amber-900/30",
           };
 
           return (
             <div
               key={u.id}
-              className={`p-4 bg-white rounded-xl border border-slate-200 shadow-xs space-y-3 ${
-                isSelf ? "bg-amber-50/20 border-amber-200" : ""
+              className={`sogan-card bg-[#0e0c0a] rounded-2xl border border-amber-900/20 p-4 shadow-sm space-y-3 ${
+                isSelf ? "border-amber-500/40 bg-amber-950/20" : ""
               }`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <h4 className="text-sm font-semibold text-slate-900">{u.nama_lengkap}</h4>
+                    <h4 className="text-sm font-semibold text-[#fdfaf6]">{u.nama_lengkap}</h4>
                     {isSelf && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-950/70 text-amber-300 border border-amber-500/40">
                         Akun Anda
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 font-mono mt-0.5">{u.email}</p>
+                  <p className="text-xs text-[#a89f91] font-mono mt-0.5">{u.email}</p>
                 </div>
                 {u.aktif ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
-                    <svg className="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-950/50 text-emerald-300 border border-emerald-500/30 shrink-0">
+                    <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                     <span>Aktif</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-300 shrink-0">
-                    <svg className="w-3 h-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#141210] text-[#a89f91] border border-amber-900/30 shrink-0">
+                    <svg className="w-3 h-3 text-[#a89f91]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                     <span>Nonaktif</span>
@@ -283,27 +283,27 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100">
+              <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-amber-900/20">
                 <div>
-                  <span className="text-slate-400 text-[11px] block">Jabatan</span>
-                  <span className="text-slate-700 font-medium">{u.jabatan || "-"}</span>
+                  <span className="text-[#8a7e72] text-[11px] block">Jabatan</span>
+                  <span className="text-[#d6cfc7] font-medium">{u.jabatan || "-"}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[11px] block">Peran (Role)</span>
+                  <span className="text-[#8a7e72] text-[11px] block">Peran (Role)</span>
                   <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-medium border ${roleMeta.badgeClass}`}>
                     {roleMeta.label}
                   </span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-slate-400 text-[11px] block">Tanggal Dibuat</span>
-                  <span className="text-slate-600 font-mono text-[11px]">{formatTanggalWIB(u.dibuat_pada)}</span>
+                  <span className="text-[#8a7e72] text-[11px] block">Tanggal Dibuat</span>
+                  <span className="text-[#a89f91] font-mono text-[11px]">{formatTanggalWIB(u.dibuat_pada)}</span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-100">
+              <div className="pt-2 border-t border-amber-900/20">
                 {isSelf ? (
-                  <div className="p-2 bg-slate-50 rounded-lg text-[11px] text-slate-500 flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="p-2 bg-[#141210] rounded-xl text-[11px] text-[#a89f91] flex items-center gap-1.5 border border-amber-900/20">
+                    <svg className="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span>Direktur tidak boleh mengubah peran atau status akunnya sendiri (BR-12)</span>
@@ -312,7 +312,7 @@ export function DaftarPengguna({ initialUsers, currentUserId }: DaftarPenggunaPr
                   <button
                     type="button"
                     onClick={() => handleEditClick(u)}
-                    className="w-full py-2 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="btn-3d-gold w-full py-2 text-xs font-bold flex items-center justify-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

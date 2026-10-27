@@ -411,7 +411,7 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                             type="button"
                             onClick={() => handleOpenUbah(akun)}
                             disabled={isLoading}
-                            className="rounded-xl border border-amber-900/30 bg-[#141210] px-3 py-1.5 text-xs font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] hover:border-amber-500/40 transition disabled:opacity-50"
+                            className="btn-3d-dark px-3 py-1.5 text-xs font-bold disabled:opacity-50"
                             title="Ubah nama dan keterangan akun"
                           >
                             Ubah
@@ -422,10 +422,8 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                             type="button"
                             onClick={() => handleToggleAktif(akun)}
                             disabled={isLoading}
-                            className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition disabled:opacity-50 ${
-                              akun.aktif
-                                ? "border-amber-500/30 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50"
-                                : "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50"
+                            className={`btn-3d-dark px-3 py-1.5 text-xs font-bold disabled:opacity-50 ${
+                              akun.aktif ? "text-amber-400" : "text-emerald-400"
                             }`}
                             title={akun.aktif ? "Nonaktifkan akun" : "Aktifkan akun"}
                           >
@@ -512,7 +510,7 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                       type="button"
                       onClick={() => handleOpenUbah(akun)}
                       disabled={isLoading}
-                      className="flex-1 rounded-xl border border-amber-900/30 bg-[#141210] py-2 text-xs font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition text-center disabled:opacity-50"
+                      className="btn-3d-dark flex-1 py-2 text-xs font-bold text-center disabled:opacity-50"
                     >
                       Ubah
                     </button>
@@ -520,10 +518,8 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                       type="button"
                       onClick={() => handleToggleAktif(akun)}
                       disabled={isLoading}
-                      className={`flex-1 rounded-xl border py-2 text-xs font-bold transition text-center disabled:opacity-50 ${
-                        akun.aktif
-                          ? "border-amber-500/30 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50"
-                          : "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50"
+                      className={`btn-3d-dark flex-1 py-2 text-xs font-bold text-center disabled:opacity-50 ${
+                        akun.aktif ? "text-amber-400" : "text-emerald-400"
                       }`}
                     >
                       {isLoading ? "..." : akun.aktif ? "Nonaktifkan" : "Aktifkan"}

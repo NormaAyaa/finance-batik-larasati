@@ -17,7 +17,7 @@ export function CetakButton({
     <button
       type="button"
       onClick={handlePrint}
-      className={`no-print inline-flex items-center gap-2 rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#d6cfc7] shadow-md hover:bg-amber-950/40 hover:text-[#fdfaf6] hover:border-amber-500/40 transition active:scale-95 ${className}`}
+      className={`btn-3d-dark no-print inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold ${className}`}
       title="Cetak laporan langsung atau simpan sebagai PDF lewat browser"
     >
       <svg

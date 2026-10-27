@@ -129,7 +129,7 @@ export function TutupPeriodeModal({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition disabled:opacity-50"
+            className="btn-3d-dark px-4 py-2.5 text-xs sm:text-sm font-bold disabled:opacity-50"
           >
             Batal
           </button>
@@ -137,7 +137,7 @@ export function TutupPeriodeModal({
             type="button"
             onClick={handleTutup}
             disabled={isSubmitting}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition disabled:opacity-50 active:scale-95"
+            className="btn-3d-gold inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-bold disabled:opacity-50"
           >
             {isSubmitting ? (
               <>

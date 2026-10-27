@@ -261,6 +261,8 @@ Email ini dikirim otomatis, mohon tidak membalas email ini.`;
  * (b) Ke seluruh DIREKTUR aktif saat status masuk 'menunggu_direktur'.
  * - Jangan mengirim ke akun nonaktif.
  * - Jangan mengirim ke orang yang sama dengan pelaku perpindahan (actorId).
+ *
+ * CATATAN: status 'disetujui' sengaja TIDAK mengirim email (aturan bisnis awal).
  */
 export function filterEmailRecipients(params: {
   statusBaru: StatusPengajuan;
@@ -271,9 +273,18 @@ export function filterEmailRecipients(params: {
   const { statusBaru, actorId, pengaju, direkturList = [] } = params;
 
   if (statusBaru === "perlu_revisi" || statusBaru === "ditolak" || statusBaru === "dibayar") {
-    if (!pengaju) return [];
-    if (!pengaju.aktif) return [];
-    if (pengaju.id === actorId) return [];
+    if (!pengaju) {
+      console.log("[email] dilewati: profil pengaju tidak ada", { status: statusBaru });
+      return [];
+    }
+    if (!pengaju.aktif) {
+      console.log("[email] dilewati: akun pengaju nonaktif", { status: statusBaru });
+      return [];
+    }
+    if (pengaju.id === actorId) {
+      console.log("[email] dilewati: pelaku sama dengan pengaju", { status: statusBaru });
+      return [];
+    }
     return [pengaju];
   }
 
@@ -281,6 +292,7 @@ export function filterEmailRecipients(params: {
     return direkturList.filter((d) => d.aktif && d.id !== actorId);
   }
 
+  console.log("[email] dilewati: status tidak memicu email", { status: statusBaru });
   return [];
 }
 
@@ -316,24 +328,43 @@ export async function sendSingleEmail(params: {
   appBaseUrl: string;
 }): Promise<EmailSendResult> {
   const { recipient, pengajuan, appBaseUrl } = params;
-  const mode = (process.env.EMAIL_MODE || "mati").trim().toLowerCase();
+
+  // Buang tanda kutip yang mungkin ikut tersimpan di nilai env (mis. dari .env atau Netlify)
+  const stripQuotes = (v?: string) => v?.trim().replace(/^["']+|["']+$/g, "").trim();
+
+  const mode = (stripQuotes(process.env.EMAIL_MODE) || "mati").toLowerCase();
+
+  console.log("[email] mulai", {
+    mode,
+    status: pengajuan.status,
+    pengajuanId: pengajuan.id,
+    penerimaId: recipient.id,
+  });
 
   if (mode === "mati") {
+    console.log("[email] dilewati: EMAIL_MODE=mati (atau EMAIL_MODE tidak terbaca di server)");
     return { status: "skipped" };
   }
 
   // Cek pemetaan email per penerima (EMAIL_UJI_PETA) terlebih dahulu
-  const emailPeta = parseEmailMapping(process.env.EMAIL_UJI_PETA);
+  const emailPeta = parseEmailMapping(stripQuotes(process.env.EMAIL_UJI_PETA));
   const mappedTarget = emailPeta.get(recipient.email.trim().toLowerCase());
 
   // Jika tidak ada pemetaan spesifik, gunakan pengalihan umum (EMAIL_TEST_REDIRECT / EMAIL_UJI_PENERIMA)
   const redirectTarget =
     mappedTarget ||
-    (process.env.EMAIL_TEST_REDIRECT || process.env.EMAIL_UJI_PENERIMA)?.trim();
+    stripQuotes(process.env.EMAIL_TEST_REDIRECT || process.env.EMAIL_UJI_PENERIMA);
   const isOriginalDummy = isDummyDomain(recipient.email);
+
+  console.log("[email] tujuan", {
+    adaPemetaan: !!mappedTarget,
+    adaRedirect: !!redirectTarget,
+    penerimaDummy: isOriginalDummy,
+  });
 
   // Jika mode kirim dan tidak ada redirect, cek domain dummy penerima
   if (mode === "kirim" && !redirectTarget && isOriginalDummy) {
+    console.warn("[email] dilewati: penerima domain dummy dan tidak ada redirect/pemetaan");
     return {
       status: "skipped",
       errorType: "DUMMY_DOMAIN",
@@ -347,6 +378,7 @@ export async function sendSingleEmail(params: {
 
   // Jangan pernah mengirim ke domain dummy bahkan jika redirectTarget yang dipasang salah ketik
   if (isDummyDomain(activeRecipient)) {
+    console.warn("[email] dilewati: alamat tujuan akhir berdomain dummy");
     return {
       status: "skipped",
       errorType: "DUMMY_DOMAIN",
@@ -365,6 +397,7 @@ export async function sendSingleEmail(params: {
   // Mode "log": simpan sebagai file HTML di folder .outbox/ (hanya non-production)
   if (mode === "log") {
     if (process.env.NODE_ENV === "production") {
+      console.log("[email] dilewati: mode log tidak berlaku di production");
       return { status: "skipped" };
     }
 
@@ -411,13 +444,16 @@ ${html}
 
   // Mode "kirim": kirim ke REST API Resend
   if (mode === "kirim") {
-    const apiKey = process.env.RESEND_API_KEY?.trim();
-    const emailFrom = (
+    const apiKey = stripQuotes(process.env.RESEND_API_KEY);
+    const emailFrom = stripQuotes(
       process.env.EMAIL_FROM || process.env.EMAIL_PENGIRIM
-    )?.trim();
+    );
 
     if (!apiKey || !emailFrom) {
-      // Konfigurasi kurang, lewati pengiriman tanpa error
+      console.error("[email] CONFIG_MISSING", {
+        adaApiKey: !!apiKey,
+        adaEmailFrom: !!emailFrom,
+      });
       return { status: "skipped", errorType: "CONFIG_MISSING" };
     }
 
@@ -428,9 +464,11 @@ ${html}
       .slice(0, 255);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    // Timeout dinaikkan ke 8 detik karena cold start serverless bisa lambat
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     try {
+      console.log("[email] memanggil Resend...");
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -449,6 +487,9 @@ ${html}
       });
 
       if (!response.ok) {
+        const detail = await response.text().catch(() => "(tidak bisa membaca body)");
+        console.error("[email] Resend menolak:", response.status, detail);
+
         if (response.status === 429) {
           console.error("Gagal mengirim notifikasi email: RATE_LIMIT");
           return {
@@ -466,6 +507,7 @@ ${html}
         };
       }
 
+      console.log("[email] terkirim via Resend, status HTTP:", response.status);
       return { status: "sent" };
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") {
@@ -477,7 +519,10 @@ ${html}
         };
       }
 
-      console.error("Gagal mengirim notifikasi email: NETWORK_ERROR");
+      console.error(
+        "Gagal mengirim notifikasi email: NETWORK_ERROR",
+        err instanceof Error ? err.message : err
+      );
       return {
         status: "failed",
         errorType: "NETWORK_ERROR",
@@ -488,6 +533,7 @@ ${html}
     }
   }
 
+  console.log("[email] dilewati: nilai EMAIL_MODE tidak dikenali:", mode);
   return { status: "skipped" };
 }
 
@@ -505,6 +551,13 @@ export async function kirimNotifikasiPengajuan(params: {
 }): Promise<KirimNotifikasiResult> {
   const { pengajuan, actorId, pengajuProfile, direkturProfiles = [] } = params;
 
+  console.log("[email] kirimNotifikasiPengajuan dipanggil", {
+    pengajuanId: pengajuan.id,
+    status: pengajuan.status,
+    adaPengaju: !!pengajuProfile,
+    jumlahDirektur: direkturProfiles.length,
+  });
+
   const recipients = filterEmailRecipients({
     statusBaru: pengajuan.status,
     actorId,
@@ -512,11 +565,13 @@ export async function kirimNotifikasiPengajuan(params: {
     direkturList: direkturProfiles,
   });
 
+  console.log("[email] jumlah penerima setelah filter:", recipients.length);
+
   if (recipients.length === 0) {
     return { success: true, count: 0 };
   }
 
-  const appBaseUrl = normalizeAppBaseUrl(process.env.APP_BASE_URL);
+  const appBaseUrl = normalizeAppBaseUrl(process.env.APP_BASE_URL?.trim().replace(/^["']+|["']+$/g, ""));
 
   let successCount = 0;
   let notice: string | undefined = undefined;
@@ -528,6 +583,8 @@ export async function kirimNotifikasiPengajuan(params: {
       pengajuan,
       appBaseUrl,
     });
+
+    console.log("[email] hasil kirim:", result.status, result.errorType ?? "");
 
     if (result.status === "sent" || result.status === "logged") {
       successCount++;

@@ -114,7 +114,7 @@ export function LabaRugiView({
               key={`${preset.tahun}-${preset.bulan}`}
               type="button"
               onClick={() => handlePilihBulan(preset.bulan, preset.tahun)}
-              className="rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-1.5 text-xs font-semibold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] hover:border-amber-500/40 transition active:scale-95"
+              className="btn-3d-dark px-3 py-1.5 text-xs font-semibold"
             >
               {preset.label}
             </button>
@@ -157,7 +157,7 @@ export function LabaRugiView({
 
           <button
             type="submit"
-            className="rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-5 py-2 text-xs sm:text-sm font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition active:scale-95"
+            className="btn-3d-gold px-5 py-2 text-xs sm:text-sm font-bold"
           >
             Terapkan Filter
           </button>

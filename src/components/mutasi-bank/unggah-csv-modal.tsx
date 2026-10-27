@@ -328,7 +328,7 @@ export function UnggahCsvModal({
                   <button
                     type="button"
                     onClick={() => setShowFormatModal(true)}
-                    className="px-3.5 py-1.5 text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-500/40 rounded-xl hover:bg-amber-900/50 transition whitespace-nowrap"
+                    className="btn-3d-dark px-3.5 py-1.5 text-xs sm:text-sm font-bold text-amber-300 whitespace-nowrap"
                   >
                     Format CSV
                   </button>
@@ -356,7 +356,7 @@ export function UnggahCsvModal({
                     type="button"
                     onClick={handleResetFile}
                     disabled={isPending}
-                    className="text-xs sm:text-sm px-4 py-2.5 text-[#8a7e72] hover:text-rose-400 hover:bg-[#1a1613] rounded-xl border border-amber-900/30 transition font-bold"
+                    className="btn-3d-dark text-xs sm:text-sm px-4 py-2 text-rose-400 font-bold"
                     title="Hapus berkas terpilih"
                   >
                     Batal
@@ -555,7 +555,7 @@ export function UnggahCsvModal({
                 type="button"
                 onClick={handleClose}
                 disabled={isPending}
-                className="px-5 py-2.5 text-sm font-bold text-[#d6cfc7] bg-[#141210] border border-amber-900/30 rounded-xl hover:bg-[#1c1815] transition disabled:opacity-50"
+                className="btn-3d-dark px-5 py-2.5 text-sm font-bold disabled:opacity-50"
               >
                 Batal
               </button>
@@ -569,7 +569,7 @@ export function UnggahCsvModal({
                   parseResult.barisInvalid > 0 ||
                   parseResult.totalBaris === 0
                 }
-                className="inline-flex items-center gap-2 px-6 py-2.5 text-sm sm:text-base font-bold text-[#070605] bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl hover:from-amber-500 hover:to-amber-600 transition shadow-lg shadow-amber-950/50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-3d-gold inline-flex items-center gap-2 px-6 py-2.5 text-sm sm:text-base font-bold disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {isPending ? (
                   <>

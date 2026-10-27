@@ -58,13 +58,13 @@ export function TabelBukuBesar({
         {/* Kontrol Paginasi Ukuran & View Mode */}
         <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
           {/* Toggle Tampilan (Mobile Friendly) */}
-          <div className="inline-flex rounded-xl border border-amber-900/30 bg-[#141210] p-1 shadow-sm sm:hidden">
+          <div className="trough-3d inline-flex p-1 sm:hidden">
             <button
               type="button"
               onClick={() => setViewMode("cards")}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition ${
+              className={`px-3 py-1 text-xs font-bold rounded-full transition ${
                 viewMode === "cards" || viewMode === "auto"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-700 text-[#070605] shadow-xs"
+                  ? "btn-3d-gold shadow-xs"
                   : "text-[#8a7e72] hover:text-[#fdfaf6]"
               }`}
               title="Tampilan Kartu"
@@ -74,9 +74,9 @@ export function TabelBukuBesar({
             <button
               type="button"
               onClick={() => setViewMode("table")}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition ${
+              className={`px-3 py-1 text-xs font-bold rounded-full transition ${
                 viewMode === "table"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-700 text-[#070605] shadow-xs"
+                  ? "btn-3d-gold shadow-xs"
                   : "text-[#8a7e72] hover:text-[#fdfaf6]"
               }`}
               title="Tampilan Tabel"
@@ -400,7 +400,7 @@ export function TabelBukuBesar({
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={validCurrentPage <= 1}
-              className="rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2 font-bold text-[#d6cfc7] hover:bg-[#1c1815] hover:text-[#fdfaf6] transition disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+              className="btn-3d-dark px-3.5 py-1.5 font-bold disabled:opacity-40 disabled:cursor-not-allowed"
             >
               ← Sebelumnya
             </button>
@@ -425,8 +425,8 @@ export function TabelBukuBesar({
                         onClick={() => setCurrentPage(p)}
                         className={`min-w-[36px] h-9 rounded-xl text-xs sm:text-sm font-bold transition ${
                           p === validCurrentPage
-                            ? "bg-gradient-to-r from-amber-600 to-amber-700 text-[#070605] shadow-md"
-                            : "border border-amber-900/30 bg-[#141210] text-[#d6cfc7] hover:bg-[#1c1815] hover:text-[#fdfaf6]"
+                            ? "btn-3d-gold shadow-md"
+                            : "btn-3d-dark"
                         }`}
                       >
                         {p}
@@ -440,7 +440,7 @@ export function TabelBukuBesar({
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={validCurrentPage >= totalPages}
-              className="rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2 font-bold text-[#d6cfc7] hover:bg-[#1c1815] hover:text-[#fdfaf6] transition disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+              className="btn-3d-dark px-3.5 py-1.5 font-bold disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Selanjutnya →
             </button>
