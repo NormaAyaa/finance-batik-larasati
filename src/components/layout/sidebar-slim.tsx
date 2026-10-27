@@ -121,7 +121,7 @@ export function SidebarSlim({ items, profile }: SidebarSlimProps) {
           <Link
             href="/dashboard"
             aria-label="Kembali ke Dashboard"
-            className="group relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/35 hover:border-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all duration-300 p-1"
+            className="group relative flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/25 to-amber-700/15 border border-amber-500/40 hover:border-amber-400 hover:shadow-[0_0_24px_rgba(245,158,11,0.4)] transition-all duration-300 p-1.5 ring-1 ring-amber-400/20"
           >
             {/* Logo Canting Resmi CV Batik Larasati */}
             <div className="relative w-full h-full rounded-xl overflow-hidden bg-[#120b07]">
@@ -129,9 +129,9 @@ export function SidebarSlim({ items, profile }: SidebarSlimProps) {
                 src="/images/logo-batik-larasati.png"
                 alt="Logo CV Batik Larasati"
                 fill
-                sizes="48px"
+                sizes="56px"
                 priority
-                className="object-cover transform group-hover:scale-110 transition duration-300"
+                className="object-cover transform group-hover:scale-105 transition duration-300"
               />
             </div>
             <span className="sr-only">CV Batik Larasati</span>

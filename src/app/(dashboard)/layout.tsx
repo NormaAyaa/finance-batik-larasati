@@ -34,34 +34,38 @@ export default async function DashboardLayout({
       {/* Konten Utama (Offset kiri w-20 pada desktop untuk mengakomodasi sidebar tetap) */}
       <div className="flex-1 flex flex-col min-w-0 md:pl-20 pb-20 md:pb-8">
         {/* Header Kontekstual Sogan Obsidian */}
-        <header className="h-16 border-b border-amber-900/20 bg-[#090807]/85 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 select-none">
+        <header className="h-18 md:h-20 border-b border-amber-900/20 bg-[#090807]/90 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 select-none">
           {/* Sisi Kiri: Identitas Brand & Sistem */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="flex items-center gap-3 group transition-opacity hover:opacity-95"
+              className="flex items-center gap-3.5 group transition-opacity hover:opacity-95"
             >
-              {/* Logo Resmi CV Batik Larasati */}
-              <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.3)] shrink-0 bg-[#120b07]">
+              {/* Logo Resmi CV Batik Larasati (Ukuran Diperbesar & Jelas) */}
+              <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl overflow-hidden border border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.35)] shrink-0 bg-[#120b07] ring-1 ring-amber-400/25 p-0.5">
                 <Image
                   src="/images/logo-batik-larasati.png"
                   alt="Logo CV Batik Larasati"
                   fill
-                  sizes="32px"
+                  sizes="(max-width: 768px) 48px, 56px"
                   priority
-                  className="object-cover transform group-hover:scale-110 transition-transform duration-300"
+                  className="object-cover transform group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-bold tracking-tight text-[#fdfaf6] group-hover:text-amber-300 transition-colors">
-                  CV Batik Larasati
-                </h1>
-                <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse" />
+              <div className="flex flex-col justify-center">
+                <div className="flex items-center gap-2.5">
+                  <h1 className="text-base md:text-lg lg:text-xl font-bold tracking-tight text-[#fdfaf6] group-hover:text-amber-300 transition-colors">
+                    CV Batik Larasati
+                  </h1>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.9)] animate-pulse" />
+                </div>
+                <div className="flex items-center gap-2 mt-0.5 font-mono text-[10px] md:text-xs text-amber-300/80 tracking-wider uppercase font-medium">
+                  <span>Surakarta</span>
+                  <span className="text-amber-500/40">•</span>
+                  <span>Sistem Keuangan Internal</span>
+                </div>
               </div>
             </Link>
-            <span className="hidden sm:inline-block text-[11px] text-amber-200/60 bg-amber-950/40 border border-amber-800/30 px-2.5 py-0.5 rounded-full font-medium">
-              Sistem Keuangan Internal
-            </span>
           </div>
 
           {/* Sisi Kanan: Informasi Pengguna & Badge Peran */}
