@@ -180,14 +180,6 @@ export function PengajuanForm({
       } = json.data;
 
       let filledCount = 0;
-      let pendingCount = 0;
-      const newSuggestions: {
-        tanggal?: string;
-        jumlah?: number;
-        keterangan?: string;
-        akunBebanId?: number;
-        akunBebanLabel?: string;
-      } = {};
 
       // 1. Kolom Tanggal: langsung isi otomatis dengan hasil AI
       if (tanggal) {

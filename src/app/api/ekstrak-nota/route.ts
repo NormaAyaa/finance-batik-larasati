@@ -32,12 +32,51 @@ function checkRateLimit(userId: string): boolean {
 export async function POST(request: NextRequest) {
   // 1. Tolak permintaan lintas situs (CSRF / Origin Check)
   const origin = request.headers.get("origin");
-  const host = request.headers.get("host");
 
-  if (origin && host) {
+  if (origin) {
     try {
-      const originHost = new URL(origin).host;
-      if (originHost !== host) {
+      const originHost = new URL(origin).host.toLowerCase();
+
+      // Host publik yang benar: pakai header x-forwarded-host bila ada, lalu host dari request.nextUrl
+      const forwardedHost = request.headers.get("x-forwarded-host");
+      const primaryForwardedHost = forwardedHost?.split(",")[0]?.trim().toLowerCase();
+      const nextUrlHost = request.nextUrl.host.toLowerCase();
+      const hostHeader = request.headers.get("host")?.trim().toLowerCase();
+
+      const publicHost = primaryForwardedHost || nextUrlHost;
+
+      // Izinkan juga alamat dari APP_BASE_URL
+      let appBaseHost: string | null = null;
+      if (process.env.APP_BASE_URL) {
+        try {
+          const rawBaseUrl = process.env.APP_BASE_URL.trim();
+          const parsedBase = new URL(
+            rawBaseUrl.startsWith("http://") || rawBaseUrl.startsWith("https://")
+              ? rawBaseUrl
+              : `https://${rawBaseUrl}`
+          );
+          appBaseHost = parsedBase.host.toLowerCase();
+        } catch {
+          // Abaikan bila format APP_BASE_URL tidak valid
+        }
+      }
+
+      // Kumpulan host yang sah (host publik, host nextUrl, header host, dan host dari APP_BASE_URL)
+      const allowedHosts = new Set<string>();
+      if (publicHost) allowedHosts.add(publicHost);
+      if (nextUrlHost) allowedHosts.add(nextUrlHost);
+      if (hostHeader) allowedHosts.add(hostHeader);
+      if (primaryForwardedHost) allowedHosts.add(primaryForwardedHost);
+      if (forwardedHost) {
+        forwardedHost.split(",").forEach((h) => {
+          const trimmed = h.trim().toLowerCase();
+          if (trimmed) allowedHosts.add(trimmed);
+        });
+      }
+      if (appBaseHost) allowedHosts.add(appBaseHost);
+
+      // Tolak Origin dari situs lain
+      if (!allowedHosts.has(originHost)) {
         return NextResponse.json(
           { success: false, error: "Akses lintas situs ditolak." },
           { status: 403 }

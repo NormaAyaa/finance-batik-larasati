@@ -99,11 +99,13 @@ export async function GET(request: NextRequest) {
       const userEmail = data.user.email?.toLowerCase().trim();
 
       // 1. Cari profil menggunakan client sesi terautentikasi pengguna
-      let { data: profile, error: profileError } = await supabase
+      const { data: initialProfile, error: profileError } = await supabase
         .from("profiles")
         .select("id, nama_lengkap, email, peran, jabatan, aktif")
         .eq("id", data.user.id)
         .maybeSingle();
+
+      let profile = initialProfile;
 
       if (profileError) {
         console.warn("Pemeriksaan profil via client pengguna:", profileError.message);
