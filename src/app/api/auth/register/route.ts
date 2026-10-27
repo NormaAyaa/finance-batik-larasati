@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PeranPengguna } from "@/types/database";
 
-const VALID_ROLES: PeranPengguna[] = ["staf", "akuntan", "direktur"];
+const VALID_ROLES: PeranPengguna[] = ["staf", "akuntan"];
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     // 3. Validasi Peran Pengguna
     if (!VALID_ROLES.includes(peran as PeranPengguna)) {
       return NextResponse.json(
-        { error: "Peran pengguna tidak valid. Pilih Staf, Akuntan, atau Direktur." },
+        { error: "Peran pengguna tidak valid. Pilih Staf atau Akuntan." },
         { status: 400 }
       );
     }
