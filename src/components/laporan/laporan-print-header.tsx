@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { formatDateTime } from "@/lib/utils/formatters";
+import { LogoBatikLarasati } from "@/components/ui/logo-batik-larasati";
 
 interface LaporanPrintHeaderProps {
   judul: string;
@@ -26,13 +27,21 @@ export function LaporanPrintHeader({
   return (
     <div className="print-only mb-6 border-b-2 border-slate-900 pb-4">
       <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            {subjudul}
-          </h1>
-          <p className="text-xs text-slate-600">
-            Sistem Informasi Keuangan & Akuntansi Internal UMKM
-          </p>
+        <div className="flex items-center gap-3.5">
+          <LogoBatikLarasati
+            variant="icon-only"
+            colorScheme="dark"
+            size="md"
+            iconClassName="w-12 h-12"
+          />
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">
+              {subjudul}
+            </h1>
+            <p className="text-xs text-slate-600">
+              Sistem Informasi Keuangan & Akuntansi Internal UMKM · Surakarta
+            </p>
+          </div>
         </div>
         <div className="text-right text-[10px] text-slate-500">
           <p>Dicetak pada:</p>

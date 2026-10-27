@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Yeseva_One } from "next/font/google";
+import { LogoBatikLarasati } from "@/components/ui/logo-batik-larasati";
 
 const yesevaOne = Yeseva_One({
   weight: "400",
@@ -108,7 +109,12 @@ export default function LandingPage() {
         
         {/* --- HEADER ATAS: MINIMALIS & KREDIBEL (UKURAN FONT JELAS) --- */}
         <header className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3.5">
+            <LogoBatikLarasati
+              variant="icon-only"
+              size="lg"
+              iconClassName="w-11 h-11 md:w-13 md:h-13 drop-shadow-[0_4px_16px_rgba(245,158,11,0.5)]"
+            />
             <div className="flex flex-col">
               <span className="font-mono text-xs md:text-sm tracking-wider uppercase text-amber-400 font-semibold">
                 [ SURAKARTA · EST. 2024 ]

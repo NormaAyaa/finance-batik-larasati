@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { NavItem } from "@/lib/constants/navigation";
 import type { UserRole } from "@/types/database";
+import { LogoBatikLarasati } from "@/components/ui/logo-batik-larasati";
 
 interface SidebarSlimProps {
   items: NavItem[];
@@ -119,16 +121,19 @@ export function SidebarSlim({ items, profile }: SidebarSlimProps) {
           <Link
             href="/dashboard"
             aria-label="Kembali ke Dashboard"
-            className="group relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/35 text-amber-400 hover:border-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all duration-300"
+            className="group relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/35 hover:border-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all duration-300 p-1"
           >
-            {/* Ikon Canting / Mahkota Emas */}
-            <svg
-              className="w-6 h-6 transform group-hover:scale-110 transition duration-300"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2L14.4 7.2L20 8L16 12L17 18L12 15.2L7 18L8 12L4 8L9.6 7.2L12 2Z" />
-            </svg>
+            {/* Logo Canting Resmi CV Batik Larasati */}
+            <div className="relative w-full h-full rounded-xl overflow-hidden bg-[#120b07]">
+              <Image
+                src="/images/logo-batik-larasati.png"
+                alt="Logo CV Batik Larasati"
+                fill
+                sizes="48px"
+                priority
+                className="object-cover transform group-hover:scale-110 transition duration-300"
+              />
+            </div>
             <span className="sr-only">CV Batik Larasati</span>
 
             {/* Hover Tooltip untuk Logo */}
