@@ -106,16 +106,16 @@ export function FilterBukuBesar({
   const selectedAkunObj = daftarAkun.find((a) => a.id === Number(akunId));
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:items-end">
+    <div className="sogan-card rounded-2xl border border-amber-500/20 bg-[#0e0c0a] p-5 sm:p-6 shadow-xl text-[#fdfaf6]">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-12 md:items-end">
           {/* 1. Dropdown Pilihan Akun (md: col 6) */}
           <div className="md:col-span-6">
             <label
               htmlFor="filter-akun"
-              className="block text-xs font-semibold text-slate-700 mb-1.5"
+              className="block text-sm sm:text-base font-semibold text-[#d6cfc7] mb-2"
             >
-              Akun Buku Besar <span className="text-rose-500">*</span>
+              Akun Buku Besar <span className="text-amber-400">*</span>
             </label>
             <div className="relative">
               <select
@@ -130,11 +130,11 @@ export function FilterBukuBesar({
                   }
                 }}
                 disabled={isPending}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-3 text-sm sm:text-base text-[#fdfaf6] shadow-sm focus:border-amber-500/80 focus:outline-none focus:ring-1 focus:ring-amber-500/50 disabled:bg-[#100e0c] disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-describedby="akun-desc"
               >
                 {daftarAkun.map((akun) => (
-                  <option key={akun.id} value={akun.id}>
+                  <option key={akun.id} value={akun.id} className="bg-[#141210] text-[#fdfaf6]">
                     {akun.kode} - {akun.nama}
                     {!akun.aktif ? " (Nonaktif)" : ""}
                   </option>
@@ -142,7 +142,7 @@ export function FilterBukuBesar({
               </select>
             </div>
             {selectedAkunObj && !selectedAkunObj.aktif && (
-              <p id="akun-desc" className="text-[11px] text-amber-600 mt-1 flex items-center gap-1">
+              <p id="akun-desc" className="text-xs sm:text-sm text-amber-400 mt-2 flex items-center gap-1.5">
                 <span aria-hidden="true">⚠️</span>
                 <span>Akun ini sudah dinonaktifkan tetapi memiliki riwayat transaksi lampau.</span>
               </p>
@@ -153,9 +153,9 @@ export function FilterBukuBesar({
           <div className="md:col-span-3">
             <label
               htmlFor="tanggal-dari"
-              className="block text-xs font-semibold text-slate-700 mb-1.5"
+              className="block text-sm sm:text-base font-semibold text-[#d6cfc7] mb-2"
             >
-              Dari Tanggal <span className="text-rose-500">*</span>
+              Dari Tanggal <span className="text-amber-400">*</span>
             </label>
             <input
               id="tanggal-dari"
@@ -164,10 +164,10 @@ export function FilterBukuBesar({
               value={dari}
               onChange={(e) => setDari(e.target.value)}
               disabled={isPending}
-              className={`w-full rounded-lg border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 disabled:bg-slate-100 ${
+              className={`w-full rounded-xl border px-4 py-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 disabled:bg-[#100e0c] disabled:opacity-50 ${
                 isDateInvalid
-                  ? "border-rose-400 bg-rose-50 text-rose-900 focus:border-rose-500 focus:ring-rose-500"
-                  : "border-slate-300 bg-white text-slate-800 focus:border-amber-700 focus:ring-amber-700"
+                  ? "border-rose-500/50 bg-rose-950/40 text-rose-200 focus:border-rose-500 focus:ring-rose-500"
+                  : "border-amber-900/30 bg-[#141210] text-[#fdfaf6] focus:border-amber-500/80 focus:ring-amber-500/50"
               }`}
             />
           </div>
@@ -176,9 +176,9 @@ export function FilterBukuBesar({
           <div className="md:col-span-3">
             <label
               htmlFor="tanggal-sampai"
-              className="block text-xs font-semibold text-slate-700 mb-1.5"
+              className="block text-sm sm:text-base font-semibold text-[#d6cfc7] mb-2"
             >
-              Sampai Tanggal <span className="text-rose-500">*</span>
+              Sampai Tanggal <span className="text-amber-400">*</span>
             </label>
             <input
               id="tanggal-sampai"
@@ -187,10 +187,10 @@ export function FilterBukuBesar({
               value={sampai}
               onChange={(e) => setSampai(e.target.value)}
               disabled={isPending}
-              className={`w-full rounded-lg border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 disabled:bg-slate-100 ${
+              className={`w-full rounded-xl border px-4 py-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 disabled:bg-[#100e0c] disabled:opacity-50 ${
                 isDateInvalid
-                  ? "border-rose-400 bg-rose-50 text-rose-900 focus:border-rose-500 focus:ring-rose-500"
-                  : "border-slate-300 bg-white text-slate-800 focus:border-amber-700 focus:ring-amber-700"
+                  ? "border-rose-500/50 bg-rose-950/40 text-rose-200 focus:border-rose-500 focus:ring-rose-500"
+                  : "border-amber-900/30 bg-[#141210] text-[#fdfaf6] focus:border-amber-500/80 focus:ring-amber-500/50"
               }`}
             />
           </div>
@@ -200,9 +200,9 @@ export function FilterBukuBesar({
         {isDateInvalid && (
           <div
             role="alert"
-            className="flex items-center gap-2 rounded-lg bg-rose-50 border border-rose-200 px-3 py-2 text-xs text-rose-700"
+            className="flex items-center gap-2.5 rounded-xl bg-rose-950/40 border border-rose-500/40 p-4 text-xs sm:text-sm text-rose-200"
           >
-            <span aria-hidden="true" className="font-bold text-sm">⛔</span>
+            <span aria-hidden="true" className="font-bold text-base">⛔</span>
             <span>
               <strong>Rentang tanggal tidak valid:</strong> Tanggal &quot;Dari&quot; tidak boleh lebih besar dari tanggal &quot;Sampai&quot;.
             </span>
@@ -210,15 +210,15 @@ export function FilterBukuBesar({
         )}
 
         {/* Baris Tombol Aksi & Preset */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-amber-900/20">
           {/* Preset Tanggal Cepat */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-600">
-            <span className="font-medium mr-1 text-slate-500 hidden sm:inline">Pilihan Cepat:</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="font-semibold text-[#8a7e72] hidden sm:inline">Pilihan Cepat:</span>
             <button
               type="button"
               onClick={() => handlePreset("bulan_ini")}
               disabled={isPending}
-              className="rounded bg-slate-100 hover:bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700 transition active:scale-95 disabled:opacity-50"
+              className="rounded-xl border border-amber-900/30 bg-[#141210] hover:bg-[#1c1815] hover:border-amber-500/40 px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#d6cfc7] transition active:scale-95 disabled:opacity-40"
             >
               Bulan Berjalan
             </button>
@@ -226,7 +226,7 @@ export function FilterBukuBesar({
               type="button"
               onClick={() => handlePreset("bulan_lalu")}
               disabled={isPending}
-              className="rounded bg-slate-100 hover:bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700 transition active:scale-95 disabled:opacity-50"
+              className="rounded-xl border border-amber-900/30 bg-[#141210] hover:bg-[#1c1815] hover:border-amber-500/40 px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#d6cfc7] transition active:scale-95 disabled:opacity-40"
             >
               Bulan Lalu
             </button>
@@ -234,7 +234,7 @@ export function FilterBukuBesar({
               type="button"
               onClick={() => handlePreset("tahun_ini")}
               disabled={isPending}
-              className="rounded bg-slate-100 hover:bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700 transition active:scale-95 disabled:opacity-50"
+              className="rounded-xl border border-amber-900/30 bg-[#141210] hover:bg-[#1c1815] hover:border-amber-500/40 px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#d6cfc7] transition active:scale-95 disabled:opacity-40"
             >
               Tahun Ini
             </button>
@@ -246,11 +246,11 @@ export function FilterBukuBesar({
               type="submit"
               disabled={isPending || isDateInvalid}
               id="btn-terapkan-filter-buku-besar"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-amber-800 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber-900 transition disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-2.5 text-sm sm:text-base font-bold text-[#070605] shadow-lg shadow-amber-950/50 hover:from-amber-500 hover:to-amber-600 transition disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
             >
               {isPending ? (
                 <>
-                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[#070605] border-t-transparent" />
                   <span>Memuat Data...</span>
                 </>
               ) : (

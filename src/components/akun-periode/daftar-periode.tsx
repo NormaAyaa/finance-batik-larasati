@@ -129,10 +129,10 @@ export function DaftarPeriode({
       {successMessage && (
         <div
           role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-medium text-emerald-800 flex items-center justify-between"
+          className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-xs font-medium text-emerald-300 flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
-            <span aria-hidden="true" className="font-bold text-emerald-600 text-sm">
+            <span aria-hidden="true" className="font-bold text-emerald-400 text-sm">
               ✓
             </span>
             <span>{successMessage}</span>
@@ -140,7 +140,7 @@ export function DaftarPeriode({
           <button
             type="button"
             onClick={() => setSuccessMessage(null)}
-            className="text-emerald-600 hover:text-emerald-800 p-1"
+            className="text-emerald-400 hover:text-emerald-200 p-1"
             aria-label="Tutup pesan sukses"
           >
             ✕
@@ -151,10 +151,10 @@ export function DaftarPeriode({
       {errorMessage && (
         <div
           role="alert"
-          className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs font-medium text-rose-800 flex items-center justify-between"
+          className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-4 text-xs font-medium text-rose-300 flex items-center justify-between"
         >
           <div className="flex items-start gap-2">
-            <span aria-hidden="true" className="font-bold text-rose-600 text-sm">
+            <span aria-hidden="true" className="font-bold text-rose-400 text-sm">
               ⚠️
             </span>
             <span>{errorMessage}</span>
@@ -162,7 +162,7 @@ export function DaftarPeriode({
           <button
             type="button"
             onClick={() => setErrorMessage(null)}
-            className="text-rose-600 hover:text-rose-800 p-1"
+            className="text-rose-400 hover:text-rose-200 p-1"
             aria-label="Tutup pesan error"
           >
             ✕
@@ -171,23 +171,23 @@ export function DaftarPeriode({
       )}
 
       {/* Toolbar Filter */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="sogan-card flex flex-col gap-3.5 rounded-2xl border border-amber-900/20 bg-[#0e0c0a] p-4 sm:p-5 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Periode Akuntansi Bulanan</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h2 className="text-sm sm:text-base font-bold text-[#fdfaf6] tracking-tight">Periode Akuntansi Bulanan</h2>
+            <p className="text-xs text-[#a89f91] mt-0.5">
               Kontrol penutupan buku (Akuntan) dan pembukaan kembali (Direktur) sesuai BR-06
             </p>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
             {isAkuntan && (
-              <span className="rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-blue-800 font-medium">
+              <span className="rounded-lg bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-amber-300 font-semibold text-xs">
                 Wewenang: Tutup Periode
               </span>
             )}
             {isDirektur && (
-              <span className="rounded-md bg-purple-50 border border-purple-200 px-2.5 py-1 text-purple-800 font-medium">
+              <span className="rounded-lg bg-purple-500/10 border border-purple-500/30 px-3 py-1 text-purple-300 font-semibold text-xs">
                 Wewenang: Buka Kembali Periode
               </span>
             )}
@@ -195,36 +195,36 @@ export function DaftarPeriode({
         </div>
 
         {/* Dropdown Filter */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-amber-900/20">
           <div>
-            <label htmlFor="filter-periode-status" className="block text-[11px] font-semibold text-slate-600 mb-1">
+            <label htmlFor="filter-periode-status" className="block text-[11px] font-semibold text-[#a89f91] mb-1.5">
               Status Periode
             </label>
             <select
               id="filter-periode-status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2 text-xs sm:text-sm text-[#fdfaf6] focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition"
             >
-              <option value="semua">Semua Status</option>
-              <option value="terbuka">Terbuka Saja</option>
-              <option value="ditutup">Ditutup Saja</option>
+              <option value="semua" className="bg-[#141210] text-[#fdfaf6]">Semua Status</option>
+              <option value="terbuka" className="bg-[#141210] text-[#fdfaf6]">Terbuka Saja</option>
+              <option value="ditutup" className="bg-[#141210] text-[#fdfaf6]">Ditutup Saja</option>
             </select>
           </div>
 
           <div>
-            <label htmlFor="filter-periode-tahun" className="block text-[11px] font-semibold text-slate-600 mb-1">
+            <label htmlFor="filter-periode-tahun" className="block text-[11px] font-semibold text-[#a89f91] mb-1.5">
               Tahun Buku
             </label>
             <select
               id="filter-periode-tahun"
               value={filterTahun}
               onChange={(e) => setFilterTahun(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2 text-xs sm:text-sm text-[#fdfaf6] focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition"
             >
-              <option value="semua">Semua Tahun</option>
+              <option value="semua" className="bg-[#141210] text-[#fdfaf6]">Semua Tahun</option>
               {tahunOptions.map((t) => (
-                <option key={t} value={t}>
+                <option key={t} value={t} className="bg-[#141210] text-[#fdfaf6]">
                   Tahun {t}
                 </option>
               ))}
@@ -234,27 +234,27 @@ export function DaftarPeriode({
       </div>
 
       {/* Ringkasan Jumlah */}
-      <div className="text-xs text-slate-500 px-1">
-        Menampilkan <strong className="text-slate-900">{filteredPeriode.length}</strong> periode akuntansi
+      <div className="text-xs text-[#a89f91] px-1">
+        Menampilkan <strong className="text-[#fdfaf6]">{filteredPeriode.length}</strong> periode akuntansi
       </div>
 
       {/* Tabel Periode Desktop */}
-      <div className="hidden md:block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
-        <table className="w-full text-left text-xs text-slate-700">
-          <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-amber-900/20 bg-[#0e0c0a] shadow-xl">
+        <table className="w-full text-left text-xs text-[#d6cfc7]">
+          <thead className="border-b border-amber-900/20 bg-[#141210] text-[11px] font-bold uppercase tracking-wider text-[#a89f91]">
             <tr>
-              <th scope="col" className="px-4 py-3">Periode</th>
-              <th scope="col" className="px-4 py-3">Status Buku</th>
-              <th scope="col" className="px-4 py-3 text-center">Jurnal Draf</th>
-              <th scope="col" className="px-4 py-3">Ditutup Oleh & Waktu</th>
-              <th scope="col" className="px-4 py-3">Alasan Buka Ulang</th>
-              <th scope="col" className="px-4 py-3 text-right">Aksi</th>
+              <th scope="col" className="px-4 py-3.5">Periode</th>
+              <th scope="col" className="px-4 py-3.5">Status Buku</th>
+              <th scope="col" className="px-4 py-3.5 text-center">Jurnal Draf</th>
+              <th scope="col" className="px-4 py-3.5">Ditutup Oleh & Waktu</th>
+              <th scope="col" className="px-4 py-3.5">Alasan Buka Ulang</th>
+              <th scope="col" className="px-4 py-3.5 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-amber-900/10">
             {filteredPeriode.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-12 text-center text-[#736b5e]">
                   Tidak ada data periode akuntansi yang sesuai.
                 </td>
               </tr>
@@ -265,11 +265,11 @@ export function DaftarPeriode({
                 const isTerakhirDitutup = !isTerbuka && latestClosedPeriode?.id === item.id;
 
                 return (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition">
+                  <tr key={item.id} className="hover:bg-amber-950/20 transition">
                     {/* Nama Periode */}
                     <td className="px-4 py-3.5 whitespace-nowrap">
-                      <div className="font-bold text-slate-900 text-sm">{label}</div>
-                      <div className="text-[11px] text-slate-400">
+                      <div className="font-bold text-[#fdfaf6] text-sm">{label}</div>
+                      <div className="text-[11px] text-[#736b5e] mt-0.5">
                         Mulai: {item.tanggal_mulai}
                       </div>
                     </td>
@@ -277,15 +277,15 @@ export function DaftarPeriode({
                     {/* Status Buku dengan Indikator Aksesibel */}
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       {isTerbuka ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-semibold text-emerald-800">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-semibold text-emerald-400">
                           <span
                             aria-hidden="true"
-                            className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"
+                            className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"
                           />
                           <span>● Terbuka</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-300 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#141210] border border-amber-900/30 px-2.5 py-1 text-[11px] font-semibold text-[#a89f91]">
                           <span aria-hidden="true">🔒</span>
                           <span>Ditutup</span>
                         </span>
@@ -295,12 +295,12 @@ export function DaftarPeriode({
                     {/* Jumlah Jurnal Draf (BR-06) */}
                     <td className="px-4 py-3.5 text-center whitespace-nowrap">
                       {item.jumlah_draf !== undefined && item.jumlah_draf > 0 ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 text-[11px] font-bold text-amber-300">
                           <span aria-hidden="true">⚠️</span>
                           <span>{item.jumlah_draf} draf</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                        <span className="inline-flex items-center rounded-full bg-[#141210] border border-amber-900/20 px-2.5 py-0.5 text-[11px] font-medium text-[#736b5e]">
                           0 draf
                         </span>
                       )}
@@ -310,23 +310,23 @@ export function DaftarPeriode({
                     <td className="px-4 py-3.5">
                       {!isTerbuka && item.ditutup_pada ? (
                         <div>
-                          <div className="font-semibold text-slate-800">
+                          <div className="font-semibold text-[#fdfaf6]">
                             {item.penutup?.nama_lengkap || "Akuntan"}
                           </div>
-                          <div className="text-[11px] text-slate-500">
+                          <div className="text-[11px] text-[#a89f91]">
                             {formatDateTime(item.ditutup_pada)}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-slate-400">-</span>
+                        <span className="text-[#736b5e]">-</span>
                       )}
                     </td>
 
                     {/* Alasan Buka Ulang (bila ada) */}
                     <td className="px-4 py-3.5 max-w-xs">
                       {item.alasan_buka_ulang ? (
-                        <div className="rounded-lg bg-purple-50/80 border border-purple-200/60 p-2 text-[11px] text-purple-900">
-                          <span className="font-semibold block text-[10px] text-purple-700 uppercase tracking-wider">
+                        <div className="rounded-xl bg-purple-950/20 border border-purple-500/30 p-2.5 text-[11px] text-purple-200">
+                          <span className="font-semibold block text-[10px] text-purple-400 uppercase tracking-wider">
                             Riwayat Buka Kembali:
                           </span>
                           <span className="italic line-clamp-2">
@@ -334,7 +334,7 @@ export function DaftarPeriode({
                           </span>
                         </div>
                       ) : (
-                        <span className="text-slate-400">-</span>
+                        <span className="text-[#736b5e]">-</span>
                       )}
                     </td>
 
@@ -349,7 +349,7 @@ export function DaftarPeriode({
                             setSuccessMessage(null);
                             setTutupModalPeriode(item);
                           }}
-                          className="inline-flex items-center gap-1 rounded-lg bg-amber-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-900 transition shadow-xs"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-3.5 py-1.5 text-xs font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition active:scale-95"
                           title="Tutup periode pembukuan ini (BR-06)"
                         >
                           <span aria-hidden="true">🔒</span>
@@ -366,7 +366,7 @@ export function DaftarPeriode({
                             setSuccessMessage(null);
                             setBukaModalPeriode(item);
                           }}
-                          className="inline-flex items-center gap-1 rounded-lg bg-purple-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-800 transition shadow-xs"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-600 hover:to-purple-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg shadow-purple-950/40 transition active:scale-95"
                           title="Buka kembali periode akuntansi terakhir yang ditutup ini (BR-06)"
                         >
                           <span aria-hidden="true">🔓</span>
@@ -376,12 +376,12 @@ export function DaftarPeriode({
 
                       {/* Jika Direktur melihat periode ditutup tetapi bukan periode terakhir yang ditutup */}
                       {isDirektur && !isTerbuka && !isTerakhirDitutup && (
-                        <span className="text-[11px] text-slate-400 italic">Ditutup</span>
+                        <span className="text-[11px] text-[#736b5e] italic">Ditutup</span>
                       )}
 
                       {/* Jika Akuntan melihat periode ditutup atau Direktur melihat periode terbuka */}
                       {((isAkuntan && !isTerbuka) || (isDirektur && isTerbuka)) && (
-                        <span className="text-[11px] text-slate-400 italic">Selesai</span>
+                        <span className="text-[11px] text-[#736b5e] italic">Selesai</span>
                       )}
                     </td>
                   </tr>
@@ -395,7 +395,7 @@ export function DaftarPeriode({
       {/* Tampilan Kartu Ponsel (Mobile Responsive) */}
       <div className="grid grid-cols-1 gap-3 md:hidden">
         {filteredPeriode.length === 0 ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 text-center text-xs text-slate-400">
+          <div className="rounded-2xl border border-amber-900/20 bg-[#0e0c0a] p-6 text-center text-xs text-[#736b5e]">
             Tidak ada data periode akuntansi yang sesuai.
           </div>
         ) : (
@@ -407,36 +407,36 @@ export function DaftarPeriode({
             return (
               <div
                 key={item.id}
-                className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs space-y-3"
+                className="sogan-card rounded-2xl border border-amber-900/20 bg-[#0e0c0a] p-4 shadow-xl space-y-3"
               >
                 {/* Header: Periode & Badge Status */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">{label}</h3>
-                    <p className="text-[11px] text-slate-400">Mulai: {item.tanggal_mulai}</p>
+                    <h3 className="text-sm font-bold text-[#fdfaf6]">{label}</h3>
+                    <p className="text-[11px] text-[#736b5e]">Mulai: {item.tanggal_mulai}</p>
                   </div>
 
                   {isTerbuka ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
                       <span>● Terbuka</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-300 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#141210] border border-amber-900/30 px-2.5 py-0.5 text-[11px] font-semibold text-[#a89f91]">
                       <span>🔒 Ditutup</span>
                     </span>
                   )}
                 </div>
 
                 {/* Indikator Jumlah Jurnal Draf di Kartu Ponsel */}
-                <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
-                  <span className="text-slate-600 font-medium text-[11px]">Jurnal Draf:</span>
+                <div className="flex items-center justify-between text-xs pt-2.5 border-t border-amber-900/20">
+                  <span className="text-[#a89f91] font-medium text-[11px]">Jurnal Draf:</span>
                   {item.jumlah_draf !== undefined && item.jumlah_draf > 0 ? (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-300">
                       <span aria-hidden="true">⚠️</span>
                       <span>{item.jumlah_draf} draf tertunda</span>
                     </span>
                   ) : (
-                    <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">
+                    <span className="rounded bg-[#141210] border border-amber-900/20 px-2 py-0.5 text-[10px] font-medium text-[#736b5e]">
                       0 draf
                     </span>
                   )}
@@ -444,14 +444,14 @@ export function DaftarPeriode({
 
                 {/* Info Penutupan */}
                 {!isTerbuka && item.ditutup_pada && (
-                  <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                    <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+                  <div className="text-xs text-[#a89f91] bg-[#141210] p-2.5 rounded-xl border border-amber-900/20">
+                    <span className="text-[#736b5e] block text-[10px] uppercase font-semibold">
                       Ditutup Oleh:
                     </span>
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-[#fdfaf6]">
                       {item.penutup?.nama_lengkap || "Akuntan"}
                     </span>
-                    <span className="text-slate-500 block text-[11px]">
+                    <span className="text-[#a89f91] block text-[11px] mt-0.5">
                       pada {formatDateTime(item.ditutup_pada)}
                     </span>
                   </div>
@@ -459,11 +459,11 @@ export function DaftarPeriode({
 
                 {/* Alasan Buka Ulang */}
                 {item.alasan_buka_ulang && (
-                  <div className="rounded-lg bg-purple-50 p-2.5 text-xs text-purple-900 border border-purple-200">
-                    <span className="font-bold block text-[10px] text-purple-700 uppercase">
+                  <div className="rounded-xl bg-purple-950/20 p-2.5 text-xs text-purple-200 border border-purple-500/30">
+                    <span className="font-bold block text-[10px] text-purple-400 uppercase">
                       Alasan Buka Ulang (Direktur):
                     </span>
-                    <p className="italic mt-0.5">&quot;{item.alasan_buka_ulang}&quot;</p>
+                    <p className="italic mt-0.5 text-[11px]">&quot;{item.alasan_buka_ulang}&quot;</p>
                   </div>
                 )}
 
@@ -476,7 +476,7 @@ export function DaftarPeriode({
                       setSuccessMessage(null);
                       setTutupModalPeriode(item);
                     }}
-                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-800 py-2 text-xs font-semibold text-white hover:bg-amber-900 transition shadow-xs"
+                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 py-2.5 text-xs font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition active:scale-95"
                   >
                     <span>🔒</span>
                     <span>Tutup Periode</span>
@@ -492,7 +492,7 @@ export function DaftarPeriode({
                       setSuccessMessage(null);
                       setBukaModalPeriode(item);
                     }}
-                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-purple-700 py-2 text-xs font-semibold text-white hover:bg-purple-800 transition shadow-xs"
+                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-600 hover:to-purple-700 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-950/40 transition active:scale-95"
                   >
                     <span>🔓</span>
                     <span>Buka Kembali Periode</span>

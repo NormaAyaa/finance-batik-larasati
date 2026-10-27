@@ -58,18 +58,30 @@ export default async function BaruJurnalPage() {
   }));
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6">
       {/* Navigasi breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <Link href="/jurnal" className="hover:text-slate-900 transition font-medium">
-          ← Kembali ke Jurnal Umum
-        </Link>
-      </div>
+      <nav aria-label="Breadcrumb">
+        <ol className="flex items-center gap-2 text-sm sm:text-base text-[#a89f91]">
+          <li>
+            <Link href="/jurnal" className="hover:text-amber-300 transition font-semibold flex items-center gap-1.5">
+              <span aria-hidden="true">←</span> Kembali ke Jurnal Umum
+            </Link>
+          </li>
+        </ol>
+      </nav>
 
       {/* Header Halaman */}
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">Input Draf Jurnal Umum</h1>
-        <p className="text-xs text-slate-500 mt-1">
+      <div className="pb-3 border-b border-amber-900/20">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-amber-400/90">
+            Pembukuan Jurnal • CV Batik Larasati
+          </span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#fdfaf6] tracking-tight">
+          Input Draf Jurnal Umum
+        </h1>
+        <p className="text-sm sm:text-base text-[#a89f91] mt-1">
           Catat transaksi minimal 2 baris akun dengan nominal debit dan kredit yang seimbang (BR-02).
         </p>
       </div>
@@ -84,3 +96,4 @@ export default async function BaruJurnalPage() {
     </div>
   );
 }
+

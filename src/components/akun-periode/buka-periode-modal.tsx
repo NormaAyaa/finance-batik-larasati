@@ -75,19 +75,19 @@ export function BukaPeriodeModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="buka-periode-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
     >
-      <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl transition-all my-8 space-y-4">
+      <div className="sogan-card relative w-full max-w-lg rounded-2xl bg-[#0e0c0a] border border-purple-500/30 p-6 shadow-2xl text-[#fdfaf6] transition-all my-8 space-y-5">
         {/* Header Modal */}
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-700 text-lg">
+        <div className="flex items-start gap-3.5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-lg">
             🔓
           </div>
           <div className="flex-1">
-            <h2 id="buka-periode-title" className="text-base font-bold text-slate-900">
+            <h2 id="buka-periode-title" className="text-base sm:text-lg font-bold text-[#fdfaf6] tracking-tight">
               Buka Kembali Periode Akuntansi
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#a89f91] mt-0.5">
               Otoritas khusus Direktur untuk membuka kembali buku periode (BR-06)
             </p>
           </div>
@@ -95,7 +95,7 @@ export function BukaPeriodeModal({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+            className="rounded-xl p-1.5 text-[#a89f91] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition"
             aria-label="Tutup dialog"
           >
             ✕
@@ -106,9 +106,9 @@ export function BukaPeriodeModal({
         {errorMessage && (
           <div
             role="alert"
-            className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-xs text-rose-800 flex items-start gap-2"
+            className="rounded-xl bg-rose-950/20 border border-rose-500/30 p-3.5 text-xs text-rose-300 flex items-start gap-2.5"
           >
-            <span className="font-bold text-rose-600" aria-hidden="true">
+            <span className="font-bold text-rose-400 text-sm" aria-hidden="true">
               ⚠️
             </span>
             <div className="flex-1">{errorMessage}</div>
@@ -116,11 +116,11 @@ export function BukaPeriodeModal({
         )}
 
         {/* Kotak Peringatan & Aturan Bisnis */}
-        <div className="rounded-xl border border-purple-200 bg-purple-50/50 p-4 text-xs text-purple-950 space-y-1.5">
-          <p className="font-semibold text-purple-900">
-            Membuka kembali periode: <span className="text-slate-900 font-bold">{periodeLabel}</span>
+        <div className="rounded-2xl border border-purple-500/25 bg-purple-950/20 p-4 text-xs text-purple-200 space-y-2">
+          <p className="font-semibold text-purple-300">
+            Membuka kembali periode: <span className="text-[#fdfaf6] font-bold">{periodeLabel}</span>
           </p>
-          <ul className="list-disc pl-4 space-y-1 text-[11px] text-purple-800">
+          <ul className="list-disc pl-4 space-y-1.5 text-[11px] text-[#d6cfc7]">
             <li>Hanya periode terakhir yang ditutup yang diizinkan untuk dibuka kembali (BR-06).</li>
             <li>Alasan pembukaan kembali wajib dicatat untuk audit trail minimal 20 karakter.</li>
           </ul>
@@ -129,13 +129,13 @@ export function BukaPeriodeModal({
         {/* Formulir Alasan Wajib */}
         <form onSubmit={handleBukaKembali} className="space-y-4">
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label htmlFor="alasan-buka-kembali" className="block text-xs font-semibold text-slate-700">
-                Alasan Pembukaan Kembali Periode <span className="text-rose-500">*</span>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="alasan-buka-kembali" className="block text-xs font-semibold text-[#d6cfc7]">
+                Alasan Pembukaan Kembali Periode <span className="text-amber-400">*</span>
               </label>
               <span
                 className={`text-[11px] font-mono ${
-                  isAlasanValid ? "text-emerald-600 font-semibold" : "text-amber-600"
+                  isAlasanValid ? "text-emerald-400 font-semibold" : "text-amber-400"
                 }`}
               >
                 {charCount} / {MIN_ALASAN_LENGTH} karakter minimal
@@ -149,30 +149,30 @@ export function BukaPeriodeModal({
               onChange={(e) => setAlasan(e.target.value)}
               placeholder="Jelaskan alasan pembukuan perlu dibuka kembali (misal: Perbaikan jurnal penyesuaian beban listrik toko yang terlewat catat)..."
               disabled={isSubmitting}
-              className="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:bg-slate-100"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] p-3.5 text-xs sm:text-sm text-[#fdfaf6] placeholder-[#5c554b] focus:border-purple-500/60 focus:outline-none focus:ring-1 focus:ring-purple-500/40 disabled:opacity-50 transition"
               required
             />
             {!isAlasanValid && (
-              <p className="text-[11px] text-amber-700 mt-1">
+              <p className="text-[11px] text-amber-400/90 mt-1.5">
                 Alasan wajib ditulis minimal {MIN_ALASAN_LENGTH} karakter sesuai aturan bisnis BR-06.
               </p>
             )}
           </div>
 
           {/* Aksi Bawah */}
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/20">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-slate-300 px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-50"
+              className="rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !isAlasanValid}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-purple-700 px-4 py-2 text-xs font-semibold text-white hover:bg-purple-800 transition disabled:opacity-50 shadow-xs"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-600 hover:to-purple-700 px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-purple-950/40 transition disabled:opacity-50 active:scale-95"
             >
               {isSubmitting ? (
                 <>

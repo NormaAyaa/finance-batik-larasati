@@ -103,24 +103,30 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       {/* Header Halaman */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-amber-900/20">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            Pengajuan Biaya & Reimburse
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-amber-400/90">
+              Pengajuan Biaya & Reimburse • CV Batik Larasati
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#fdfaf6] tracking-tight">
+            Daftar Pengajuan
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-sm sm:text-base text-[#a89f91] mt-1">
             {profile.peran === "staf"
-              ? "Pantau dan kelola riwayat pengajuan biaya operasional dan reimburse Anda"
-              : "Daftar seluruh pengajuan biaya operasional dan reimburse karyawan CV Batik Larasati"}
+              ? "Pantau dan kelola riwayat pengajuan biaya operasional dan reimburse Anda secara real-time."
+              : "Daftar seluruh pengajuan biaya operasional dan reimburse karyawan CV Batik Larasati."}
           </p>
         </div>
 
         {canCreate && (
           <Link
             href="/pengajuan/baru"
-            className="inline-flex items-center justify-center rounded-lg bg-amber-800 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition shrink-0"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-5 py-2.5 text-sm sm:text-base font-bold text-black shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition shrink-0"
           >
-            <span aria-hidden="true" className="mr-1.5 font-bold">
+            <span aria-hidden="true" className="font-black text-base">
               +
             </span>
             Buat Pengajuan Baru
@@ -139,119 +145,140 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-800"
+          className="sogan-card border-rose-900/40 bg-gradient-to-r from-rose-950/30 to-[#0f0d0b] p-5 text-sm text-rose-300"
         >
-          <p className="font-semibold">Gagal memuat data pengajuan</p>
-          <p className="mt-0.5">
+          <p className="font-bold flex items-center gap-2">
+            <span aria-hidden="true">⚠️</span> Gagal Memuat Data Pengajuan
+          </p>
+          <p className="mt-1 text-rose-400/90">
             Terjadi kendala saat mengambil data dari database. Silakan muat ulang halaman.
           </p>
         </div>
       )}
 
-      {/* Tampilan Desktop: Tabel */}
-      <div className="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      {/* Tampilan Desktop: Tabel Sogan Obsidian */}
+      <div className="hidden md:block sogan-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse" aria-label="Tabel Daftar Pengajuan">
+          <table className="w-full text-left border-collapse text-base text-[#fdfaf6]" aria-label="Tabel Daftar Pengajuan">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/75 text-[11px] font-bold uppercase tracking-wider text-slate-600">
-                <th scope="col" className="px-4 py-3">
-                  Nomor
+              <tr className="border-b border-amber-900/30 bg-[#141210] text-sm sm:text-base font-bold uppercase tracking-wider text-[#d6cfc7]">
+                <th scope="col" className="px-5 py-4">
+                  Nomor & Jenis
                 </th>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-5 py-4">
                   Tanggal
                 </th>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-5 py-4">
                   Pengaju
                 </th>
-                <th scope="col" className="px-4 py-3">
-                  Keperluan
+                <th scope="col" className="px-5 py-4">
+                  Keperluan & Akun
                 </th>
-                <th scope="col" className="px-4 py-3 text-right">
+                <th scope="col" className="px-5 py-4 text-right">
                   Jumlah
                 </th>
-                <th scope="col" className="px-4 py-3 text-center">
+                <th scope="col" className="px-5 py-4 text-center">
                   Status
                 </th>
-                <th scope="col" className="px-4 py-3 text-center">
+                <th scope="col" className="px-5 py-4 text-center">
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs text-slate-800">
+            <tbody className="divide-y divide-amber-900/15">
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
-                    <p className="text-sm font-medium text-slate-600">
-                      Tidak ada pengajuan ditemukan
-                    </p>
-                    <p className="text-xs text-slate-400 mt-1">
+                  <td colSpan={7} className="px-6 py-16 text-center">
+                    <div
+                      aria-hidden="true"
+                      className="w-16 h-16 mx-auto rounded-full bg-amber-950/40 text-amber-400 flex items-center justify-center text-3xl font-bold mb-4 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+                    >
+                      📄
+                    </div>
+                    <h4 className="text-lg sm:text-xl font-bold text-[#fdfaf6]">
+                      Tidak Ada Pengajuan Ditemukan
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#a89f91] mt-1.5 max-w-md mx-auto">
                       {currentStatus || currentBulan || currentSearch
-                        ? "Coba ubah atau reset kata kunci pencarian dan filter Anda."
+                        ? "Coba sesuaikan kata kunci pencarian atau reset filter aktif Anda."
                         : canCreate
-                        ? "Mulai dengan membuat pengajuan biaya atau reimburse baru."
+                        ? "Mulai dengan membuat pengajuan biaya operasional atau reimburse baru."
                         : "Belum ada data pengajuan yang tersimpan."}
                     </p>
+                    {canCreate && !currentStatus && !currentBulan && !currentSearch && (
+                      <div className="mt-5">
+                        <Link
+                          href="/pengajuan/baru"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-bold text-amber-300 hover:bg-[#1e1a16] transition shadow-sm"
+                        >
+                          + Buat Pengajuan Pertama
+                        </Link>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ) : (
                 items.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={item.id} className="hover:bg-[#1a1613] transition-colors">
                     {/* Nomor Pengajuan */}
-                    <td className="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">
+                    <td className="px-5 py-4.5 whitespace-nowrap">
                       {item.nomor ? (
-                        <span className="font-mono text-slate-800">{item.nomor}</span>
+                        <span className="font-mono font-bold text-[#fdfaf6] text-base sm:text-lg">{item.nomor}</span>
                       ) : (
-                        <span className="text-slate-400 italic">Draf (belum ada nomor)</span>
+                        <span className="text-[#a89f91] italic text-base">Draf #{item.id}</span>
                       )}
-                      <div className="text-[10px] uppercase font-bold text-amber-700 tracking-wide">
-                        {item.jenis}
+                      <div>
+                        <span className="inline-block mt-1 text-xs sm:text-sm uppercase font-bold text-amber-400 tracking-wider bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded">
+                          {item.jenis}
+                        </span>
                       </div>
                     </td>
 
                     {/* Tanggal Transaksi */}
-                    <td className="px-4 py-3 whitespace-nowrap text-slate-600">
+                    <td className="px-5 py-4.5 whitespace-nowrap text-sm sm:text-base text-[#d6cfc7] font-medium">
                       {formatDate(item.tanggal_transaksi)}
                     </td>
 
                     {/* Pengaju */}
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-slate-900">
+                    <td className="px-5 py-4.5">
+                      <div className="font-bold text-base sm:text-lg text-[#fdfaf6]">
                         {item.pengaju?.nama_lengkap || "-"}
                       </div>
-                      <div className="text-[11px] text-slate-400 truncate max-w-[160px]">
+                      <div className="text-sm text-[#a89f91] truncate max-w-[200px] mt-0.5">
                         {item.pengaju?.email}
                       </div>
                     </td>
 
                     {/* Keperluan */}
-                    <td className="px-4 py-3 max-w-xs">
-                      <p className="line-clamp-2 text-slate-700" title={item.keterangan}>
+                    <td className="px-5 py-4.5 max-w-sm">
+                      <p className="line-clamp-2 text-sm sm:text-base text-[#fdfaf6] leading-relaxed" title={item.keterangan}>
                         {item.keterangan}
                       </p>
                       {item.akun_beban && (
-                        <span className="inline-block mt-0.5 text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                        <span className="inline-block mt-1.5 text-xs sm:text-sm text-amber-300 font-semibold bg-amber-950/50 border border-amber-900/40 px-2.5 py-1 rounded">
                           {item.akun_beban.kode} - {item.akun_beban.nama}
                         </span>
                       )}
                     </td>
 
                     {/* Jumlah (Rata Kanan) */}
-                    <td className="px-4 py-3 text-right font-bold text-slate-900 tabular-nums whitespace-nowrap">
+                    <td className="px-5 py-4.5 text-right font-mono font-black text-lg sm:text-xl text-amber-300 tabular-nums whitespace-nowrap">
                       {formatRupiah(item.jumlah)}
                     </td>
 
-                    {/* Status (Badge Aksesibel) */}
-                    <td className="px-4 py-3 text-center whitespace-nowrap">
+                    {/* Status */}
+                    <td className="px-5 py-4.5 text-center whitespace-nowrap">
                       <StatusBadge status={item.status} />
                     </td>
 
                     {/* Aksi */}
-                    <td className="px-4 py-3 text-center whitespace-nowrap">
+                    <td className="px-5 py-4.5 text-center whitespace-nowrap">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 transition"
+                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm sm:text-base font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_12px_rgba(245,158,11,0.25)] hover:shadow-[0_0_18px_rgba(245,158,11,0.4)]"
                       >
-                        Detail →
+                        <span>Detail</span>
+                        <span aria-hidden="true">→</span>
                       </Link>
                     </td>
                   </tr>
@@ -263,13 +290,13 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
       </div>
 
       {/* Tampilan Ponsel: Daftar Kartu (Card View) */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden space-y-4">
         {items.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-400">
-            <p className="text-sm font-medium text-slate-600">
+          <div className="sogan-card p-8 text-center text-[#a89f91]">
+            <p className="text-lg font-bold text-[#fdfaf6]">
               Tidak ada pengajuan ditemukan
             </p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-sm sm:text-base text-[#a89f91] mt-1.5">
               {currentStatus || currentBulan || currentSearch
                 ? "Coba ubah atau reset filter Anda."
                 : canCreate
@@ -281,15 +308,15 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
           items.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3"
+              className="sogan-card sogan-card-hover p-5 space-y-4"
             >
               {/* Header Kartu: Nomor & Status */}
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <span className="font-mono text-xs font-bold text-slate-900">
-                    {item.nomor || "Draf (Belum bernomor)"}
+                  <span className="font-mono text-base sm:text-lg font-bold text-[#fdfaf6]">
+                    {item.nomor || `Draf #${item.id}`}
                   </span>
-                  <span className="ml-2 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                  <span className="ml-2 text-xs sm:text-sm font-bold uppercase px-2.5 py-1 rounded bg-amber-950/70 text-amber-300 border border-amber-500/40 inline-block">
                     {item.jenis}
                   </span>
                 </div>
@@ -298,35 +325,36 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
 
               {/* Isi: Keperluan & Akun Beban */}
               <div>
-                <p className="text-xs font-medium text-slate-800 line-clamp-2">
+                <p className="text-sm sm:text-base font-medium text-[#fdfaf6] line-clamp-2 leading-relaxed">
                   {item.keterangan}
                 </p>
                 {item.akun_beban && (
-                  <p className="text-[10px] text-slate-500 mt-0.5">
+                  <p className="text-xs sm:text-sm text-amber-300 font-semibold mt-1.5">
                     Akun: {item.akun_beban.kode} - {item.akun_beban.nama}
                   </p>
                 )}
               </div>
 
               {/* Pengaju & Tanggal */}
-              <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                <span>Pengaju: {item.pengaju?.nama_lengkap || "-"}</span>
-                <span>{formatDate(item.tanggal_transaksi)}</span>
+              <div className="flex items-center justify-between text-sm sm:text-base text-[#a89f91] pt-3 border-t border-amber-900/20">
+                <span>Pengaju: <strong className="text-[#fdfaf6] font-semibold">{item.pengaju?.nama_lengkap || "-"}</strong></span>
+                <span className="font-mono text-xs sm:text-sm">{formatDate(item.tanggal_transaksi)}</span>
               </div>
 
               {/* Footer Kartu: Nominal & Tombol Detail */}
               <div className="flex items-center justify-between pt-1">
                 <div>
-                  <span className="text-[10px] text-slate-400 block">Total Jumlah</span>
-                  <span className="text-sm font-extrabold text-slate-900 tabular-nums">
+                  <span className="text-xs sm:text-sm text-[#a89f91] block">Total Jumlah</span>
+                  <span className="text-lg sm:text-xl font-black text-amber-300 font-mono tabular-nums">
                     {formatRupiah(item.jumlah)}
                   </span>
                 </div>
                 <Link
                   href={`/pengajuan/${item.id}`}
-                  className="rounded-lg bg-slate-900 text-white px-3 py-1.5 text-xs font-semibold hover:bg-slate-800 transition"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm sm:text-base font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_10px_rgba(245,158,11,0.25)]"
                 >
-                  Lihat Detail →
+                  <span>Detail</span>
+                  <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </div>
@@ -336,3 +364,5 @@ export default async function PengajuanPage({ searchParams }: PageProps) {
     </div>
   );
 }
+
+

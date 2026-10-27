@@ -64,8 +64,8 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        {/* Konten Halaman */}
-        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
+        {/* Konten Halaman (Full-width fluid tanpa batasan max-w-7xl) */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full">
           {children}
         </main>
       </div>

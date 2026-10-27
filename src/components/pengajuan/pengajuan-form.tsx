@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { transisiStatusPengajuanAction } from "@/app/(dashboard)/pengajuan/actions";
 import { getFriendlyErrorMessage } from "@/lib/utils/errors";
 import { formatRupiah } from "@/lib/utils/formatters";
 import type { JenisPengajuan, StatusPengajuan } from "@/types/database";
@@ -367,22 +368,19 @@ export function PengajuanForm({
         savedId = initialData.id;
       }
 
-      // Jika aksi = "kirim", lakukan transisi status lewat RPC resmi transisi_status_pengajuan
+      // Jika aksi = "kirim", lakukan transisi status lewat Server Action transisiStatusPengajuanAction
       if (isSending) {
         // Alur peran: Staf -> 'diajukan', Akuntan -> 'menunggu_direktur' (BR-09)
         const targetStatus: StatusPengajuan =
           userRole === "akuntan" ? "menunggu_direktur" : "diajukan";
 
-        const { error: rpcErr } = await supabase.rpc(
-          "transisi_status_pengajuan",
-          {
-            p_pengajuan_id: savedId,
-            p_status_baru: targetStatus,
-          }
-        );
+        const res = await transisiStatusPengajuanAction({
+          pengajuanId: savedId,
+          targetStatus,
+        });
 
-        if (rpcErr) {
-          throw rpcErr;
+        if (!res.success) {
+          throw new Error(res.error || "Gagal mengirim pengajuan.");
         }
       }
 
@@ -397,21 +395,21 @@ export function PengajuanForm({
   };
 
   return (
-    <div className="space-y-6 max-w-2xl bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-sm">
+    <div className="space-y-6 w-full max-w-4xl sogan-card p-6 sm:p-8 border-amber-900/30 text-[#fdfaf6]">
       {/* Catatan peninjau jika dalam status perlu revisi */}
       {mode === "edit" && initialData?.catatan_peninjau && (
         <div
           role="region"
           aria-label="Catatan Revisi dari Peninjau"
-          className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-900"
+          className="rounded-xl border border-orange-500/40 bg-orange-950/30 p-5 text-sm sm:text-base text-orange-200"
         >
-          <div className="flex items-center gap-1.5 font-bold text-amber-900">
-            <span aria-hidden="true">↩</span> Catatan Revisi dari Peninjau:
+          <div className="flex items-center gap-2 font-bold text-orange-300">
+            <span aria-hidden="true" className="text-base sm:text-lg">↩</span> Catatan Revisi dari Peninjau:
           </div>
-          <p className="mt-1 text-slate-800 font-medium">
+          <p className="mt-1.5 text-[#fdfaf6] font-medium leading-relaxed">
             &quot;{initialData.catatan_peninjau}&quot;
           </p>
-          <p className="mt-1.5 text-[11px] text-amber-700">
+          <p className="mt-2 text-xs sm:text-sm text-[#a89f91]">
             Harap sesuaikan data pengajuan atau unggah ulang nota bukti sesuai arahan di atas sebelum mengirim ulang.
           </p>
         </div>
@@ -422,12 +420,12 @@ export function PengajuanForm({
         <div
           role="alert"
           aria-live="assertive"
-          className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-xs text-rose-800"
+          className="sogan-card border-rose-500/40 bg-gradient-to-r from-rose-950/30 to-[#0f0d0b] p-5 text-sm sm:text-base text-rose-300"
         >
-          <p className="font-bold flex items-center gap-1.5">
+          <p className="font-bold flex items-center gap-2 text-base">
             <span aria-hidden="true">⚠️</span> Gagal Menyimpan Pengajuan
           </p>
-          <p className="mt-1">{errorMessage}</p>
+          <p className="mt-1 text-rose-400/90 leading-relaxed">{errorMessage}</p>
         </div>
       )}
 
@@ -436,17 +434,17 @@ export function PengajuanForm({
         <div
           role="status"
           aria-live="polite"
-          className={`rounded-xl border p-4 text-xs ${
+          className={`rounded-xl border p-5 text-sm sm:text-base ${
             aiNotification.type === "success"
-              ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+              ? "border-emerald-500/40 bg-emerald-950/40 text-emerald-300"
               : aiNotification.type === "error"
-              ? "border-rose-300 bg-rose-50 text-rose-800"
-              : "border-sky-300 bg-sky-50 text-sky-900"
+              ? "border-rose-500/40 bg-rose-950/40 text-rose-300"
+              : "border-amber-500/40 bg-amber-950/40 text-amber-300"
           }`}
         >
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-start gap-2">
-              <span aria-hidden="true" className="text-base leading-none">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2.5">
+              <span aria-hidden="true" className="text-lg leading-none">
                 {aiNotification.type === "success"
                   ? "✨"
                   : aiNotification.type === "error"
@@ -461,13 +459,13 @@ export function PengajuanForm({
                     ? "Pemberitahuan Ekstraksi Nota"
                     : "Informasi Ekstraksi Nota"}
                 </p>
-                <p className="mt-0.5">{aiNotification.message}</p>
+                <p className="mt-1 leading-relaxed">{aiNotification.message}</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setAiNotification(null)}
-              className="text-xs font-bold opacity-60 hover:opacity-100 px-1 py-0.5 rounded"
+              className="text-sm font-bold opacity-60 hover:opacity-100 px-1 py-0.5 rounded"
               aria-label="Tutup pemberitahuan"
             >
               ✕
@@ -481,20 +479,20 @@ export function PengajuanForm({
           e.preventDefault();
           handleSubmit("kirim");
         }}
-        className="space-y-5"
+        className="space-y-6"
       >
         {/* Jenis Pengajuan */}
-        <fieldset className="space-y-2">
-          <legend className="text-xs font-bold text-slate-900">
-            Jenis Pengajuan <span className="text-rose-600">*</span>
+        <fieldset className="space-y-2.5">
+          <legend className="text-sm sm:text-base font-bold text-[#fdfaf6]">
+            Jenis Pengajuan <span className="text-rose-400">*</span>
           </legend>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <label
               htmlFor="jenis-reimburse"
-              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${
+              className={`flex items-center gap-3.5 p-4 rounded-xl border cursor-pointer transition ${
                 jenis === "reimburse"
-                  ? "border-amber-700 bg-amber-50/50 ring-1 ring-amber-700"
-                  : "border-slate-200 hover:bg-slate-50"
+                  ? "border-amber-500 bg-amber-950/40 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-1 ring-amber-500/50"
+                  : "border-amber-900/30 bg-[#141210] hover:bg-[#1a1613]"
               }`}
             >
               <input
@@ -504,24 +502,24 @@ export function PengajuanForm({
                 value="reimburse"
                 checked={jenis === "reimburse"}
                 onChange={() => setJenis("reimburse")}
-                className="h-4 w-4 text-amber-700 focus:ring-amber-500 border-slate-300"
+                className="h-5 w-5 text-amber-500 focus:ring-amber-400 bg-[#0e0c0a] border-amber-900/50"
               />
               <div>
-                <span className="block text-xs font-bold text-slate-900">
+                <span className="block text-sm sm:text-base font-bold text-[#fdfaf6]">
                   Reimburse
                 </span>
-                <span className="block text-[11px] text-slate-500">
-                  Penggantian uang pribadi
+                <span className="block text-xs sm:text-sm text-[#a89f91] mt-0.5">
+                  Penggantian uang pribadi karyawan
                 </span>
               </div>
             </label>
 
             <label
               htmlFor="jenis-pengeluaran"
-              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${
+              className={`flex items-center gap-3.5 p-4 rounded-xl border cursor-pointer transition ${
                 jenis === "pengeluaran"
-                  ? "border-amber-700 bg-amber-50/50 ring-1 ring-amber-700"
-                  : "border-slate-200 hover:bg-slate-50"
+                  ? "border-amber-500 bg-amber-950/40 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-1 ring-amber-500/50"
+                  : "border-amber-900/30 bg-[#141210] hover:bg-[#1a1613]"
               }`}
             >
               <input
@@ -531,14 +529,14 @@ export function PengajuanForm({
                 value="pengeluaran"
                 checked={jenis === "pengeluaran"}
                 onChange={() => setJenis("pengeluaran")}
-                className="h-4 w-4 text-amber-700 focus:ring-amber-500 border-slate-300"
+                className="h-5 w-5 text-amber-500 focus:ring-amber-400 bg-[#0e0c0a] border-amber-900/50"
               />
               <div>
-                <span className="block text-xs font-bold text-slate-900">
+                <span className="block text-sm sm:text-base font-bold text-[#fdfaf6]">
                   Pengeluaran
                 </span>
-                <span className="block text-[11px] text-slate-500">
-                  Biaya langsung UMKM
+                <span className="block text-xs sm:text-sm text-[#a89f91] mt-0.5">
+                  Biaya langsung operasional UMKM
                 </span>
               </div>
             </label>
@@ -546,16 +544,16 @@ export function PengajuanForm({
         </fieldset>
 
         {/* Tanggal Transaksi */}
-        <div className="space-y-1.5">
-          <div className="flex flex-wrap items-center justify-between gap-1">
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-1.5">
             <label
               htmlFor="tanggal_transaksi"
-              className="text-xs font-bold text-slate-900 inline-flex items-center flex-wrap gap-1.5"
+              className="text-sm sm:text-base font-bold text-[#fdfaf6] inline-flex items-center flex-wrap gap-2"
             >
               <span>Tanggal Transaksi</span>
-              <span className="text-rose-600">*</span>
+              <span className="text-rose-400">*</span>
               {aiAppliedFields.tanggal && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-500/40">
                   <span aria-hidden="true">✓</span> Diisi AI, periksa dulu
                 </span>
               )}
@@ -564,7 +562,7 @@ export function PengajuanForm({
               <button
                 type="button"
                 onClick={() => applyAiSuggestion("tanggal")}
-                className="text-[11px] font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 py-0.5 rounded transition shadow-sm"
+                className="text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 px-3 py-1 rounded-lg transition shadow-sm"
               >
                 Pakai hasil AI: {aiSuggestions.tanggal}
               </button>
@@ -578,54 +576,54 @@ export function PengajuanForm({
             value={tanggalTransaksi}
             onChange={(e) => setTanggalTransaksi(e.target.value)}
             required
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 [color-scheme:dark]"
           />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs sm:text-sm text-[#a89f91]">
             Maksimal 30 hari ke belakang ({minDateStr}) dan tidak boleh di masa depan (BR-07).
           </p>
         </div>
 
         {/* Akun Beban (Hanya Akun Beban Aktif) */}
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <label
             htmlFor="akun_beban_id"
-            className="block text-xs font-bold text-slate-900"
+            className="block text-sm sm:text-base font-bold text-[#fdfaf6]"
           >
-            Akun Beban <span className="text-rose-600">*</span>
+            Akun Beban <span className="text-rose-400">*</span>
           </label>
           <select
             id="akun_beban_id"
             value={akunBebanId}
             onChange={(e) => setAkunBebanId(Number(e.target.value))}
             required
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
           >
             {expenseAccounts.length === 0 ? (
-              <option value="">Tidak ada akun beban aktif</option>
+              <option value="" className="bg-[#141210] text-[#fdfaf6]">Tidak ada akun beban aktif</option>
             ) : (
               expenseAccounts.map((acc) => (
-                <option key={acc.id} value={acc.id}>
+                <option key={acc.id} value={acc.id} className="bg-[#141210] text-[#fdfaf6]">
                   {acc.kode} — {acc.nama}
                 </option>
               ))
             )}
           </select>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs sm:text-sm text-[#a89f91]">
             Hanya akun bertipe beban yang berstatus aktif yang dapat dipilih (BR-07).
           </p>
         </div>
 
         {/* Jumlah Rupiah */}
-        <div className="space-y-1.5">
-          <div className="flex flex-wrap items-center justify-between gap-1">
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-1.5">
             <label
               htmlFor="jumlah"
-              className="text-xs font-bold text-slate-900 inline-flex items-center flex-wrap gap-1.5"
+              className="text-sm sm:text-base font-bold text-[#fdfaf6] inline-flex items-center flex-wrap gap-2"
             >
               <span>Jumlah Pengajuan (Rupiah)</span>
-              <span className="text-rose-600">*</span>
+              <span className="text-rose-400">*</span>
               {aiAppliedFields.jumlah && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-500/40">
                   <span aria-hidden="true">✓</span> Diisi AI, periksa dulu
                 </span>
               )}
@@ -634,7 +632,7 @@ export function PengajuanForm({
               <button
                 type="button"
                 onClick={() => applyAiSuggestion("jumlah")}
-                className="text-[11px] font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 py-0.5 rounded transition shadow-sm"
+                className="text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 px-3 py-1 rounded-lg transition shadow-sm"
               >
                 Pakai hasil AI: {formatRupiah(aiSuggestions.jumlah)}
               </button>
@@ -643,7 +641,7 @@ export function PengajuanForm({
           <div className="relative">
             <span
               aria-hidden="true"
-              className="absolute left-3 top-2.5 text-xs font-bold text-slate-500"
+              className="absolute left-3.5 top-3.5 text-sm sm:text-base font-bold text-amber-400/80"
             >
               Rp
             </span>
@@ -657,15 +655,15 @@ export function PengajuanForm({
               onChange={(e) => setJumlah(e.target.value)}
               placeholder="10000 s/d 25000000"
               required
-              className="w-full pl-10 pr-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full pl-12 pr-4 py-3 text-base sm:text-lg font-mono font-bold rounded-xl border border-amber-900/40 bg-[#141210] text-amber-300 placeholder-[#78716c] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
             />
           </div>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-slate-500">
-              Rentang: Rp 10.000 s/d Rp 25.000.000 (bilangan bulat rupiah)
+          <div className="flex items-center justify-between text-xs sm:text-sm">
+            <span className="text-[#a89f91]">
+              Rentang: Rp 10.000 s/d Rp 25.000.000 (bilangan bulat)
             </span>
             {parsedJumlah > 0 && (
-              <span className="font-bold text-amber-800">
+              <span className="font-bold font-mono text-amber-300 text-sm sm:text-base">
                 {formatRupiah(parsedJumlah)}
               </span>
             )}
@@ -673,16 +671,16 @@ export function PengajuanForm({
         </div>
 
         {/* Keperluan / Keterangan */}
-        <div className="space-y-1.5">
-          <div className="flex flex-wrap items-center justify-between gap-1">
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-1.5">
             <label
               htmlFor="keterangan"
-              className="text-xs font-bold text-slate-900 inline-flex items-center flex-wrap gap-1.5"
+              className="text-sm sm:text-base font-bold text-[#fdfaf6] inline-flex items-center flex-wrap gap-2"
             >
               <span>Keperluan Pengajuan</span>
-              <span className="text-rose-600">*</span>
+              <span className="text-rose-400">*</span>
               {aiAppliedFields.keterangan && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-500/40">
                   <span aria-hidden="true">✓</span> Diisi AI, periksa dulu
                 </span>
               )}
@@ -691,7 +689,7 @@ export function PengajuanForm({
               <button
                 type="button"
                 onClick={() => applyAiSuggestion("keterangan")}
-                className="text-[11px] font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2 py-0.5 rounded transition shadow-sm truncate max-w-xs"
+                className="text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 px-3 py-1 rounded-lg transition shadow-sm truncate max-w-xs"
                 title={aiSuggestions.keterangan}
               >
                 Pakai hasil AI: &quot;{aiSuggestions.keterangan.slice(0, 20)}...&quot;
@@ -700,19 +698,19 @@ export function PengajuanForm({
           </div>
           <textarea
             id="keterangan"
-            rows={3}
+            rows={4}
             value={keterangan}
             onChange={(e) => setKeterangan(e.target.value)}
             placeholder="Jelaskan rincian keperluan pengeluaran atau reimburse secara jelas..."
             required
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] placeholder-[#78716c] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 leading-relaxed"
           />
-          <div className="flex items-center justify-between text-[11px]">
+          <div className="flex items-center justify-between text-xs sm:text-sm">
             <span
               className={
                 keterangan.trim().length >= 10
-                  ? "text-emerald-700 font-medium"
-                  : "text-rose-600"
+                  ? "text-emerald-400 font-medium"
+                  : "text-rose-400 font-medium"
               }
             >
               Minimal 10 karakter (terisi: {keterangan.trim().length} karakter)
@@ -721,24 +719,24 @@ export function PengajuanForm({
         </div>
 
         {/* Upload Bukti Nota / Dokumen */}
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <label
             htmlFor="bukti_file"
-            className="block text-xs font-bold text-slate-900"
+            className="block text-sm sm:text-base font-bold text-[#fdfaf6]"
           >
             Unggah Bukti Transaksi (Nota / Kuitansi / Faktur){" "}
-            <span className="text-rose-600">*</span>
+            <span className="text-rose-400">*</span>
           </label>
 
           {existingBuktiPath && !file && (
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-700 flex items-center justify-between">
+            <div className="rounded-xl bg-[#141210] border border-amber-900/30 p-3.5 text-sm text-[#a89f91] flex items-center justify-between">
               <span className="truncate max-w-sm">
                 📁 Bukti saat ini:{" "}
-                <span className="font-mono text-[11px] font-semibold text-slate-900">
+                <span className="font-mono text-xs sm:text-sm font-bold text-amber-300">
                   {existingBuktiPath.split("/").pop()?.replace(/^\d+-/, "")}
                 </span>
               </span>
-              <span className="text-emerald-700 font-semibold text-[11px]">
+              <span className="text-emerald-400 font-bold text-xs sm:text-sm">
                 ✓ Tersimpan
               </span>
             </div>
@@ -753,21 +751,21 @@ export function PengajuanForm({
               const selected = e.target.files?.[0] || null;
               setFile(selected);
             }}
-            className="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-900 hover:file:bg-amber-200 cursor-pointer border border-slate-300 rounded-lg p-1 bg-white disabled:opacity-50 disabled:pointer-events-none"
+            className="block w-full text-sm sm:text-base text-[#a89f91] file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-amber-950/70 file:text-amber-300 hover:file:bg-amber-900/70 cursor-pointer border border-amber-900/40 rounded-xl p-1.5 bg-[#141210] disabled:opacity-50 disabled:pointer-events-none"
           />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs sm:text-sm text-[#a89f91]">
             Format yang didukung: JPG, PNG, atau PDF. Ukuran berkas maksimal 5 MB. Bukti disimpan secara privat dan aman di bucket penyimpanan (BR-07).
           </p>
 
           {/* Tombol Isi Otomatis dari Nota (AI) */}
           {file && (
-            <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50/70 p-3 space-y-2">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-2.5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                  <p className="text-sm sm:text-base font-bold text-amber-300 flex items-center gap-1.5">
                     <span aria-hidden="true">✨</span> Isi Otomatis dari Nota (AI)
                   </p>
-                  <p className="text-[11px] text-amber-800 mt-0.5">
+                  <p className="text-xs sm:text-sm text-[#a89f91] mt-0.5">
                     Foto dikirim ke layanan AI Google (tingkat gratis) untuk dibaca. Pembacaan hanya dijalankan saat tombol ditekan.
                   </p>
                 </div>
@@ -775,12 +773,12 @@ export function PengajuanForm({
                   type="button"
                   disabled={isExtractingAi || isSubmitting}
                   onClick={handleExtractNota}
-                  className="px-3 py-1.5 bg-amber-800 hover:bg-amber-900 text-white rounded-md text-xs font-semibold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5 shadow-sm"
+                  className="px-4 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black rounded-xl text-xs sm:text-sm font-bold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5 shadow-[0_0_10px_rgba(245,158,11,0.25)]"
                 >
                   {isExtractingAi ? (
                     <>
                       <span
-                        className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
+                        className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent"
                         aria-hidden="true"
                       />
                       Membaca nota...
@@ -795,11 +793,11 @@ export function PengajuanForm({
         </div>
 
         {/* Tombol Aksi */}
-        <div className="pt-4 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
+        <div className="pt-5 border-t border-amber-900/20 flex flex-col-reverse sm:flex-row items-center justify-end gap-3.5">
           <Link
             href="/pengajuan"
             tabIndex={isSubmitting ? -1 : 0}
-            className={`w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 text-center transition ${
+            className={`w-full sm:w-auto px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] text-center transition ${
               isSubmitting ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
             }`}
           >
@@ -811,7 +809,7 @@ export function PengajuanForm({
             type="button"
             disabled={isSubmitting}
             onClick={() => handleSubmit("draf")}
-            className="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-400 bg-white text-xs font-semibold text-slate-800 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none transition"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-amber-300 hover:bg-[#1e1a16] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none transition"
           >
             {isSubmitting && actionType === "draf"
               ? "Menyimpan Draf..."
@@ -822,7 +820,7 @@ export function PengajuanForm({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto px-5 py-2 rounded-lg bg-amber-800 hover:bg-amber-900 text-xs font-bold text-white shadow focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none transition"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-sm sm:text-base font-bold text-black shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none transition"
           >
             {isSubmitting && actionType === "kirim"
               ? "Mengirim..."
@@ -835,3 +833,4 @@ export function PengajuanForm({
     </div>
   );
 }
+

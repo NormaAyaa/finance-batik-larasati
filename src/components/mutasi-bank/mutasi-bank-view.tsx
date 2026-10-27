@@ -92,19 +92,23 @@ export function MutasiBankView({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Header Halaman */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-              Mutasi Rekening Bank
-            </h1>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-amber-900/20 pb-5">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">
+              Integrasi Rekening Koran & CSV
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-950/60 text-amber-300 border border-amber-500/40 shadow-sm">
               Nilai Tambah (PRD 11)
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#fdfaf6] tracking-tight">
+            Mutasi Rekening Bank
+          </h1>
+          <p className="text-sm sm:text-base text-[#a89f91] max-w-3xl leading-relaxed">
             Impor riwayat transaksi rekening koran CSV (maks. 1 MB & 2.000 baris), validasi pencegahan duplikasi data transaksi, dan pembuatan draf jurnal umum secara atomik.
           </p>
         </div>
@@ -118,9 +122,10 @@ export function MutasiBankView({
                 setFeedback(null);
                 setIsUnggahOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm"
+              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm sm:text-base font-bold text-[#070605] bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl hover:from-amber-500 hover:to-amber-600 transition shadow-lg shadow-amber-950/50 active:scale-95"
             >
-              <span>📥</span> Unggah CSV Mutasi
+              <span aria-hidden="true">📥</span>
+              <span>Unggah CSV Mutasi</span>
             </button>
           </div>
         )}
@@ -130,19 +135,19 @@ export function MutasiBankView({
       {feedback && (
         <div
           role="status"
-          className={`p-4 rounded-xl border flex items-center justify-between text-xs animate-in fade-in duration-200 ${
+          className={`sogan-card p-4 sm:p-5 rounded-2xl border flex items-center justify-between text-sm sm:text-base animate-in fade-in duration-200 shadow-xl ${
             feedback.type === "success"
-              ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-              : "bg-red-50 border-red-200 text-red-900"
+              ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200"
+              : "bg-rose-950/40 border-rose-500/40 text-rose-200"
           }`}
         >
-          <div className="flex items-center gap-2">
-            <span className="text-base">{feedback.type === "success" ? "✓" : "⚠"}</span>
-            <span className="font-medium">{feedback.text}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xl font-bold">{feedback.type === "success" ? "✓" : "⚠"}</span>
+            <span className="font-semibold">{feedback.text}</span>
             {feedback.jurnalId && (
               <Link
                 href={`/jurnal/${feedback.jurnalId}`}
-                className="font-bold underline text-blue-700 hover:text-blue-900 ml-2"
+                className="font-bold underline text-amber-300 hover:text-amber-200 ml-2 text-sm"
               >
                 Lihat Draf Jurnal #{feedback.jurnalId} →
               </Link>
@@ -151,7 +156,7 @@ export function MutasiBankView({
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-slate-400 hover:text-slate-600 text-sm font-bold ml-4"
+            className="text-[#8a7e72] hover:text-[#fdfaf6] text-base font-bold ml-4 p-1 rounded-lg transition"
             aria-label="Tutup pesan"
           >
             ✕

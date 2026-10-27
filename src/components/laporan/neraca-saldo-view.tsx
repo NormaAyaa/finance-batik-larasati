@@ -40,22 +40,31 @@ export function NeracaSaldoView({
   const isDataKosong = !data || data.baris.length === 0;
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* Header Halaman (Screen View) */}
-      <div className="no-print space-y-2">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <Link href="/laporan" className="hover:text-slate-900 transition flex items-center gap-1 font-medium">
-            <span>←</span> Kembali ke Laporan Keuangan
+      <div className="no-print space-y-3">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/laporan"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-400 hover:text-amber-300 transition"
+          >
+            <span>←</span> Kembali ke Pusat Laporan
           </Link>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-              Neraca Saldo
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" />
+              <span className="text-xs font-bold tracking-widest text-amber-400 uppercase">
+                VALIDASI PEMBUKUAN BERPASANGAN
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#fdfaf6] tracking-tight">
+              Neraca Saldo (Trial Balance)
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Daftar saldo debit dan kredit seluruh akun untuk memastikan keseimbangan pembukuan CV Batik Larasati
+            <p className="text-xs sm:text-sm text-[#a89f91] mt-1 max-w-3xl leading-relaxed">
+              Daftar saldo debit dan kredit seluruh bagan akun untuk memastikan validitas dan keseimbangan pembukuan berpasangan CV Batik Larasati (PRD Bagian 7 &amp; BR-11).
             </p>
           </div>
 
@@ -69,10 +78,12 @@ export function NeracaSaldoView({
       <LaporanPrintHeader judul="Neraca Saldo (Trial Balance)" periode={tanggalLabel} />
 
       {/* Toolbar Filter Tanggal (No Print) */}
-      <div className="no-print rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+      <div className="no-print sogan-card rounded-2xl border border-amber-900/20 bg-[#0e0c0a] p-5 shadow-xl space-y-4">
         {/* Pilihan Cepat Tanggal Akhir Bulan */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3">
-          <span className="text-xs font-semibold text-slate-600 mr-1">Pilihan Cepat:</span>
+        <div className="flex flex-wrap items-center gap-2 border-b border-amber-900/20 pb-4">
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-400 mr-2 flex items-center gap-1.5">
+            <span>⚡</span> Pilihan Cepat:
+          </span>
           {[
             { label: "31 Juli 2026", tgl: "2026-07-31" },
             { label: "31 Agustus 2026", tgl: "2026-08-31" },
@@ -83,7 +94,7 @@ export function NeracaSaldoView({
               key={preset.tgl}
               type="button"
               onClick={() => handlePilihTanggal(preset.tgl)}
-              className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition"
+              className="rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-1.5 text-xs font-semibold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] hover:border-amber-500/40 transition active:scale-95"
             >
               {preset.label}
             </button>
@@ -91,9 +102,9 @@ export function NeracaSaldoView({
         </div>
 
         {/* Form Pemilihan Tanggal Kustom */}
-        <form onSubmit={handleFilterSubmit} className="flex flex-wrap items-end gap-3">
+        <form onSubmit={handleFilterSubmit} className="flex flex-wrap items-end gap-4">
           <div>
-            <label htmlFor="filter-tanggal-neraca-saldo" className="block text-xs font-semibold text-slate-700 mb-1">
+            <label htmlFor="filter-tanggal-neraca-saldo" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider mb-1.5">
               Posisi Per Tanggal
             </label>
             <input
@@ -101,13 +112,13 @@ export function NeracaSaldoView({
               type="date"
               value={tanggal}
               onChange={(e) => setTanggal(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-800 focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700"
+              className="rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2 text-xs sm:text-sm text-[#fdfaf6] focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition"
             />
           </div>
 
           <button
             type="submit"
-            className="rounded-lg bg-amber-800 px-4 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-900 transition"
+            className="rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-5 py-2 text-xs sm:text-sm font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition active:scale-95"
           >
             Terapkan Tanggal
           </button>
@@ -116,59 +127,61 @@ export function NeracaSaldoView({
 
       {/* Banner Error */}
       {errorMessage && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-800 flex items-start gap-2">
-          <span className="text-base font-bold">⚠️</span>
+        <div className="rounded-2xl border border-rose-500/30 bg-rose-950/40 p-4 text-xs sm:text-sm text-rose-300 flex items-start gap-3">
+          <span className="text-base font-bold text-rose-400">⚠️</span>
           <div>
-            <p className="font-semibold">Terjadi Kesalahan</p>
+            <p className="font-bold text-rose-200">Terjadi Kesalahan</p>
             <p className="mt-0.5">{errorMessage}</p>
           </div>
         </div>
       )}
 
-      {/* Tampilan Konten Laporan */}
+      {/* Tampilan Konten Laporan Kosong */}
       {!errorMessage && isDataKosong && (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
-          <p className="text-sm font-semibold text-slate-700">Tidak ada data akun</p>
-          <p className="text-xs text-slate-500 mt-1">
+        <div className="sogan-card rounded-2xl border border-dashed border-amber-900/30 bg-[#0e0c0a] p-12 text-center text-[#a89f91]">
+          <p className="text-base font-bold text-[#fdfaf6]">Tidak ada data akun</p>
+          <p className="text-xs sm:text-sm mt-1.5 max-w-md mx-auto">
             Belum ada akun yang terdaftar atau dapat diakses dalam sistem.
           </p>
         </div>
       )}
 
       {!errorMessage && data && !isDataKosong && (
-        <div className="space-y-6">
+        <div className="space-y-6 sm:space-y-8">
           {/* Banner Status Keseimbangan Neraca Saldo */}
           <div
-            className={`rounded-xl border p-4 shadow-sm flex items-start sm:items-center justify-between gap-4 ${
+            className={`sogan-card rounded-2xl border p-5 sm:p-6 shadow-xl flex items-start sm:items-center justify-between gap-4 ${
               data.is_seimbang
-                ? "border-emerald-300 bg-emerald-50/80 text-emerald-950"
-                : "border-rose-300 bg-rose-50/80 text-rose-950"
+                ? "border-emerald-500/40 bg-gradient-to-br from-emerald-950/30 via-[#0e0c0a] to-[#0e0c0a] text-emerald-200"
+                : "border-rose-500/40 bg-gradient-to-br from-rose-950/30 via-[#0e0c0a] to-[#0e0c0a] text-rose-200"
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3.5">
               <span
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-bold ${
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-lg font-bold ${
                   data.is_seimbang
-                    ? "bg-emerald-200 text-emerald-900 border border-emerald-300"
-                    : "bg-rose-200 text-rose-900 border border-rose-300"
+                    ? "bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 shadow-sm"
+                    : "bg-rose-950/60 text-rose-300 border border-rose-500/40 shadow-sm"
                 }`}
               >
                 {data.is_seimbang ? "✓" : "⚠️"}
               </span>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold">
-                    {data.is_seimbang ? "Neraca Saldo Seimbang" : "Peringatan: Neraca Saldo Tidak Seimbang"}
+                <div className="flex items-center gap-2.5">
+                  <h3 className="text-base sm:text-lg font-bold text-[#fdfaf6]">
+                    {data.is_seimbang ? "Neraca Saldo Seimbang (Debit = Kredit)" : "Peringatan: Neraca Saldo Tidak Seimbang"}
                   </h3>
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                      data.is_seimbang ? "bg-emerald-200 text-emerald-900" : "bg-rose-200 text-rose-900"
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                      data.is_seimbang
+                        ? "bg-emerald-950/60 text-emerald-300 border border-emerald-500/40"
+                        : "bg-rose-950/60 text-rose-300 border border-rose-500/40"
                     }`}
                   >
                     {data.is_seimbang ? "Seimbang" : "Tidak Seimbang"}
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 mt-0.5">
+                <p className="text-xs sm:text-sm text-[#d6cfc7] mt-1 max-w-2xl">
                   {data.is_seimbang
                     ? `Total Debit (${formatRupiah(data.total_debit)}) sama persis dengan Total Kredit (${formatRupiah(data.total_kredit)}).`
                     : `Terdapat selisih sebesar ${formatRupiah(data.selisih)} antara debit dan kredit.`}
@@ -177,12 +190,12 @@ export function NeracaSaldoView({
             </div>
 
             <div className="text-right hidden sm:block">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Selisih
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#a89f91]">
+                Selisih Debit / Kredit
               </span>
               <p
-                className={`text-lg font-mono font-bold ${
-                  data.is_seimbang ? "text-emerald-800" : "text-rose-800"
+                className={`text-xl sm:text-2xl font-mono font-extrabold ${
+                  data.is_seimbang ? "text-emerald-400" : "text-rose-400"
                 }`}
               >
                 {formatRupiah(data.selisih)}
@@ -191,65 +204,72 @@ export function NeracaSaldoView({
           </div>
 
           {/* Tabel Neraca Saldo */}
-          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-            <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+          <div className="sogan-card rounded-2xl border border-amber-900/20 bg-[#0e0c0a] overflow-hidden shadow-xl">
+            <div className="bg-gradient-to-r from-amber-950/30 to-[#0e0c0a] px-5 py-4 border-b border-amber-900/20 flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Daftar Saldo Akun
-                </h2>
-                <p className="text-[11px] text-slate-500">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-amber-400" />
+                  <h2 className="text-sm sm:text-base font-bold text-[#fdfaf6] uppercase tracking-wide">
+                    Daftar Saldo Akun
+                  </h2>
+                </div>
+                <p className="text-[11px] text-[#a89f91] mt-0.5">
                   Posisi saldo neto satu sisi per akun (termasuk akun dengan saldo nol)
                 </p>
               </div>
-              <span className="text-xs font-semibold text-slate-500">
+              <span className="text-xs font-semibold text-[#a89f91]">
                 {data.baris.length} akun terdaftar
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs min-w-[600px]">
+              <table className="w-full text-left text-xs sm:text-sm min-w-[650px]">
                 <caption className="sr-only">Daftar Saldo Debit dan Kredit Seluruh Akun</caption>
-                <thead className="border-b border-slate-200 bg-slate-100/50 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                <thead className="border-b border-amber-900/20 bg-[#141210] text-[11px] font-bold uppercase tracking-wider text-[#a89f91]">
                   <tr>
-                    <th scope="col" className="px-4 py-2.5 w-24">Kode</th>
-                    <th scope="col" className="px-4 py-2.5">Nama Akun</th>
-                    <th scope="col" className="px-4 py-2.5 w-28">Klasifikasi</th>
-                    <th scope="col" className="px-4 py-2.5 text-right w-40">Saldo Debit</th>
-                    <th scope="col" className="px-4 py-2.5 text-right w-40">Saldo Kredit</th>
+                    <th scope="col" className="px-5 py-3 w-28">Kode</th>
+                    <th scope="col" className="px-5 py-3">Nama Akun</th>
+                    <th scope="col" className="px-5 py-3 w-36">Klasifikasi</th>
+                    <th scope="col" className="px-5 py-3 text-right w-44">Saldo Debit</th>
+                    <th scope="col" className="px-5 py-3 text-right w-44">Saldo Kredit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-800">
+                <tbody className="divide-y divide-amber-900/10 text-[#d6cfc7]">
                   {data.baris.map((item) => (
-                    <tr key={item.akun_id} className="hover:bg-slate-50/60 transition">
-                      <td className="px-4 py-2.5 font-mono text-slate-600">{item.kode}</td>
-                      <td className="px-4 py-2.5 font-medium text-slate-900">{item.nama}</td>
-                      <td className="px-4 py-2.5 capitalize text-slate-500 text-[11px]">{item.tipe}</td>
-                      <td className="px-4 py-2.5 text-right font-mono font-medium">
+                    <tr key={item.akun_id} className="hover:bg-amber-950/20 transition-colors">
+                      <td className="px-5 py-3 font-mono text-amber-300/90">{item.kode}</td>
+                      <td className="px-5 py-3 font-semibold text-[#fdfaf6]">{item.nama}</td>
+                      <td className="px-5 py-3">
+                        <span className="rounded-lg bg-amber-950/40 border border-amber-900/30 px-2 py-0.5 text-[11px] capitalize text-amber-200/90 font-medium">
+                          {item.tipe}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-right font-mono font-bold">
                         {item.saldo_debit > 0 ? (
-                          formatRupiah(item.saldo_debit)
+                          <span className="text-emerald-400">{formatRupiah(item.saldo_debit)}</span>
                         ) : (
-                          <span className="text-slate-300">-</span>
+                          <span className="text-[#5c554b]">-</span>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-right font-mono font-medium">
+                      <td className="px-5 py-3 text-right font-mono font-bold">
                         {item.saldo_kredit > 0 ? (
-                          formatRupiah(item.saldo_kredit)
+                          <span className="text-amber-400">{formatRupiah(item.saldo_kredit)}</span>
                         ) : (
-                          <span className="text-slate-300">-</span>
+                          <span className="text-[#5c554b]">-</span>
                         )}
                       </td>
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="border-t-2 border-slate-300 bg-slate-50 font-bold text-slate-900">
+                <tfoot className="border-t-2 border-amber-900/40 bg-[#141210] font-bold text-[#fdfaf6]">
                   <tr>
-                    <td colSpan={3} className="px-4 py-3 text-right uppercase tracking-wider text-xs">
-                      Total Saldo
+                    <td colSpan={3} className="px-5 py-3.5 text-right uppercase tracking-wider text-xs text-[#a89f91]">
+                      Total Saldo Keseluruhan
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-sm text-slate-900">
+                    <td className="px-5 py-3.5 text-right font-mono text-base text-emerald-400">
                       {formatRupiah(data.total_debit)}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-sm text-slate-900">
+                    <td className="px-5 py-3.5 text-right font-mono text-base text-amber-400">
                       {formatRupiah(data.total_kredit)}
                     </td>
                   </tr>

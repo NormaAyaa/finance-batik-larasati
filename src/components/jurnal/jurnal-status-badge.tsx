@@ -9,11 +9,11 @@ export function JurnalStatusBadge({ status, className = "" }: JurnalStatusBadgeP
   if (status === "diposting") {
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 ${className}`}
+        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border tracking-wide bg-emerald-950/70 text-emerald-300 border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.15)] ${className}`}
         title="Jurnal sudah diposting dan mengunci saldo buku besar"
         aria-label="Status: Diposting"
       >
-        <span aria-hidden="true" className="font-bold">✓</span>
+        <span aria-hidden="true" className="font-extrabold text-sm sm:text-base">✓</span>
         <span>Diposting</span>
       </span>
     );
@@ -22,11 +22,11 @@ export function JurnalStatusBadge({ status, className = "" }: JurnalStatusBadgeP
   if (status === "dibalik") {
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-300 ${className}`}
+        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border tracking-wide bg-purple-950/70 text-purple-300 border-purple-500/40 shadow-[0_0_8px_rgba(168,85,247,0.15)] ${className}`}
         title="Jurnal telah dibalik oleh jurnal pembalik koreksi"
         aria-label="Status: Dibalik"
       >
-        <span aria-hidden="true" className="font-bold">↩</span>
+        <span aria-hidden="true" className="font-extrabold text-sm sm:text-base">↩</span>
         <span>Dibalik</span>
       </span>
     );
@@ -35,11 +35,11 @@ export function JurnalStatusBadge({ status, className = "" }: JurnalStatusBadgeP
   // Draf
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border tracking-wide bg-amber-950/70 text-amber-300 border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.15)] ${className}`}
       title="Draf jurnal belum diposting ke buku besar"
       aria-label="Status: Draf"
     >
-      <span aria-hidden="true" className="font-semibold">✎</span>
+      <span aria-hidden="true" className="font-extrabold text-sm sm:text-base">✎</span>
       <span>Draf</span>
     </span>
   );
@@ -55,7 +55,7 @@ export function JurnalSumberBadge({ sumber, className = "" }: JurnalSumberBadgeP
     case "pembalik":
       return (
         <span
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-purple-50 text-purple-700 border border-purple-200 ${className}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border tracking-wide bg-purple-950/60 text-purple-300 border-purple-500/30 ${className}`}
           title="Dihasilkan dari aksi pembalik jurnal"
         >
           <span aria-hidden="true">🔄</span>
@@ -66,7 +66,7 @@ export function JurnalSumberBadge({ sumber, className = "" }: JurnalSumberBadgeP
     case "pembayaran_pengajuan":
       return (
         <span
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200 ${className}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border tracking-wide bg-sky-950/60 text-sky-300 border-sky-500/30 ${className}`}
           title="Dihasilkan otomatis saat pembayaran pengajuan biaya disetujui"
         >
           <span aria-hidden="true">📄</span>
@@ -77,7 +77,7 @@ export function JurnalSumberBadge({ sumber, className = "" }: JurnalSumberBadgeP
     default:
       return (
         <span
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-50 text-slate-600 border border-slate-200 ${className}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold border tracking-wide bg-stone-900/80 text-stone-300 border-stone-700/60 ${className}`}
           title="Pencatatan manual oleh Akuntan"
         >
           <span aria-hidden="true">✍</span>
@@ -86,3 +86,4 @@ export function JurnalSumberBadge({ sumber, className = "" }: JurnalSumberBadgeP
       );
   }
 }
+

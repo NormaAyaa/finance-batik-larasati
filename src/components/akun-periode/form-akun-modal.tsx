@@ -197,16 +197,19 @@ function FormAkunDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="form-akun-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl transition-all my-8">
+      <div className="sogan-card relative w-full max-w-lg rounded-2xl bg-[#0e0c0a] border border-amber-500/25 p-6 sm:p-7 shadow-2xl transition-all my-8 text-[#fdfaf6]">
         {/* Header Modal */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center justify-between border-b border-amber-900/20 pb-4">
           <div>
-            <h2 id="form-akun-title" className="text-base font-bold text-slate-900">
-              {isEdit ? "Ubah Akun" : "Tambah Akun Baru"}
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="h-2 w-2 rounded-full bg-amber-400" />
+              <h2 id="form-akun-title" className="text-base sm:text-lg font-bold text-[#fdfaf6] tracking-tight">
+                {isEdit ? "Ubah Akun" : "Tambah Akun Baru"}
+              </h2>
+            </div>
+            <p className="text-xs text-[#a89f91] mt-0.5">
               {isEdit
                 ? "Perbarui informasi akun bagan (COA 4 digit)"
                 : "Daftarkan akun baru sesuai aturan klasifikasi BR-01"}
@@ -216,7 +219,7 @@ function FormAkunDialog({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+            className="rounded-xl p-2 text-[#a89f91] hover:bg-amber-950/40 hover:text-[#fdfaf6] border border-transparent hover:border-amber-900/40 transition disabled:opacity-50"
             aria-label="Tutup modal"
           >
             ✕
@@ -227,9 +230,9 @@ function FormAkunDialog({
         {errorMessage && (
           <div
             role="alert"
-            className="mt-4 rounded-lg bg-rose-50 border border-rose-200 p-3 text-xs text-rose-800 flex items-start gap-2"
+            className="mt-4 rounded-xl bg-rose-950/40 border border-rose-500/30 p-3.5 text-xs text-rose-300 flex items-start gap-2.5"
           >
-            <span className="font-bold text-rose-600" aria-hidden="true">
+            <span className="font-bold text-rose-400" aria-hidden="true">
               ⚠️
             </span>
             <div className="flex-1">{errorMessage}</div>
@@ -240,14 +243,14 @@ function FormAkunDialog({
         {isEdit && isUsed && (
           <div
             role="note"
-            className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900 flex items-start gap-2.5"
+            className="mt-4 rounded-xl bg-amber-950/20 border border-amber-500/20 p-4 text-xs text-amber-200/90 flex items-start gap-3"
           >
-            <span aria-hidden="true" className="font-bold text-amber-600 text-sm">
+            <span aria-hidden="true" className="font-bold text-amber-400 text-sm">
               🔒
             </span>
             <div className="flex-1">
-              <p className="font-bold">Kode dan Tipe Akun Terkunci (BR-01)</p>
-              <p className="text-[11px] text-amber-800 mt-0.5">
+              <p className="font-bold text-[#fdfaf6]">Kode dan Tipe Akun Terkunci (BR-01)</p>
+              <p className="text-[11px] text-[#d6cfc7] mt-1 leading-relaxed">
                 Akun ini sudah pernah digunakan dalam transaksi jurnal atau pengajuan. Kolom kode dan tipe dinonaktifkan di antarmuka (database tetap yang menjadi pengaman utama dan menolak bila ada perubahan). Anda tetap dapat memperbarui nama, keterangan, penanda kas/bank, dan status aktif akun.
               </p>
             </div>
@@ -255,15 +258,15 @@ function FormAkunDialog({
         )}
 
         {/* Formulir */}
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {/* Tipe Akun */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label htmlFor="tipe-akun" className="block text-xs font-semibold text-slate-700">
-                Tipe Klasifikasi Akun <span className="text-rose-500">*</span>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="tipe-akun" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider">
+                Tipe Klasifikasi Akun <span className="text-amber-400">*</span>
               </label>
               {isUsed && (
-                <span className="text-[10px] font-semibold text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-semibold text-amber-300 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full">
                   Terkunci (Sudah Digunakan)
                 </span>
               )}
@@ -273,15 +276,15 @@ function FormAkunDialog({
               value={tipe}
               onChange={(e) => handleTipeChange(e.target.value as TipeAkun)}
               disabled={isSubmitting || isUsed}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2.5 text-xs sm:text-sm text-[#fdfaf6] focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition disabled:bg-[#070605] disabled:text-[#a89f91]"
             >
               {TIPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} className="bg-[#141210] text-[#fdfaf6]">
                   {opt.label}
                 </option>
               ))}
             </select>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-[#a89f91] mt-1">
               Digit pertama kode wajib sinkron dengan tipe (BR-01).
             </p>
           </div>
@@ -289,12 +292,12 @@ function FormAkunDialog({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Kode Akun */}
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label htmlFor="kode-akun" className="block text-xs font-semibold text-slate-700">
-                  Kode Akun (4 Digit) <span className="text-rose-500">*</span>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="kode-akun" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider">
+                  Kode Akun (4 Digit) <span className="text-amber-400">*</span>
                 </label>
                 {isUsed && (
-                  <span className="text-[10px] font-semibold text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-semibold text-amber-300 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full">
                     Terkunci
                   </span>
                 )}
@@ -307,30 +310,30 @@ function FormAkunDialog({
                 onChange={(e) => handleKodeChange(e.target.value)}
                 placeholder="Contoh: 1101"
                 disabled={isSubmitting || isUsed}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-mono font-bold tracking-wider text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500"
+                className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2.5 text-xs sm:text-sm font-mono font-bold tracking-wider text-amber-300 focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition disabled:bg-[#070605] disabled:text-[#a89f91]"
                 required
               />
             </div>
 
             {/* Saldo Normal (Otomatis dari Tipe) */}
             <div>
-              <label htmlFor="saldo-normal-display" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="saldo-normal-display" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider mb-1.5">
                 Saldo Normal (Otomatis)
               </label>
               <div
                 id="saldo-normal-display"
-                className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 flex items-center justify-between"
+                className="rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2.5 text-xs sm:text-sm font-bold text-[#fdfaf6] flex items-center justify-between"
               >
-                <span className="capitalize">{saldoNormal}</span>
-                <span className="text-[10px] text-slate-400 font-normal">Sesuai BR-01</span>
+                <span className="capitalize text-amber-300">{saldoNormal}</span>
+                <span className="text-[10px] text-[#a89f91] font-normal">Sesuai BR-01</span>
               </div>
             </div>
           </div>
 
           {/* Nama Akun */}
           <div>
-            <label htmlFor="nama-akun" className="block text-xs font-semibold text-slate-700 mb-1">
-              Nama Akun <span className="text-rose-500">*</span>
+            <label htmlFor="nama-akun" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider mb-1.5">
+              Nama Akun <span className="text-amber-400">*</span>
             </label>
             <input
               id="nama-akun"
@@ -339,34 +342,34 @@ function FormAkunDialog({
               onChange={(e) => setNama(e.target.value)}
               placeholder="Contoh: Kas Operasional Toko"
               disabled={isSubmitting}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-slate-100"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2.5 text-xs sm:text-sm text-[#fdfaf6] placeholder-[#5c554b] focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition disabled:bg-[#070605]"
               required
               minLength={3}
             />
-            <p className="text-[11px] text-slate-500 mt-1">Minimal 3 karakter.</p>
+            <p className="text-[11px] text-[#a89f91] mt-1">Minimal 3 karakter.</p>
           </div>
 
           {/* Penanda Kas/Bank (Khusus Aset) */}
-          <div className="rounded-lg border border-slate-200 p-3 bg-slate-50/50">
-            <div className="flex items-start gap-2.5">
+          <div className="rounded-xl border border-amber-900/25 p-4 bg-[#141210]/60">
+            <div className="flex items-start gap-3">
               <input
                 id="is-kas-bank"
                 type="checkbox"
                 checked={isKasBank}
                 onChange={(e) => setIsKasBank(e.target.checked)}
                 disabled={isSubmitting || tipe !== "aset"}
-                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-40"
+                className="mt-1 h-4 w-4 rounded border-amber-900/40 bg-[#141210] text-amber-500 focus:ring-amber-500/40 disabled:opacity-40"
               />
               <div>
                 <label
                   htmlFor="is-kas-bank"
-                  className={`text-xs font-semibold ${
-                    tipe === "aset" ? "text-slate-800" : "text-slate-400"
+                  className={`text-xs sm:text-sm font-bold ${
+                    tipe === "aset" ? "text-[#fdfaf6]" : "text-[#5c554b]"
                   }`}
                 >
                   Tandai Sebagai Akun Kas / Bank
                 </label>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-[11px] text-[#a89f91] mt-0.5">
                   {tipe === "aset"
                     ? "Digunakan untuk menampung kas tunai atau rekening bank pada pembayaran pengajuan (BR-10)."
                     : "Hanya akun bertipe Aset yang diizinkan memiliki penanda Kas/Bank (BR-01)."}
@@ -377,7 +380,7 @@ function FormAkunDialog({
 
           {/* Keterangan */}
           <div>
-            <label htmlFor="keterangan-akun" className="block text-xs font-semibold text-slate-700 mb-1">
+            <label htmlFor="keterangan-akun" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider mb-1.5">
               Keterangan (Opsional)
             </label>
             <textarea
@@ -387,43 +390,43 @@ function FormAkunDialog({
               onChange={(e) => setKeterangan(e.target.value)}
               placeholder="Peruntukan atau catatan penggunaan akun ini..."
               disabled={isSubmitting}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-slate-100"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] p-3 text-xs sm:text-sm text-[#fdfaf6] placeholder-[#5c554b] focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition disabled:bg-[#070605]"
             />
           </div>
 
           {/* Status Aktif */}
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2.5 pt-1">
             <input
               id="status-aktif"
               type="checkbox"
               checked={aktif}
               onChange={(e) => setAktif(e.target.checked)}
               disabled={isSubmitting}
-              className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              className="h-4 w-4 rounded border-amber-900/40 bg-[#141210] text-amber-500 focus:ring-amber-500/40"
             />
-            <label htmlFor="status-aktif" className="text-xs font-medium text-slate-700">
+            <label htmlFor="status-aktif" className="text-xs sm:text-sm font-semibold text-[#d6cfc7]">
               Akun Aktif (Dapat dipilih pada pencatatan transaksi jurnal dan pengajuan baru)
             </label>
           </div>
 
           {/* Aksi Bawah */}
-          <div className="flex items-center justify-end gap-2 border-t border-slate-100 pt-4 mt-6">
+          <div className="flex items-center justify-end gap-3 border-t border-amber-900/20 pt-4 mt-6">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-slate-300 px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-50"
+              className="rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition disabled:opacity-50 shadow-xs"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition disabled:opacity-50 active:scale-95"
             >
               {isSubmitting ? (
                 <>
-                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#070605] border-t-transparent" />
                   <span>Menyimpan...</span>
                 </>
               ) : isEdit ? (

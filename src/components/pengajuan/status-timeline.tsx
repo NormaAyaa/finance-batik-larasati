@@ -200,19 +200,19 @@ export function StatusTimeline({
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+    <div className="space-y-5">
+      <h3 className="text-base sm:text-lg font-bold text-[#fdfaf6] flex items-center gap-2 border-b border-amber-900/20 pb-3">
         <span aria-hidden="true">⏱️</span> Riwayat Perkembangan Pengajuan
       </h3>
 
-      <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+      <div className="relative pl-8 space-y-6 before:absolute before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-amber-900/40">
         {items.map((item) => {
           const badgeColors = {
-            success: "bg-emerald-100 text-emerald-800 border-emerald-300",
-            warning: "bg-amber-100 text-amber-800 border-amber-300",
-            danger: "bg-rose-100 text-rose-800 border-rose-300",
-            info: "bg-sky-100 text-sky-800 border-sky-300",
-            neutral: "bg-slate-100 text-slate-700 border-slate-300",
+            success: "bg-emerald-950/80 text-emerald-300 border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.2)]",
+            warning: "bg-orange-950/80 text-orange-300 border-orange-500/40 shadow-[0_0_8px_rgba(249,115,22,0.2)]",
+            danger: "bg-rose-950/80 text-rose-300 border-rose-500/40 shadow-[0_0_8px_rgba(244,63,94,0.2)]",
+            info: "bg-amber-950/80 text-amber-300 border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.2)]",
+            neutral: "bg-stone-900/80 text-stone-300 border-stone-700",
           }[item.statusType];
 
           return (
@@ -220,29 +220,29 @@ export function StatusTimeline({
               {/* Node Icon */}
               <div
                 aria-hidden="true"
-                className={`absolute -left-6 top-0.5 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold shadow-sm ${badgeColors}`}
+                className={`absolute -left-8 top-1 flex h-7 w-7 items-center justify-center rounded-full border text-xs sm:text-sm font-bold shadow-md ${badgeColors}`}
               >
                 {item.icon}
               </div>
 
               {/* Detail Riwayat */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1">
+              <div className="bg-[#141210] border border-amber-900/25 rounded-xl p-4 sm:p-5 space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                  <span className="text-xs font-bold text-slate-900">
+                  <span className="text-sm sm:text-base font-bold text-[#fdfaf6]">
                     {item.title}
                   </span>
                   {item.timestamp && (
-                    <span className="text-[11px] text-slate-500 font-mono">
+                    <span className="text-xs sm:text-sm text-amber-400 font-mono font-medium">
                       {formatDateTime(item.timestamp)}
                     </span>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-600 font-medium">
-                  Pelaku: <span className="text-slate-900">{item.actor}</span>
+                <p className="text-xs sm:text-sm text-[#a89f91] font-medium">
+                  Pelaku: <span className="text-[#fdfaf6] font-semibold">{item.actor}</span>
                 </p>
 
-                <p className="text-xs text-slate-700 mt-1 leading-relaxed">
+                <p className="text-sm sm:text-base text-[#d6cfc7] leading-relaxed">
                   {item.description}
                 </p>
               </div>

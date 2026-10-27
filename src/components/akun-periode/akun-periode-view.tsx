@@ -25,35 +25,44 @@ export function AkunPeriodeView({
   const periodeTerbukaCount = initialPeriode.filter((p) => p.status === "terbuka").length;
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* Header Halaman */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Bagan Akun & Periode Akuntansi</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Kelola Chart of Accounts (COA 4 digit) dan kontrol status tutup/buka periode bulanan
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" />
+            <span className="text-xs font-bold tracking-widest text-amber-400 uppercase">
+              STRUKTUR COA &amp; PENUTUPAN BUKU
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#fdfaf6] tracking-tight">
+            Bagan Akun &amp; Periode Akuntansi
+          </h1>
+          <p className="text-xs sm:text-sm text-[#a89f91] mt-1 max-w-3xl leading-relaxed">
+            Kelola Chart of Accounts (COA 4 digit sesuai BR-01) dan kontrol status penutupan buku periode bulanan CV Batik Larasati (BR-06).
           </p>
         </div>
 
         {/* Indikator Status Singkat */}
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="sogan-card inline-flex items-center gap-2 rounded-full bg-[#0e0c0a] border border-amber-900/30 px-3.5 py-1.5 text-xs font-medium text-[#d6cfc7]">
             <span>Total Akun:</span>
-            <strong className="text-slate-900">{initialAkun.length}</strong>
+            <strong className="text-amber-400 font-mono font-bold text-sm">{initialAkun.length}</strong>
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-medium text-emerald-800">
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-950/40 border border-emerald-500/30 px-3.5 py-1.5 text-xs font-medium text-emerald-300">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Periode Terbuka:</span>
-            <strong>{periodeTerbukaCount}</strong>
+            <strong className="font-mono font-bold text-sm">{periodeTerbukaCount}</strong>
           </span>
         </div>
       </div>
 
       {/* Navigasi Tab */}
-      <div className="border-b border-slate-200">
+      <div className="border-b border-amber-900/25">
         <nav
           role="tablist"
           aria-label="Pilihan tampilan akun dan periode"
-          className="-mb-px flex space-x-6"
+          className="-mb-px flex space-x-6 sm:space-x-8"
         >
           <button
             type="button"
@@ -62,21 +71,21 @@ export function AkunPeriodeView({
             aria-selected={activeTab === "akun"}
             aria-controls="panel-akun"
             onClick={() => setActiveTab("akun")}
-            className={`flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition ${
+            className={`flex items-center gap-2.5 border-b-2 py-3.5 text-xs sm:text-sm font-bold transition ${
               activeTab === "akun"
-                ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
+                ? "border-amber-400 text-amber-300"
+                : "border-transparent text-[#a89f91] hover:border-amber-500/30 hover:text-[#fdfaf6]"
             }`}
           >
-            <span aria-hidden="true" className="text-sm">
+            <span aria-hidden="true" className="text-base">
               📁
             </span>
             <span>Bagan Akun (COA)</span>
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+              className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                 activeTab === "akun"
-                  ? "bg-indigo-50 text-indigo-700"
-                  : "bg-slate-100 text-slate-600"
+                  ? "bg-amber-950/60 text-amber-300 border border-amber-500/30"
+                  : "bg-[#141210] text-[#a89f91] border border-amber-900/30"
               }`}
             >
               {initialAkun.length}
@@ -90,21 +99,21 @@ export function AkunPeriodeView({
             aria-selected={activeTab === "periode"}
             aria-controls="panel-periode"
             onClick={() => setActiveTab("periode")}
-            className={`flex items-center gap-2 border-b-2 py-3 text-xs font-semibold transition ${
+            className={`flex items-center gap-2.5 border-b-2 py-3.5 text-xs sm:text-sm font-bold transition ${
               activeTab === "periode"
-                ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
+                ? "border-amber-400 text-amber-300"
+                : "border-transparent text-[#a89f91] hover:border-amber-500/30 hover:text-[#fdfaf6]"
             }`}
           >
-            <span aria-hidden="true" className="text-sm">
+            <span aria-hidden="true" className="text-base">
               📅
             </span>
             <span>Periode Akuntansi</span>
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+              className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                 activeTab === "periode"
-                  ? "bg-indigo-50 text-indigo-700"
-                  : "bg-slate-100 text-slate-600"
+                  ? "bg-amber-950/60 text-amber-300 border border-amber-500/30"
+                  : "bg-[#141210] text-[#a89f91] border border-amber-900/30"
               }`}
             >
               {initialPeriode.length}
@@ -114,7 +123,7 @@ export function AkunPeriodeView({
       </div>
 
       {/* Konten Panel Tab */}
-      <div className="pt-1">
+      <div className="pt-2">
         {activeTab === "akun" && (
           <div
             role="tabpanel"

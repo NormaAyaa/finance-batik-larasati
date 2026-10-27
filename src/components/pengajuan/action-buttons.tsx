@@ -3,7 +3,10 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import {
+  transisiStatusPengajuanAction,
+  bayarPengajuanAction,
+} from "@/app/(dashboard)/pengajuan/actions";
 import { getFriendlyErrorMessage } from "@/lib/utils/errors";
 import { formatRupiah } from "@/lib/utils/formatters";
 import type { StatusPengajuan, UserRole } from "@/types/database";
@@ -35,7 +38,6 @@ export function ActionButtons({
   kasAccounts = [],
 }: ActionButtonsProps) {
   const router = useRouter();
-  const supabase = createClient();
 
   const isOwner = userId === pengajuId;
   const isAkuntan = userRole === "akuntan";
@@ -64,7 +66,7 @@ export function ActionButtons({
     setErrorMessage(null);
   };
 
-  // 1. Eksekusi transisi status umum via RPC transisi_status_pengajuan
+  // 1. Eksekusi transisi status umum via Server Action transisiStatusPengajuanAction
   const handleTransition = async (
     targetStatus: StatusPengajuan,
     pCatatan: string | null = null
@@ -76,27 +78,29 @@ export function ActionButtons({
     setSuccessMessage(null);
 
     try {
-      const { error } = await supabase.rpc("transisi_status_pengajuan", {
-        p_pengajuan_id: pengajuanId,
-        p_status_baru: targetStatus,
-        p_catatan: pCatatan,
+      const res = await transisiStatusPengajuanAction({
+        pengajuanId,
+        targetStatus,
+        catatan: pCatatan,
       });
 
-      if (error) {
-        throw error;
+      if (!res.success) {
+        setErrorMessage(res.error || "Gagal memperbarui status pengajuan.");
+      } else {
+        const noticeSuffix = res.emailNotice ? ` (${res.emailNotice})` : "";
+        setSuccessMessage(`Status pengajuan berhasil diperbarui!${noticeSuffix}`);
+        resetModals();
       }
-
-      setSuccessMessage("Status pengajuan berhasil diperbarui!");
-      resetModals();
-      router.refresh();
     } catch (err: unknown) {
       setErrorMessage(getFriendlyErrorMessage(err));
     } finally {
+      // Saat Server Action gagal atau habis waktu, UI tetap memanggil router.refresh() karena status database mungkin sudah berubah
+      router.refresh();
       setLoading(false);
     }
   };
 
-  // 2. Eksekusi pembayaran via RPC bayar_pengajuan
+  // 2. Eksekusi pembayaran via Server Action bayarPengajuanAction
   const handleBayar = async () => {
     if (loading) return;
 
@@ -114,24 +118,26 @@ export function ActionButtons({
     setSuccessMessage(null);
 
     try {
-      const { error } = await supabase.rpc("bayar_pengajuan", {
-        p_pengajuan_id: pengajuanId,
-        p_akun_kas_id: Number(selectedAkunKasId),
-        p_tanggal_bayar: tanggalBayar,
+      const res = await bayarPengajuanAction({
+        pengajuanId,
+        akunKasId: Number(selectedAkunKasId),
+        tanggalBayar,
       });
 
-      if (error) {
-        throw error;
+      if (!res.success) {
+        setErrorMessage(res.error || "Gagal mencatat pembayaran pengajuan.");
+      } else {
+        const noticeSuffix = res.emailNotice ? ` (${res.emailNotice})` : "";
+        setSuccessMessage(
+          `Pembayaran pengajuan berhasil dicatat dan jurnal pengeluaran otomatis diposting!${noticeSuffix}`
+        );
+        resetModals();
       }
-
-      setSuccessMessage(
-        "Pembayaran pengajuan berhasil dicatat dan jurnal pengeluaran otomatis diposting!"
-      );
-      resetModals();
-      router.refresh();
     } catch (err: unknown) {
       setErrorMessage(getFriendlyErrorMessage(err));
     } finally {
+      // Selalu refresh tampilan untuk memastikan sinkronisasi status database terbaru
+      router.refresh();
       setLoading(false);
     }
   };
@@ -165,10 +171,10 @@ export function ActionButtons({
         <div
           role="status"
           aria-live="polite"
-          className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 flex items-center justify-between"
+          className="sogan-card border-emerald-500/40 bg-gradient-to-r from-emerald-950/30 to-[#0f0d0b] p-4 text-sm sm:text-base font-semibold text-emerald-300 flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
-            <span aria-hidden="true" className="text-base">
+            <span aria-hidden="true" className="text-lg text-emerald-400 font-bold">
               ✓
             </span>
             <span>{successMessage}</span>
@@ -176,7 +182,7 @@ export function ActionButtons({
           <button
             type="button"
             onClick={() => setSuccessMessage(null)}
-            className="text-emerald-700 hover:text-emerald-900"
+            className="text-emerald-400 hover:text-emerald-200 text-sm font-bold px-1"
           >
             ✕
           </button>
@@ -188,19 +194,19 @@ export function ActionButtons({
         <div
           role="alert"
           aria-live="assertive"
-          className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-xs text-rose-800"
+          className="sogan-card border-rose-500/40 bg-gradient-to-r from-rose-950/30 to-[#0f0d0b] p-4 text-sm sm:text-base text-rose-300"
         >
           <p className="font-bold flex items-center gap-1.5">
             <span aria-hidden="true">⚠️</span> Aksi Tidak Dapat Dilanjutkan
           </p>
-          <p className="mt-1">{errorMessage}</p>
+          <p className="mt-1 text-rose-400/90">{errorMessage}</p>
         </div>
       )}
 
       {/* Baris Tombol Aksi */}
       {hasAnyAction && (
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-3">
-          <span className="text-xs font-bold text-slate-700 mr-1">
+        <div className="sogan-card p-5 border-amber-900/30 flex flex-wrap items-center gap-3.5">
+          <span className="text-sm sm:text-base font-bold text-[#fdfaf6] mr-1">
             Tindakan yang Dapat Dilakukan:
           </span>
 
@@ -214,7 +220,7 @@ export function ActionButtons({
                   userRole === "akuntan" ? "menunggu_direktur" : "diajukan";
                 handleTransition(targetStatus);
               }}
-              className="rounded-lg bg-amber-800 hover:bg-amber-900 text-white px-3.5 py-2 text-xs font-bold shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+              className="rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(245,158,11,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               {loading
                 ? "Memproses..."
@@ -229,7 +235,7 @@ export function ActionButtons({
             <Link
               href={`/pengajuan/${pengajuanId}/ubah`}
               tabIndex={loading ? -1 : 0}
-              className={`rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 px-3.5 py-2 text-xs font-semibold shadow-sm transition ${
+              className={`rounded-xl border border-amber-900/40 bg-[#161310] hover:bg-[#1e1a16] text-amber-300 px-5 py-2.5 text-sm sm:text-base font-semibold shadow-sm transition ${
                 loading ? "opacity-50 pointer-events-none cursor-not-allowed" : ""
               }`}
             >
@@ -243,7 +249,7 @@ export function ActionButtons({
               type="button"
               disabled={loading}
               onClick={() => setModalMode("batal")}
-              className="rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 px-3.5 py-2 text-xs font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+              className="rounded-xl border border-rose-900/40 bg-rose-950/30 hover:bg-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               ⊘ Batalkan Pengajuan
             </button>
@@ -257,7 +263,7 @@ export function ActionButtons({
                   type="button"
                   disabled={loading}
                   onClick={() => handleTransition("disetujui")}
-                  className="rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-2 text-xs font-bold shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                  className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(16,185,129,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
                 >
                   {loading ? "Memproses..." : "✓ Setujui Pengajuan (≤ Rp 1 Jt)"}
                 </button>
@@ -266,7 +272,7 @@ export function ActionButtons({
                   type="button"
                   disabled={loading}
                   onClick={() => handleTransition("menunggu_direktur")}
-                  className="rounded-lg bg-purple-700 hover:bg-purple-800 text-white px-3.5 py-2 text-xs font-bold shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                  className="rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(168,85,247,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
                 >
                   {loading ? "Memproses..." : "⏳ Teruskan ke Direktur (> Rp 1 Jt)"}
                 </button>
@@ -276,7 +282,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("revisi")}
-                className="rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 px-3.5 py-2 text-xs font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="rounded-xl border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/40 text-orange-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ↩ Minta Revisi
               </button>
@@ -285,7 +291,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("tolak")}
-                className="rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-800 px-3.5 py-2 text-xs font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="rounded-xl border border-rose-500/40 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ✕ Tolak Pengajuan
               </button>
@@ -299,7 +305,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => handleTransition("disetujui")}
-                className="rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-2 text-xs font-bold shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(16,185,129,0.25)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 {loading ? "Memproses..." : "✓ Setujui Pengajuan"}
               </button>
@@ -308,7 +314,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("revisi")}
-                className="rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 px-3.5 py-2 text-xs font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="rounded-xl border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/40 text-orange-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ↩ Minta Revisi
               </button>
@@ -317,7 +323,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => setModalMode("tolak")}
-                className="rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-800 px-3.5 py-2 text-xs font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="rounded-xl border border-rose-500/40 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 px-5 py-2.5 text-sm sm:text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 ✕ Tolak Pengajuan
               </button>
@@ -330,7 +336,7 @@ export function ActionButtons({
               type="button"
               disabled={loading}
               onClick={() => setModalMode("bayar")}
-              className="rounded-lg bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 text-xs font-bold shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+              className="rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-300 hover:to-teal-400 text-black px-5 py-2.5 text-sm sm:text-base font-bold shadow-[0_0_12px_rgba(20,184,166,0.3)] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               💳 Bayar Pengajuan Sekarang
             </button>
@@ -344,21 +350,21 @@ export function ActionButtons({
           role="dialog"
           aria-modal="true"
           aria-label="Konfirmasi Pembatalan Pengajuan"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
         >
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl space-y-4">
-            <h4 className="text-sm font-bold text-slate-900">
-              Batalkan Pengajuan Ini?
+          <div className="sogan-card bg-[#0e0c0a] border border-rose-900/40 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5">
+            <h4 className="text-base sm:text-lg font-bold text-[#fdfaf6] flex items-center gap-2">
+              <span aria-hidden="true" className="text-rose-400">⊘</span> Batalkan Pengajuan Ini?
             </h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Apakah Anda yakin ingin membatalkan pengajuan ini? Status pengajuan akan diubah menjadi <strong className="text-slate-800">Dibatalkan</strong> dan tidak dapat diproses lagi.
+            <p className="text-sm sm:text-base text-[#a89f91] leading-relaxed">
+              Apakah Anda yakin ingin membatalkan pengajuan ini? Status pengajuan akan diubah menjadi <strong className="text-rose-400 font-bold">Dibatalkan</strong> dan tidak dapat diproses lagi.
             </p>
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/20">
               <button
                 type="button"
                 disabled={loading}
                 onClick={resetModals}
-                className="px-3.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                className="px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] transition"
               >
                 Kembali
               </button>
@@ -366,7 +372,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading}
                 onClick={() => handleTransition("dibatalkan")}
-                className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm sm:text-base font-bold transition disabled:opacity-50 shadow-[0_0_10px_rgba(225,29,72,0.3)]"
               >
                 {loading ? "Membatalkan..." : "Ya, Batalkan"}
               </button>
@@ -381,11 +387,11 @@ export function ActionButtons({
           role="dialog"
           aria-modal="true"
           aria-label={modalMode === "revisi" ? "Form Permintaan Revisi" : "Form Penolakan Pengajuan"}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
         >
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl space-y-4">
+          <div className="sogan-card bg-[#0e0c0a] border border-amber-500/30 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-slate-900">
+              <h4 className="text-base sm:text-lg font-bold text-[#fdfaf6]">
                 {modalMode === "revisi"
                   ? "↩ Minta Revisi Pengajuan"
                   : "✕ Tolak Pengajuan"}
@@ -393,25 +399,25 @@ export function ActionButtons({
               <button
                 type="button"
                 onClick={resetModals}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-[#a89f91] hover:text-[#fdfaf6] text-sm font-bold px-1"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-slate-600">
+            <p className="text-sm sm:text-base text-[#a89f91]">
               {modalMode === "revisi"
                 ? "Berikan catatan arahan bagian mana yang harus diperbaiki oleh pengaju (BR-08)."
                 : "Berikan alasan yang jelas mengapa pengajuan ini ditolak (BR-08)."}
             </p>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label
                 htmlFor="catatan-peninjau-input"
-                className="block text-xs font-bold text-slate-800"
+                className="block text-sm sm:text-base font-bold text-[#fdfaf6]"
               >
                 Catatan Peninjau (Wajib minimal 10 karakter){" "}
-                <span className="text-rose-600">*</span>
+                <span className="text-rose-400">*</span>
               </label>
               <textarea
                 id="catatan-peninjau-input"
@@ -419,14 +425,14 @@ export function ActionButtons({
                 value={catatan}
                 onChange={(e) => setCatatan(e.target.value)}
                 placeholder="Tuliskan catatan detail (minimal 10 karakter)..."
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] placeholder-[#78716c] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
               />
-              <div className="flex justify-between text-[11px]">
+              <div className="flex justify-between text-xs sm:text-sm">
                 <span
                   className={
                     catatan.trim().length >= 10
-                      ? "text-emerald-700 font-medium"
-                      : "text-rose-600"
+                      ? "text-emerald-400 font-medium"
+                      : "text-rose-400"
                   }
                 >
                   Minimal 10 karakter (saat ini: {catatan.trim().length})
@@ -434,12 +440,12 @@ export function ActionButtons({
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/20">
               <button
                 type="button"
                 disabled={loading}
                 onClick={resetModals}
-                className="px-3.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                className="px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] transition"
               >
                 Batal
               </button>
@@ -451,10 +457,10 @@ export function ActionButtons({
                     modalMode === "revisi" ? "perlu_revisi" : "ditolak";
                   handleTransition(targetStatus, catatan.trim());
                 }}
-                className={`px-4 py-2 rounded-lg text-white text-xs font-bold transition disabled:opacity-50 ${
+                className={`px-5 py-2.5 rounded-xl text-sm sm:text-base font-bold transition disabled:opacity-50 ${
                   modalMode === "revisi"
-                    ? "bg-amber-700 hover:bg-amber-800"
-                    : "bg-rose-600 hover:bg-rose-700"
+                    ? "bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black shadow-[0_0_10px_rgba(245,158,11,0.25)]"
+                    : "bg-rose-600 hover:bg-rose-500 text-white shadow-[0_0_10px_rgba(225,29,72,0.3)]"
                 }`}
               >
                 {loading
@@ -474,62 +480,62 @@ export function ActionButtons({
           role="dialog"
           aria-modal="true"
           aria-label="Modal Pembayaran Pengajuan"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
         >
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl space-y-4">
+          <div className="sogan-card bg-[#0e0c0a] border border-teal-500/40 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <span aria-hidden="true">💳</span> Pembayaran Pengajuan #{pengajuanId}
+              <h4 className="text-base sm:text-lg font-bold text-[#fdfaf6] flex items-center gap-2">
+                <span aria-hidden="true" className="text-teal-400">💳</span> Pembayaran Pengajuan #{pengajuanId}
               </h4>
               <button
                 type="button"
                 onClick={resetModals}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-[#a89f91] hover:text-[#fdfaf6] text-sm font-bold px-1"
               >
                 ✕
               </button>
             </div>
 
-            <div className="rounded-lg bg-teal-50 border border-teal-200 p-3 text-xs text-teal-900 space-y-1">
-              <div className="flex justify-between">
-                <span>Total yang Harus Dibayar:</span>
-                <span className="font-extrabold text-teal-950">
+            <div className="rounded-xl bg-teal-950/40 border border-teal-500/30 p-4 text-sm sm:text-base text-teal-200 space-y-1.5">
+              <div className="flex justify-between items-baseline">
+                <span className="text-[#a89f91] text-xs sm:text-sm">Total yang Harus Dibayar:</span>
+                <span className="font-extrabold text-teal-300 font-mono text-lg sm:text-xl">
                   {formatRupiah(jumlah)}
                 </span>
               </div>
-              <p className="text-[11px] text-teal-700">
+              <p className="text-xs sm:text-sm text-teal-300/80 pt-1">
                 Sistem akan secara otomatis membuat dan memposting jurnal pengeluaran (Debit Akun Beban, Kredit Akun Kas/Bank) (BR-10).
               </p>
             </div>
 
             {/* Pilihan Akun Kas / Bank Aktif */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label
                 htmlFor="akun-kas-select"
-                className="block text-xs font-bold text-slate-800"
+                className="block text-sm sm:text-base font-bold text-[#fdfaf6]"
               >
                 Pilih Akun Kas atau Bank Pembayar{" "}
-                <span className="text-rose-600">*</span>
+                <span className="text-rose-400">*</span>
               </label>
               <select
                 id="akun-kas-select"
                 disabled={loading}
                 value={selectedAkunKasId}
                 onChange={(e) => setSelectedAkunKasId(Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-50"
+                className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 disabled:opacity-50"
               >
                 {kasAccounts.length === 0 ? (
-                  <option value="">Tidak ada akun kas/bank yang aktif</option>
+                  <option value="" className="bg-[#141210] text-[#fdfaf6]">Tidak ada akun kas/bank yang aktif</option>
                 ) : (
                   kasAccounts.map((acc) => (
-                    <option key={acc.id} value={acc.id}>
+                    <option key={acc.id} value={acc.id} className="bg-[#141210] text-[#fdfaf6]">
                       {acc.kode} — {acc.nama} (Saldo: {formatRupiah(acc.saldo)})
                     </option>
                   ))
                 )}
               </select>
-              <p className="text-[11px] text-slate-500">
-                Informasi: Angka saldo di atas dihitung oleh server berdasarkan seluruh mutasi debit dan kredit jurnal berstatus diposting dan dibalik. Angka ini hanya sebagai informasi; validasi saldo akhir dan penolakan tetap dieksekusi secara ketat oleh database saat transaksi diproses (BR-10).
+              <p className="text-xs sm:text-sm text-[#a89f91]">
+                Informasi: Angka saldo di atas dihitung berdasarkan seluruh mutasi debit dan kredit jurnal berstatus diposting dan dibalik (BR-10).
               </p>
 
               {/* Peringatan jika saldo terhitung kurang dari nilai pengajuan */}
@@ -537,11 +543,11 @@ export function ActionButtons({
                 const sel = kasAccounts.find((a) => a.id === Number(selectedAkunKasId));
                 if (sel && sel.saldo < jumlah) {
                   return (
-                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-[11px] text-amber-900 flex items-start gap-1.5 mt-1">
-                      <span aria-hidden="true" className="font-bold">⚠️</span>
+                    <div className="rounded-xl bg-amber-950/40 border border-amber-500/40 p-3 text-xs sm:text-sm text-amber-300 flex items-start gap-2 mt-1">
+                      <span aria-hidden="true" className="font-bold text-base">⚠️</span>
                       <div>
                         <strong className="block">Perkiraan Saldo Kurang:</strong>
-                        <span>
+                        <span className="text-[#a89f91]">
                           Saldo akun {sel.kode} ({formatRupiah(sel.saldo)}) diperkirakan kurang dari nominal pembayaran ({formatRupiah(jumlah)}). Bila diteruskan, database akan menolak pembayaran sesuai aturan BR-10.
                         </span>
                       </div>
@@ -553,12 +559,12 @@ export function ActionButtons({
             </div>
 
             {/* Tanggal Bayar */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label
                 htmlFor="tanggal-bayar-input"
-                className="block text-xs font-bold text-slate-800"
+                className="block text-sm sm:text-base font-bold text-[#fdfaf6]"
               >
-                Tanggal Pembayaran <span className="text-rose-600">*</span>
+                Tanggal Pembayaran <span className="text-rose-400">*</span>
               </label>
               <input
                 id="tanggal-bayar-input"
@@ -566,20 +572,20 @@ export function ActionButtons({
                 disabled={loading}
                 value={tanggalBayar}
                 onChange={(e) => setTanggalBayar(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-50"
+                className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 disabled:opacity-50 [color-scheme:dark]"
               />
-              <p className="text-[11px] text-slate-500">
+              <p className="text-xs sm:text-sm text-[#a89f91]">
                 Tanggal bayar wajib berada pada periode akuntansi yang berstatus terbuka (BR-05).
               </p>
             </div>
 
             {/* Tombol Konfirmasi */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/20">
               <button
                 type="button"
                 disabled={loading}
                 onClick={resetModals}
-                className="px-3.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="px-5 py-2.5 rounded-xl border border-amber-900/40 bg-[#161310] text-sm sm:text-base font-semibold text-[#a89f91] hover:text-[#fdfaf6] hover:bg-[#1e1a16] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
                 Batal
               </button>
@@ -587,7 +593,7 @@ export function ActionButtons({
                 type="button"
                 disabled={loading || !selectedAkunKasId || !tanggalBayar}
                 onClick={handleBayar}
-                className="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-300 hover:to-teal-400 text-black text-sm sm:text-base font-bold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none shadow-[0_0_12px_rgba(20,184,166,0.3)]"
               >
                 {loading ? "Memproses Pembayaran..." : "Konfirmasi & Bayar"}
               </button>

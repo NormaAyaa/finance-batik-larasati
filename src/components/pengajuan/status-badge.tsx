@@ -76,12 +76,13 @@ export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
     <span
       role="status"
       aria-label={config.description}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${config.className} ${className}`}
+      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm sm:text-base font-bold border tracking-wide ${config.className} ${className}`}
     >
-      <span aria-hidden="true" className="font-bold text-[11px]">
+      <span aria-hidden="true" className="font-extrabold text-sm sm:text-base">
         {config.icon}
       </span>
       <span>{config.label}</span>
     </span>
   );
 }
+

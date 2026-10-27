@@ -108,27 +108,30 @@ export function PembalikModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-labelledby="pembalik-modal-title"
     >
-      <div className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-xl space-y-4">
+      <div className="sogan-card w-full max-w-xl rounded-2xl border border-amber-500/25 bg-[#0e0c0a] p-6 sm:p-7 shadow-2xl space-y-5 text-[#fdfaf6]">
         {/* Header Modal */}
-        <div className="flex items-start justify-between border-b border-slate-100 pb-3">
-          <div>
-            <h2 id="pembalik-modal-title" className="text-base font-bold text-slate-900">
-              Buat Jurnal Pembalik (Koreksi)
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Membalik posisi debit dan kredit jurnal <strong className="font-mono">{jurnalNomor}</strong> secara otomatis (BR-04)
+        <div className="flex items-start justify-between border-b border-amber-900/20 pb-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+              <h2 id="pembalik-modal-title" className="text-xl font-bold text-[#fdfaf6]">
+                Buat Jurnal Pembalik (Koreksi)
+              </h2>
+            </div>
+            <p className="text-sm text-[#a89f91]">
+              Membalik posisi debit dan kredit jurnal <strong className="font-mono text-amber-300">{jurnalNomor}</strong> secara otomatis (BR-04)
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="text-slate-400 hover:text-slate-600 font-bold p-1"
+            className="text-[#8a7e72] hover:text-[#fdfaf6] hover:bg-[#1a1613] rounded-lg p-2 transition text-base"
             aria-label="Tutup dialog"
           >
             ✕
@@ -139,34 +142,34 @@ export function PembalikModal({
         {errorMessage && (
           <div
             role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800 flex items-start gap-2"
+            className="rounded-xl border border-rose-500/30 bg-rose-950/40 p-4 text-sm text-rose-200 flex items-start gap-3"
           >
-            <span className="font-bold text-red-600">✕</span>
-            <div className="flex-1">
+            <span className="font-bold text-rose-400 text-base">✕</span>
+            <div className="flex-1 space-y-1">
               <strong className="block font-semibold">Gagal membalik jurnal:</strong>
-              <span>{errorMessage}</span>
+              <span className="text-xs sm:text-sm text-rose-300/90">{errorMessage}</span>
             </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Info aturan BR-04 */}
-          <div className="rounded-lg border border-blue-200 bg-blue-50/70 p-3 text-[11px] text-blue-900 space-y-1">
-            <p className="font-semibold flex items-center gap-1">
+          <div className="rounded-xl border border-amber-500/20 bg-amber-950/20 p-4 text-xs sm:text-sm text-amber-200/90 space-y-2">
+            <p className="font-bold text-amber-300 flex items-center gap-1.5">
               <span>ℹ</span> Aturan Bisnis Pembalik Jurnal (BR-04 & BR-05):
             </p>
-            <ul className="list-disc list-inside space-y-0.5 text-blue-800">
+            <ul className="list-disc list-inside space-y-1 text-[#d6cfc7] text-xs sm:text-sm">
               <li>Seluruh baris akun akan disalin dengan membalik posisi debit dan kredit.</li>
               <li>Jurnal pembalik akan langsung diposting dengan nomor JU baru.</li>
-              <li>Jurnal asal ({jurnalNomor}) akan ditandai berstatus &quot;Dibalik&quot; secara permanen.</li>
+              <li>Jurnal asal (<span className="font-mono text-amber-300">{jurnalNomor}</span>) akan ditandai berstatus &quot;Dibalik&quot; secara permanen.</li>
               <li>Tanggal pembalik harus berada pada periode akuntansi yang berstatus terbuka.</li>
             </ul>
           </div>
 
           {/* Input Tanggal Pembalik */}
           <div>
-            <label htmlFor="tanggal-pembalik" className="block font-semibold text-slate-700 mb-1">
-              Tanggal Transaksi Pembalik <span className="text-red-500">*</span>
+            <label htmlFor="tanggal-pembalik" className="block font-semibold text-sm sm:text-base text-[#d6cfc7] mb-1.5">
+              Tanggal Transaksi Pembalik <span className="text-amber-400">*</span>
             </label>
             <input
               id="tanggal-pembalik"
@@ -175,20 +178,20 @@ export function PembalikModal({
               onChange={(e) => setTanggalPembalik(e.target.value)}
               disabled={isSubmitting}
               required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-800 focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:bg-slate-50"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-3 text-sm sm:text-base text-[#fdfaf6] focus:border-amber-500/80 focus:outline-none focus:ring-1 focus:ring-amber-500/50 disabled:bg-[#100e0c] disabled:opacity-50"
             />
           </div>
 
           {/* Status Periode Tanggal Pembalik */}
           <div>
-            <label htmlFor="status-periode-pembalik" className="block font-semibold text-slate-700 mb-1">
+            <label htmlFor="status-periode-pembalik" className="block font-semibold text-sm sm:text-base text-[#d6cfc7] mb-1.5">
               Status Periode Akuntansi
             </label>
             <div
               id="status-periode-pembalik"
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs"
+              className="flex items-center justify-between rounded-xl border border-amber-900/20 bg-[#141210] px-4 py-3 text-sm sm:text-base"
             >
-              <span className="font-medium text-slate-700">
+              <span className="font-medium text-[#fdfaf6]">
                 {periodePembalik
                   ? formatBulanTahun(periodePembalik.tahun, periodePembalik.bulan)
                   : "Pilih tanggal"}
@@ -196,17 +199,17 @@ export function PembalikModal({
               {periodePembalik && (
                 <div>
                   {periodePembalik.status === "terbuka" && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950/60 border border-emerald-500/40 px-3 py-1 text-xs font-bold text-emerald-300">
                       ✓ Terbuka
                     </span>
                   )}
                   {periodePembalik.status === "ditutup" && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-950/60 border border-rose-500/40 px-3 py-1 text-xs font-bold text-rose-300">
                       ✕ Ditutup (BR-05)
                     </span>
                   )}
                   {periodePembalik.status === "tidak_ada" && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-950/60 border border-amber-500/40 px-3 py-1 text-xs font-bold text-amber-300">
                       ⚠ Belum Dibuat
                     </span>
                   )}
@@ -214,52 +217,52 @@ export function PembalikModal({
               )}
             </div>
             {isPeriodClosed && (
-              <p className="text-[11px] text-red-600 mt-1">
-                ⚠ Tanggal pembalik berada pada periode yang telah ditutup (BR-05).
+              <p className="text-xs sm:text-sm text-rose-400 mt-1.5 flex items-center gap-1">
+                <span>⚠</span> Tanggal pembalik berada pada periode yang telah ditutup (BR-05).
               </p>
             )}
             {isPeriodMissing && (
-              <p className="text-[11px] text-amber-700 mt-1">
-                ⚠ Periode akuntansi belum dibuat di sistem.
+              <p className="text-xs sm:text-sm text-amber-400 mt-1.5 flex items-center gap-1">
+                <span>⚠</span> Periode akuntansi belum dibuat di sistem.
               </p>
             )}
           </div>
 
           {/* Keterangan Pembalik */}
           <div>
-            <label htmlFor="keterangan-pembalik" className="block font-semibold text-slate-700 mb-1">
-              Keterangan / Alasan Pembalik <span className="text-red-500">*</span>
+            <label htmlFor="keterangan-pembalik" className="block font-semibold text-sm sm:text-base text-[#d6cfc7] mb-1.5">
+              Keterangan / Alasan Pembalik <span className="text-amber-400">*</span>
             </label>
             <textarea
               id="keterangan-pembalik"
-              rows={2}
+              rows={3}
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
               disabled={isSubmitting}
               placeholder="Jelaskan alasan pembalikan / koreksi jurnal..."
               required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:bg-slate-50"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-3 text-sm sm:text-base text-[#fdfaf6] placeholder-[#5a524a] focus:border-amber-500/80 focus:outline-none focus:ring-1 focus:ring-amber-500/50 disabled:bg-[#100e0c]"
             />
           </div>
 
           {/* Tombol Aksi */}
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/20">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100 transition disabled:opacity-50"
+              className="rounded-xl border border-amber-900/40 bg-[#141210] px-5 py-2.5 font-bold text-sm sm:text-base text-[#d6cfc7] hover:bg-[#1c1815] hover:text-[#fdfaf6] transition disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting || isPeriodClosed || isPeriodMissing}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-amber-800 px-4 py-2 font-semibold text-white hover:bg-amber-900 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-2.5 font-bold text-sm sm:text-base text-[#070605] shadow-lg shadow-amber-950/50 hover:from-amber-500 hover:to-amber-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
-                  <span className="animate-spin text-xs">⏳</span>
+                  <span className="animate-spin text-sm">⏳</span>
                   <span>Memproses Pembalik...</span>
                 </>
               ) : (

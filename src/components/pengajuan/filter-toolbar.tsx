@@ -68,11 +68,11 @@ export function FilterToolbar({
   const hasActiveFilters = Boolean(currentStatus || currentBulan || currentSearch);
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
-      <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+    <div className="sogan-card p-5 sm:p-6 space-y-4">
+      <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
         {/* Input Pencarian */}
-        <div className="md:col-span-5 space-y-1">
-          <label htmlFor="search-input" className="block text-xs font-semibold text-slate-700">
+        <div className="md:col-span-5 space-y-2">
+          <label htmlFor="search-input" className="block text-sm sm:text-base font-bold text-[#fdfaf6]">
             Pencarian
           </label>
           <div className="relative">
@@ -82,11 +82,11 @@ export function FilterToolbar({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari nomor (PG-...), pengaju, atau keperluan..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full pl-11 pr-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] placeholder-[#78716c] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
             />
             <span
               aria-hidden="true"
-              className="absolute left-3 top-2.5 text-slate-400 text-xs"
+              className="absolute left-3.5 top-3.5 text-amber-400/80 text-base"
             >
               🔍
             </span>
@@ -94,8 +94,8 @@ export function FilterToolbar({
         </div>
 
         {/* Filter Status */}
-        <div className="md:col-span-3 space-y-1">
-          <label htmlFor="status-select" className="block text-xs font-semibold text-slate-700">
+        <div className="md:col-span-3 space-y-2">
+          <label htmlFor="status-select" className="block text-sm sm:text-base font-bold text-[#fdfaf6]">
             Filter Status
           </label>
           <select
@@ -104,11 +104,11 @@ export function FilterToolbar({
             onChange={(e) => {
               applyFilters({ status: e.target.value });
             }}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
           >
-            <option value="">Semua Status</option>
+            <option value="" className="bg-[#141210] text-[#fdfaf6]">Semua Status</option>
             {(Object.keys(SUBMISSION_STATUS_LABELS) as StatusPengajuan[]).map((st) => (
-              <option key={st} value={st}>
+              <option key={st} value={st} className="bg-[#141210] text-[#fdfaf6]">
                 {SUBMISSION_STATUS_LABELS[st]}
               </option>
             ))}
@@ -116,8 +116,8 @@ export function FilterToolbar({
         </div>
 
         {/* Filter Bulan Transaksi */}
-        <div className="md:col-span-2 space-y-1">
-          <label htmlFor="bulan-input" className="block text-xs font-semibold text-slate-700">
+        <div className="md:col-span-2 space-y-2">
+          <label htmlFor="bulan-input" className="block text-sm sm:text-base font-bold text-[#fdfaf6]">
             Bulan Transaksi
           </label>
           <input
@@ -127,7 +127,7 @@ export function FilterToolbar({
             onChange={(e) => {
               applyFilters({ bulan: e.target.value });
             }}
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 [color-scheme:dark]"
           />
         </div>
 
@@ -136,7 +136,7 @@ export function FilterToolbar({
           <button
             type="submit"
             disabled={isPending}
-            className="flex-1 rounded-lg bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 text-xs font-medium transition disabled:opacity-50"
+            className="flex-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black px-4 py-3 text-sm sm:text-base font-bold transition shadow-[0_0_12px_rgba(245,158,11,0.25)] disabled:opacity-50"
           >
             {isPending ? "Memuat..." : "Terapkan"}
           </button>
@@ -146,7 +146,7 @@ export function FilterToolbar({
               onClick={handleReset}
               disabled={isPending}
               title="Reset seluruh filter"
-              className="rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 px-2.5 py-2 text-xs font-medium transition"
+              className="rounded-xl border border-amber-900/40 bg-[#161310] text-amber-300 hover:bg-[#1e1a16] px-4 py-3 text-sm sm:text-base font-semibold transition"
             >
               Reset
             </button>
@@ -155,20 +155,20 @@ export function FilterToolbar({
       </form>
 
       {hasActiveFilters && (
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 text-xs text-slate-600">
-          <span className="font-semibold text-slate-700">Filter aktif:</span>
+        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-amber-900/20 text-sm text-[#a89f91]">
+          <span className="font-bold text-amber-400 text-sm sm:text-base">Filter aktif:</span>
           {currentSearch && (
-            <span className="bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full">
+            <span className="bg-amber-950/70 text-amber-300 border border-amber-500/40 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold">
               Pencarian: &quot;{currentSearch}&quot;
             </span>
           )}
           {currentStatus && (
-            <span className="bg-sky-50 text-sky-800 border border-sky-200 px-2 py-0.5 rounded-full">
+            <span className="bg-amber-950/70 text-amber-300 border border-amber-500/40 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold">
               Status: {SUBMISSION_STATUS_LABELS[currentStatus as StatusPengajuan] || currentStatus}
             </span>
           )}
           {currentBulan && (
-            <span className="bg-purple-50 text-purple-800 border border-purple-200 px-2 py-0.5 rounded-full">
+            <span className="bg-amber-950/70 text-amber-300 border border-amber-500/40 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold">
               Bulan: {currentBulan}
             </span>
           )}

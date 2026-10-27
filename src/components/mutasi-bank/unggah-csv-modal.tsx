@@ -242,16 +242,19 @@ export function UnggahCsvModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="unggah-modal-title"
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 overflow-y-auto animate-in fade-in duration-150"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6 overflow-y-auto backdrop-blur-md animate-in fade-in duration-150"
       >
-        <div className="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden my-6">
+        <div className="sogan-card relative w-full max-w-4xl bg-[#0e0c0a] rounded-2xl shadow-2xl border border-amber-500/25 overflow-hidden my-6 text-[#fdfaf6]">
           {/* Header Modal */}
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-            <div>
-              <h3 id="unggah-modal-title" className="text-base font-bold text-slate-900">
-                Unggah CSV Mutasi Rekening Bank
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+          <div className="px-6 sm:px-7 py-5 border-b border-amber-900/20 flex items-center justify-between bg-[#141210]">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                <h3 id="unggah-modal-title" className="text-xl font-bold text-[#fdfaf6]">
+                  Unggah CSV Mutasi Rekening Bank
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-[#a89f91]">
                 Proses impor transaksi rekening koran bank secara mandiri (maks. 1 MB & 1.000 baris)
               </p>
             </div>
@@ -259,7 +262,7 @@ export function UnggahCsvModal({
               type="button"
               onClick={handleClose}
               disabled={isPending}
-              className="text-slate-400 hover:text-slate-600 rounded-lg p-1.5 hover:bg-slate-200 transition disabled:opacity-50"
+              className="text-[#8a7e72] hover:text-[#fdfaf6] rounded-xl p-2 hover:bg-[#1a1613] transition text-base disabled:opacity-50"
               aria-label="Tutup jendela unggah"
             >
               ✕
@@ -267,21 +270,21 @@ export function UnggahCsvModal({
           </div>
 
           {/* Body Modal */}
-          <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+          <div className="p-6 sm:p-7 space-y-5 max-h-[75vh] overflow-y-auto">
             {errorMessage && (
               <div
                 role="alert"
-                className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800 flex flex-col gap-1.5"
+                className="p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl text-sm text-rose-200 flex flex-col gap-2"
               >
-                <div className="flex items-start gap-2">
-                  <span className="font-bold text-red-600">⚠</span>
+                <div className="flex items-start gap-2.5">
+                  <span className="font-bold text-rose-400 text-base">⚠</span>
                   <span className="whitespace-pre-line font-medium">{errorMessage}</span>
                 </div>
                 {errorList.length > 0 && (
-                  <div className="mt-2 max-h-40 overflow-y-auto rounded-lg bg-white p-2.5 text-xs text-red-700 border border-red-200 space-y-1">
-                    <div className="font-bold text-slate-800 mb-1">Rincian Kesalahan per Baris:</div>
+                  <div className="mt-2 max-h-40 overflow-y-auto rounded-xl bg-[#141210] p-3 text-xs text-rose-300 border border-rose-500/30 space-y-1">
+                    <div className="font-bold text-[#fdfaf6] mb-1">Rincian Kesalahan per Baris:</div>
                     {errorList.map((err, idx) => (
-                      <div key={idx} className="font-mono text-[11px] text-red-600">
+                      <div key={idx} className="font-mono text-xs text-rose-400">
                         • {err}
                       </div>
                     ))}
@@ -291,41 +294,41 @@ export function UnggahCsvModal({
             )}
 
             {/* Kontrol Akun & Berkas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Pilihan Akun Bank */}
-              <div className="space-y-1">
-                <label htmlFor="akun-bank-select" className="block text-xs font-bold text-slate-800">
-                  Pilih Akun Kas / Bank <span className="text-red-500">*</span>
+              <div className="space-y-1.5">
+                <label htmlFor="akun-bank-select" className="block text-sm sm:text-base font-semibold text-[#d6cfc7]">
+                  Pilih Akun Kas / Bank <span className="text-amber-400">*</span>
                 </label>
                 <select
                   id="akun-bank-select"
                   value={selectedAkunId}
                   onChange={handleAkunChange}
                   disabled={isPending}
-                  className="w-full text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full text-sm sm:text-base rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-3 text-[#fdfaf6] focus:border-amber-500/80 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
                 >
                   {akunKasBankList.map((a) => (
-                    <option key={a.id} value={a.id}>
+                    <option key={a.id} value={a.id} className="bg-[#141210] text-[#fdfaf6]">
                       {a.kode} - {a.nama}
                     </option>
                   ))}
                 </select>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-[#8a7e72]">
                   Hanya menampilkan akun kas atau bank yang aktif (is_kas_bank).
                 </p>
               </div>
 
               {/* Tautan Panduan Format CSV */}
               <div className="flex flex-col justify-end">
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs">
+                <div className="p-4 bg-[#141210] border border-amber-900/30 rounded-xl flex items-center justify-between text-xs sm:text-sm">
                   <div>
-                    <span className="font-semibold text-slate-800 block">Butuh bantuan format berkas?</span>
-                    <span className="text-[11px] text-slate-500">Lihat aturan kolom & contoh CSV siap pakai</span>
+                    <span className="font-bold text-[#fdfaf6] block">Butuh bantuan format berkas?</span>
+                    <span className="text-xs text-[#a89f91]">Lihat aturan kolom & contoh CSV siap pakai</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setShowFormatModal(true)}
-                    className="px-2.5 py-1 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition whitespace-nowrap"
+                    className="px-3.5 py-1.5 text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-500/40 rounded-xl hover:bg-amber-900/50 transition whitespace-nowrap"
                   >
                     Format CSV
                   </button>
@@ -334,11 +337,11 @@ export function UnggahCsvModal({
             </div>
 
             {/* Input Berkas CSV */}
-            <div className="space-y-1.5">
-              <label htmlFor="csv-file-input" className="block text-xs font-bold text-slate-800">
-                Pilih Berkas CSV Mutasi Bank <span className="text-red-500">*</span>
+            <div className="space-y-2">
+              <label htmlFor="csv-file-input" className="block text-sm sm:text-base font-semibold text-[#d6cfc7]">
+                Pilih Berkas CSV Mutasi Bank <span className="text-amber-400">*</span>
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <input
                   id="csv-file-input"
                   ref={fileInputRef}
@@ -346,68 +349,68 @@ export function UnggahCsvModal({
                   accept=".csv"
                   onChange={handleFileChange}
                   disabled={isPending}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer border border-slate-300 rounded-lg bg-white cursor-pointer disabled:opacity-50"
+                  className="block w-full text-sm text-[#a89f91] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-bold file:bg-amber-950/60 file:text-amber-300 hover:file:bg-amber-900/60 file:border file:border-amber-500/40 border border-amber-900/30 rounded-xl bg-[#141210] cursor-pointer disabled:opacity-50"
                 />
                 {file && (
                   <button
                     type="button"
                     onClick={handleResetFile}
                     disabled={isPending}
-                    className="text-xs px-2.5 py-2 text-slate-500 hover:text-red-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+                    className="text-xs sm:text-sm px-4 py-2.5 text-[#8a7e72] hover:text-rose-400 hover:bg-[#1a1613] rounded-xl border border-amber-900/30 transition font-bold"
                     title="Hapus berkas terpilih"
                   >
                     Batal
                   </button>
                 )}
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-xs text-[#8a7e72]">
                 Ekstensi wajib .csv, ukuran maks. 1 MB, batas maks. 1.000 baris data transaksi.
               </p>
             </div>
 
             {/* Ringkasan & Pratinjau Baris Data */}
             {parseResult && (
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
-                    <span className="text-slate-500 block text-[10px]">Total Baris CSV</span>
-                    <span className="font-bold text-slate-800 text-sm">
+              <div className="space-y-4 pt-3 border-t border-amber-900/20">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm">
+                  <div className="p-3.5 bg-[#141210] border border-amber-900/20 rounded-xl">
+                    <span className="text-[#8a7e72] block text-xs">Total Baris CSV</span>
+                    <span className="font-mono font-bold text-[#fdfaf6] text-lg">
                       {parseResult.totalBaris.toLocaleString("id-ID")}
                     </span>
                   </div>
-                  <div className={`p-2.5 rounded-lg border ${
+                  <div className={`p-3.5 rounded-xl border ${
                     barisBaruCount > 0
-                      ? "bg-emerald-50 border-emerald-200"
-                      : "bg-slate-50 border-slate-200"
+                      ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200"
+                      : "bg-[#141210] border-amber-900/20 text-[#8a7e72]"
                   }`}>
-                    <span className={`block text-[10px] ${barisBaruCount > 0 ? "text-emerald-700" : "text-slate-500"}`}>
+                    <span className="block text-xs font-semibold">
                       Baru & Siap Impor
                     </span>
-                    <span className={`font-bold text-sm ${barisBaruCount > 0 ? "text-emerald-800" : "text-slate-600"}`}>
+                    <span className="font-mono font-bold text-lg text-emerald-300">
                       {barisBaruCount.toLocaleString("id-ID")}
                     </span>
                   </div>
-                  <div className={`p-2.5 rounded-lg border ${
+                  <div className={`p-3.5 rounded-xl border ${
                     duplikatDbCount > 0
-                      ? "bg-amber-50 border-amber-300"
-                      : "bg-slate-50 border-slate-200"
+                      ? "bg-amber-950/40 border-amber-500/40 text-amber-200"
+                      : "bg-[#141210] border-amber-900/20 text-[#8a7e72]"
                   }`}>
-                    <span className={`block text-[10px] ${duplikatDbCount > 0 ? "text-amber-700" : "text-slate-500"}`}>
+                    <span className="block text-xs font-semibold">
                       Sudah di Database
                     </span>
-                    <span className={`font-bold text-sm ${duplikatDbCount > 0 ? "text-amber-800" : "text-slate-600"}`}>
+                    <span className="font-mono font-bold text-lg text-amber-300">
                       {duplikatDbCount.toLocaleString("id-ID")}
                     </span>
                   </div>
-                  <div className={`p-2.5 rounded-lg border ${
+                  <div className={`p-3.5 rounded-xl border ${
                     parseResult.barisInvalid > 0
-                      ? "bg-red-50 border-red-200"
-                      : "bg-slate-50 border-slate-200"
+                      ? "bg-rose-950/40 border-rose-500/40 text-rose-200"
+                      : "bg-[#141210] border-amber-900/20 text-[#8a7e72]"
                   }`}>
-                    <span className={`block text-[10px] ${parseResult.barisInvalid > 0 ? "text-red-700" : "text-slate-500"}`}>
+                    <span className="block text-xs font-semibold">
                       Cacat / Invalid
                     </span>
-                    <span className={`font-bold text-sm ${parseResult.barisInvalid > 0 ? "text-red-800" : "text-slate-600"}`}>
+                    <span className="font-mono font-bold text-lg text-rose-300">
                       {parseResult.barisInvalid.toLocaleString("id-ID")}
                     </span>
                   </div>
@@ -415,77 +418,78 @@ export function UnggahCsvModal({
 
                 {/* Notifikasi jika ada kembar identik dalam berkas CSV */}
                 {parseResult.barisKembarBerkas > 0 && (
-                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center gap-2">
+                  <div className="p-3.5 bg-amber-950/30 border border-amber-500/30 rounded-xl text-xs sm:text-sm text-amber-200 flex items-center gap-2">
                     <span>⚠</span>
                     <span>Terdapat {parseResult.barisKembarBerkas} baris kembar identik di dalam berkas CSV.</span>
                   </div>
                 )}
 
                 {/* Pratinjau Tabel Transaksi */}
-                <div className="border border-slate-200 rounded-lg overflow-hidden">
-                  <div className="bg-slate-100 px-3 py-1.5 border-b border-slate-200 flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-700">
+                <div className="border border-amber-900/20 rounded-xl overflow-hidden">
+                  <div className="bg-[#141210] px-4 py-2.5 border-b border-amber-900/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
+                    <span className="font-bold text-[#fdfaf6]">
                       Pratinjau Data Transaksi ({Math.min(parseResult.baris.length, 50)} dari {parseResult.totalBaris} baris)
                     </span>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-xs text-[#8a7e72]">
                       {isCheckingDb ? "Sedang memeriksa duplikat di database..." : "Format desimal, eksponen, & duplikat otomatis divalidasi"}
                     </span>
                   </div>
                   <div className="max-h-60 overflow-y-auto">
-                    <table className="w-full text-xs text-left border-collapse">
-                      <thead className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase border-b border-slate-200 sticky top-0">
+                    <table className="w-full text-xs sm:text-sm text-left border-collapse">
+                      <thead className="bg-[#141210] text-xs font-bold text-[#d6cfc7] uppercase border-b border-amber-900/30 sticky top-0">
                         <tr>
-                          <th className="py-1.5 px-3 w-12 text-center">Baris</th>
-                          <th className="py-1.5 px-3 w-24">Tanggal</th>
-                          <th className="py-1.5 px-3">Deskripsi Transaksi</th>
-                          <th className="py-1.5 px-3 text-right w-28">Jumlah (Rp)</th>
-                          <th className="py-1.5 px-3 text-right w-28">Saldo (Rp)</th>
-                          <th className="py-1.5 px-3 w-32 text-center">Status</th>
+                          <th className="py-2.5 px-3.5 w-14 text-center">Baris</th>
+                          <th className="py-2.5 px-3.5 w-28">Tanggal</th>
+                          <th className="py-2.5 px-3.5">Deskripsi Transaksi</th>
+                          <th className="py-2.5 px-3.5 text-right w-32">Jumlah (Rp)</th>
+                          <th className="py-2.5 px-3.5 text-right w-32">Saldo (Rp)</th>
+                          <th className="py-2.5 px-3.5 w-36 text-center">Status</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-amber-900/10">
                         {parseResult.baris.slice(0, 50).map((row) => {
                           const isInvalid = !row.isValid;
                           const isMasuk = (row.jumlah || 0) > 0;
                           const isDupDb = Boolean(row.isDuplikatDb);
+
                           return (
                             <tr
                               key={row.barisKe}
-                              className={`hover:bg-slate-50 ${
+                              className={`hover:bg-[#161311] transition-colors ${
                                 isInvalid
-                                  ? "bg-red-50/50"
+                                  ? "bg-rose-950/20"
                                   : isDupDb
-                                  ? "bg-amber-50/40"
+                                  ? "bg-amber-950/20"
                                   : ""
                               }`}
                             >
-                              <td className="py-1.5 px-3 text-center text-slate-400 font-mono text-[11px]">
+                              <td className="py-2.5 px-3.5 text-center text-[#8a7e72] font-mono text-xs">
                                 {row.barisKe}
                               </td>
-                              <td className="py-1.5 px-3 text-slate-800 whitespace-nowrap">
-                                {row.tanggal ? formatDate(row.tanggal) : <span className="text-red-500">{row.rawTanggal || "-"}</span>}
+                              <td className="py-2.5 px-3.5 text-[#fdfaf6] whitespace-nowrap">
+                                {row.tanggal ? formatDate(row.tanggal) : <span className="text-rose-400">{row.rawTanggal || "-"}</span>}
                               </td>
-                              <td className="py-1.5 px-3 text-slate-800 max-w-xs truncate" title={row.deskripsi || row.rawDeskripsi}>
-                                {row.deskripsi || <span className="text-red-500 italic">(Kosong)</span>}
+                              <td className="py-2.5 px-3.5 text-[#fdfaf6] max-w-xs truncate" title={row.deskripsi || row.rawDeskripsi}>
+                                {row.deskripsi || <span className="text-rose-400 italic">(Kosong)</span>}
                               </td>
-                              <td className="py-1.5 px-3 text-right whitespace-nowrap">
+                              <td className="py-2.5 px-3.5 text-right whitespace-nowrap font-mono tabular-nums">
                                 {row.jumlah !== undefined ? (
-                                  <span className={`font-semibold ${isMasuk ? "text-emerald-700" : "text-rose-700"}`}>
+                                  <span className={`font-bold ${isMasuk ? "text-emerald-300" : "text-rose-300"}`}>
                                     {isMasuk ? "+" : ""}
                                     {formatRupiah(row.jumlah)}
                                   </span>
                                 ) : (
-                                  <span className="text-red-500">{row.rawJumlah || "-"}</span>
+                                  <span className="text-rose-400">{row.rawJumlah || "-"}</span>
                                 )}
                               </td>
-                              <td className="py-1.5 px-3 text-right text-slate-600 whitespace-nowrap">
-                                {row.saldo !== null && row.saldo !== undefined ? formatRupiah(row.saldo) : <span className="text-slate-400">-</span>}
+                              <td className="py-2.5 px-3.5 text-right text-[#d6cfc7] whitespace-nowrap font-mono tabular-nums">
+                                {row.saldo !== null && row.saldo !== undefined ? formatRupiah(row.saldo) : <span className="text-[#5a524a]">-</span>}
                               </td>
-                              <td className="py-1.5 px-3 text-center whitespace-nowrap">
+                              <td className="py-2.5 px-3.5 text-center whitespace-nowrap">
                                 {isInvalid ? (
                                   <div className="flex flex-col items-center">
                                     <span
-                                      className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 border border-red-200 cursor-help"
+                                      className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-950/60 text-rose-300 border border-rose-500/40 cursor-help"
                                       title={row.errors.join(", ")}
                                     >
                                       ✕ Cacat
@@ -493,13 +497,13 @@ export function UnggahCsvModal({
                                   </div>
                                 ) : isDupDb ? (
                                   <span
-                                    className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 cursor-help"
+                                    className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 cursor-help"
                                     title="Transaksi ini sudah ada di database mutasi bank untuk akun ini. Baris ini akan dilewati otomatis saat impor."
                                   >
-                                    ⚠ Sudah di Database
+                                    ⚠ Di Database
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
                                     ✓ Baru & Valid
                                   </span>
                                 )}
@@ -516,42 +520,42 @@ export function UnggahCsvModal({
           </div>
 
           {/* Footer Modal */}
-          <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-            <span className="text-xs text-slate-500">
+          <div className="px-6 sm:px-7 py-4 border-t border-amber-900/20 bg-[#141210] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-xs sm:text-sm text-[#8a7e72]">
               {parseResult && (
                 <>
                   {barisBaruCount > 0 ? (
                     <>
-                      Baru: <strong className="text-emerald-700">{barisBaruCount} baris</strong>
+                      Baru: <strong className="text-emerald-300">{barisBaruCount} baris</strong>
                       {duplikatDbCount > 0 && (
-                        <span className="text-amber-700 ml-1.5 font-medium">
+                        <span className="text-amber-400 ml-1.5 font-medium">
                           ({duplikatDbCount} sudah di database, akan dilewati)
                         </span>
                       )}
                     </>
                   ) : duplikatDbCount > 0 ? (
-                    <span className="text-amber-700 font-semibold">
+                    <span className="text-amber-400 font-semibold">
                       Semua transaksi ({duplikatDbCount} baris) sudah ada di database (akan dilewati).
                     </span>
                   ) : (
                     <>
-                      Valid: <strong>{barisBaruCount} baris</strong>
+                      Valid: <strong className="text-emerald-300">{barisBaruCount} baris</strong>
                     </>
                   )}
                   {parseResult.barisInvalid > 0 && (
-                    <span className="text-red-600 ml-1">
+                    <span className="text-rose-400 ml-1">
                       ({parseResult.barisInvalid} cacat, seluruh impor ditolak)
                     </span>
                   )}
                 </>
               )}
             </span>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={isPending}
-                className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition disabled:opacity-50"
+                className="px-5 py-2.5 text-sm font-bold text-[#d6cfc7] bg-[#141210] border border-amber-900/30 rounded-xl hover:bg-[#1c1815] transition disabled:opacity-50"
               >
                 Batal
               </button>
@@ -565,7 +569,7 @@ export function UnggahCsvModal({
                   parseResult.barisInvalid > 0 ||
                   parseResult.totalBaris === 0
                 }
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 text-sm sm:text-base font-bold text-[#070605] bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl hover:from-amber-500 hover:to-amber-600 transition shadow-lg shadow-amber-950/50 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {isPending ? (
                   <>
@@ -577,11 +581,11 @@ export function UnggahCsvModal({
                   </>
                 ) : barisBaruCount === 0 && duplikatDbCount > 0 ? (
                   <>
-                    <span>📥</span> Impor Mutasi (0 Baris Baru, {duplikatDbCount} Dilewati)
+                    <span>📥</span> Impor Mutasi (0 Baru, {duplikatDbCount} Dilewati)
                   </>
                 ) : duplikatDbCount > 0 ? (
                   <>
-                    <span>📥</span> Impor Mutasi ({barisBaruCount} Baris Baru, {duplikatDbCount} Dilewati)
+                    <span>📥</span> Impor Mutasi ({barisBaruCount} Baru, {duplikatDbCount} Dilewati)
                   </>
                 ) : (
                   <>

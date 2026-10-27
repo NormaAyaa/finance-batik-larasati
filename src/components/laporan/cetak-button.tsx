@@ -17,11 +17,11 @@ export function CetakButton({
     <button
       type="button"
       onClick={handlePrint}
-      className={`no-print inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition ${className}`}
+      className={`no-print inline-flex items-center gap-2 rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#d6cfc7] shadow-md hover:bg-amber-950/40 hover:text-[#fdfaf6] hover:border-amber-500/40 transition active:scale-95 ${className}`}
       title="Cetak laporan langsung atau simpan sebagai PDF lewat browser"
     >
       <svg
-        className="w-4 h-4 text-slate-500"
+        className="w-4 h-4 text-amber-400"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"

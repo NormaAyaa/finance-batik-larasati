@@ -154,25 +154,31 @@ export function JurnalDetail({
   // Jika sedang mode edit draf (hanya untuk status draf dan Akuntan)
   if (isEditing && isAkuntan && jurnal.status === "draf") {
     return (
-      <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="space-y-6 w-full">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="text-amber-800 hover:underline font-semibold"
+              className="text-amber-400 hover:text-amber-300 font-bold text-sm sm:text-base flex items-center gap-2 transition"
             >
-              ← Batal Ubah & Kembali ke Detail
+              <span>←</span>
+              <span>Batal Ubah & Kembali ke Detail</span>
             </button>
           </div>
-          <span className="text-xs font-mono bg-amber-50 text-amber-800 px-2.5 py-1 rounded border border-amber-200">
+          <span className="text-xs sm:text-sm font-mono font-bold bg-amber-950/60 text-amber-300 px-3.5 py-1.5 rounded-full border border-amber-500/40 shadow-sm">
             Mode Ubah Draf
           </span>
         </div>
 
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">Ubah Draf Jurnal #{jurnal.id}</h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#fdfaf6] tracking-tight">
+              Ubah Draf Jurnal #{jurnal.id}
+            </h1>
+          </div>
+          <p className="text-sm sm:text-base text-[#a89f91]">
             Perbarui data baris debit-kredit sebelum diposting resmi ke buku besar (BR-02)
           </p>
         </div>
@@ -201,30 +207,36 @@ export function JurnalDetail({
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 w-full">
       {/* Navigasi breadcrumb */}
-      <div className="flex items-center justify-between text-xs text-slate-500">
-        <Link href="/jurnal" className="hover:text-slate-900 transition font-medium">
-          ← Kembali ke Daftar Jurnal
+      <div className="flex items-center justify-between">
+        <Link
+          href="/jurnal"
+          className="text-amber-400 hover:text-amber-300 font-bold text-sm sm:text-base flex items-center gap-2 transition"
+        >
+          <span>←</span>
+          <span>Kembali ke Daftar Jurnal</span>
         </Link>
-        <span className="font-mono text-[11px]">ID Internal: #{jurnal.id}</span>
+        <span className="font-mono text-xs sm:text-sm text-[#8a7e72] bg-[#141210] border border-amber-900/20 px-3 py-1.5 rounded-lg">
+          ID Internal: #{jurnal.id}
+        </span>
       </div>
 
       {/* Alert Error Tindakan */}
       {actionError && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800 flex items-start gap-2 shadow-sm"
+          className="sogan-card rounded-2xl border border-rose-500/40 bg-rose-950/40 p-4 sm:p-5 text-sm sm:text-base text-rose-200 flex items-start gap-3 shadow-lg"
         >
-          <span className="font-bold text-red-600">✕</span>
-          <div className="flex-1">
+          <span className="font-bold text-rose-400 text-lg">✕</span>
+          <div className="flex-1 space-y-1">
             <strong className="block font-semibold">Tindakan ditolak oleh sistem:</strong>
-            <span>{actionError}</span>
+            <span className="text-xs sm:text-sm text-rose-300/90">{actionError}</span>
           </div>
           <button
             type="button"
             onClick={() => setActionError(null)}
-            className="text-red-600 hover:text-red-900 font-bold ml-2"
+            className="text-rose-400 hover:text-rose-200 font-bold p-1 transition"
             aria-label="Tutup pesan galat"
           >
             ✕
@@ -234,18 +246,18 @@ export function JurnalDetail({
 
       {/* Alert Berhasil Posting */}
       {postingSuccessNomor && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 flex items-start gap-2 shadow-sm">
-          <span className="font-bold text-emerald-600 text-sm">✓</span>
-          <div className="flex-1">
+        <div className="sogan-card rounded-2xl border border-emerald-500/40 bg-emerald-950/40 p-4 sm:p-5 text-sm sm:text-base text-emerald-200 flex items-start gap-3 shadow-lg">
+          <span className="font-bold text-emerald-400 text-lg">✓</span>
+          <div className="flex-1 space-y-1">
             <strong className="block font-semibold">Jurnal Berhasil Diposting!</strong>
-            <span>
-              Nomor dokumen resmi: <strong className="font-mono">{postingSuccessNomor}</strong>. Transaksi telah dibukukan ke buku besar.
+            <span className="text-xs sm:text-sm text-emerald-300/90">
+              Nomor dokumen resmi: <strong className="font-mono text-amber-300 font-bold">{postingSuccessNomor}</strong>. Transaksi telah dibukukan ke buku besar.
             </span>
           </div>
           <button
             type="button"
             onClick={() => setPostingSuccessNomor(null)}
-            className="text-emerald-700 hover:text-emerald-900 font-bold ml-2"
+            className="text-emerald-400 hover:text-emerald-200 font-bold p-1 transition"
             aria-label="Tutup pesan sukses"
           >
             ✕
@@ -256,19 +268,19 @@ export function JurnalDetail({
       {/* Banner Tautan Jurnal Terkait */}
       {/* 1. Jika jurnal ini merupakan jurnal pembalik */}
       {jurnal.sumber === "pembalik" && jurnal.jurnal_dibalik && (
-        <div className="rounded-xl border border-purple-200 bg-purple-50/70 p-4 text-xs text-purple-900 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-base">🔄</span>
+        <div className="sogan-card rounded-2xl border border-purple-500/30 bg-purple-950/30 p-5 text-sm text-purple-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">🔄</span>
             <div>
-              <p className="font-semibold">Ini adalah Jurnal Pembalik (Koreksi)</p>
-              <p className="text-purple-700 text-[11px]">
+              <p className="font-bold text-purple-200">Ini adalah Jurnal Pembalik (Koreksi)</p>
+              <p className="text-purple-300/80 text-xs sm:text-sm">
                 Membalik transaksi pada jurnal asal bertanggal {formatDate(jurnal.jurnal_dibalik.tanggal)}
               </p>
             </div>
           </div>
           <Link
             href={`/jurnal/${jurnal.jurnal_dibalik.id}`}
-            className="font-mono font-semibold underline hover:text-purple-950 whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 font-mono font-bold text-amber-300 hover:text-amber-200 underline whitespace-nowrap text-sm"
           >
             Buka Jurnal Asal ({jurnal.jurnal_dibalik.nomor || `#${jurnal.jurnal_dibalik.id}`}) →
           </Link>
@@ -277,19 +289,19 @@ export function JurnalDetail({
 
       {/* 2. Jika jurnal ini telah dibalik oleh jurnal lain */}
       {jurnal.jurnal_pembalik && (
-        <div className="rounded-xl border border-slate-300 bg-slate-100 p-4 text-xs text-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-base">↩</span>
+        <div className="sogan-card rounded-2xl border border-amber-500/30 bg-amber-950/30 p-5 text-sm text-amber-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">↩</span>
             <div>
-              <p className="font-semibold">Jurnal Ini Telah Dibalik</p>
-              <p className="text-slate-600 text-[11px]">
+              <p className="font-bold text-amber-200">Jurnal Ini Telah Dibalik</p>
+              <p className="text-[#a89f91] text-xs sm:text-sm">
                 Telah dibuatkan jurnal pembalik untuk mengoreksi transaksi ini (BR-04)
               </p>
             </div>
           </div>
           <Link
             href={`/jurnal/${jurnal.jurnal_pembalik.id}`}
-            className="font-mono font-semibold text-amber-900 underline hover:text-amber-950 whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 font-mono font-bold text-amber-400 hover:text-amber-300 underline whitespace-nowrap text-sm"
           >
             Lihat Pembalik ({jurnal.jurnal_pembalik.nomor || `#${jurnal.jurnal_pembalik.id}`}) →
           </Link>
@@ -298,19 +310,19 @@ export function JurnalDetail({
 
       {/* 3. Jika jurnal berasal dari pembayaran pengajuan biaya */}
       {jurnal.pengajuan_id && (
-        <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-blue-900 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-base">📄</span>
+        <div className="sogan-card rounded-2xl border border-blue-500/30 bg-blue-950/30 p-5 text-sm text-blue-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">📄</span>
             <div>
-              <p className="font-semibold">Jurnal Otomatis Pembayaran Pengajuan</p>
-              <p className="text-blue-700 text-[11px]">
+              <p className="font-bold text-blue-200">Jurnal Otomatis Pembayaran Pengajuan</p>
+              <p className="text-blue-300/80 text-xs sm:text-sm">
                 Dibuat otomatis oleh sistem saat pengajuan biaya dibayarkan oleh Akuntan (BR-10)
               </p>
             </div>
           </div>
           <Link
             href={`/pengajuan/${jurnal.pengajuan_id}`}
-            className="font-mono font-semibold underline hover:text-blue-950 whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 font-mono font-bold text-amber-300 hover:text-amber-200 underline whitespace-nowrap text-sm"
           >
             Buka Pengajuan ({jurnal.pengajuan?.nomor || `#${jurnal.pengajuan_id}`}) →
           </Link>
@@ -318,159 +330,164 @@ export function JurnalDetail({
       )}
 
       {/* Card Header Jurnal */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
-          <div>
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+      <div className="sogan-card rounded-2xl border border-amber-500/20 bg-[#0e0c0a] p-6 sm:p-7 shadow-xl space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-amber-900/20 pb-5">
+          <div className="space-y-1">
+            <span className="text-xs font-bold text-amber-400 uppercase tracking-widest block">
               Nomor Dokumen
             </span>
-            <h1 className="text-2xl font-bold font-mono text-slate-900">
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-mono text-[#fdfaf6]">
               {jurnal.status === "draf" || !jurnal.nomor ? (
-                <span className="italic font-sans text-amber-700">Draf Jurnal</span>
+                <span className="italic font-sans text-amber-400">Draf Jurnal</span>
               ) : (
                 jurnal.nomor
               )}
             </h1>
           </div>
-          <div className="flex items-center gap-2">
-            <JurnalSumberBadge sumber={jurnal.sumber} className="text-xs px-2.5 py-1" />
-            <JurnalStatusBadge status={jurnal.status} className="text-xs px-3 py-1" />
+          <div className="flex flex-wrap items-center gap-2.5">
+            <JurnalSumberBadge sumber={jurnal.sumber} className="text-xs sm:text-sm px-3.5 py-1.5" />
+            <JurnalStatusBadge status={jurnal.status} className="text-xs sm:text-sm px-3.5 py-1.5" />
           </div>
         </div>
 
         {/* Informasi Kunci */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-          <div>
-            <span className="text-[11px] font-semibold text-slate-400 block mb-0.5">Tanggal Transaksi</span>
-            <span className="font-medium text-slate-800">{formatDate(jurnal.tanggal)}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-[#141210] border border-amber-900/20 rounded-xl p-4">
+            <span className="text-xs font-semibold text-[#8a7e72] uppercase tracking-wider block mb-1">Tanggal Transaksi</span>
+            <span className="font-bold text-sm sm:text-base text-[#fdfaf6]">{formatDate(jurnal.tanggal)}</span>
           </div>
 
-          <div>
-            <span className="text-[11px] font-semibold text-slate-400 block mb-0.5">Periode Akuntansi</span>
-            <span className="font-medium text-slate-800">
+          <div className="bg-[#141210] border border-amber-900/20 rounded-xl p-4">
+            <span className="text-xs font-semibold text-[#8a7e72] uppercase tracking-wider block mb-1">Periode Akuntansi</span>
+            <span className="font-bold text-sm sm:text-base text-[#fdfaf6]">
               {jurnal.periode
                 ? formatBulanTahun(jurnal.periode.tahun, jurnal.periode.bulan)
                 : "-"}
             </span>
             {jurnal.periode && (
-              <span className="text-[10px] text-slate-500 block">
+              <span className="text-xs text-[#a89f91] mt-0.5 block">
                 ({jurnal.periode.status === "terbuka" ? "Status: Terbuka" : "Status: Ditutup"})
               </span>
             )}
           </div>
 
-          <div>
-            <span className="text-[11px] font-semibold text-slate-400 block mb-0.5">Dibuat Oleh</span>
-            <span className="font-medium text-slate-800">
+          <div className="bg-[#141210] border border-amber-900/20 rounded-xl p-4">
+            <span className="text-xs font-semibold text-[#8a7e72] uppercase tracking-wider block mb-1">Dibuat Oleh</span>
+            <span className="font-bold text-sm sm:text-base text-[#fdfaf6]">
               {jurnal.pembuat?.nama_lengkap || "Pengguna"}
             </span>
-            <span className="text-[10px] text-slate-500 block">{jurnal.pembuat?.email || ""}</span>
+            <span className="text-xs text-[#a89f91] mt-0.5 block">{jurnal.pembuat?.email || ""}</span>
           </div>
 
-          <div>
-            <span className="text-[11px] font-semibold text-slate-400 block mb-0.5">Pelaku & Waktu Posting</span>
+          <div className="bg-[#141210] border border-amber-900/20 rounded-xl p-4">
+            <span className="text-xs font-semibold text-[#8a7e72] uppercase tracking-wider block mb-1">Pelaku & Waktu Posting</span>
             {jurnal.status !== "draf" && jurnal.pemosting ? (
               <>
-                <span className="font-medium text-slate-800">{jurnal.pemosting.nama_lengkap}</span>
-                <span className="text-[10px] text-slate-500 block">
+                <span className="font-bold text-sm sm:text-base text-[#fdfaf6]">{jurnal.pemosting.nama_lengkap}</span>
+                <span className="text-xs text-[#a89f91] mt-0.5 block">
                   {jurnal.diposting_pada ? formatDateTime(jurnal.diposting_pada) : "-"}
                 </span>
               </>
             ) : (
-              <span className="text-slate-400 italic">Belum diposting</span>
+              <span className="text-[#8a7e72] italic text-sm">Belum diposting</span>
             )}
           </div>
         </div>
 
         {/* Keterangan */}
-        <div className="pt-2 border-t border-slate-100">
-          <span className="text-[11px] font-semibold text-slate-400 block mb-1">Keterangan Transaksi</span>
-          <p className="text-xs text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200">
+        <div className="pt-2 border-t border-amber-900/20 space-y-2">
+          <span className="text-xs font-semibold text-[#8a7e72] uppercase tracking-wider block">Keterangan Transaksi</span>
+          <p className="text-sm sm:text-base text-[#d6cfc7] bg-[#141210] rounded-xl p-4 border border-amber-900/20 leading-relaxed">
             {jurnal.keterangan}
           </p>
         </div>
       </div>
 
       {/* Rincian Baris Jurnal Debit - Kredit */}
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-slate-900">Rincian Baris Akun (BR-02)</h2>
-            <p className="text-[11px] text-slate-500">
+      <div className="sogan-card rounded-2xl border border-amber-500/20 bg-[#0e0c0a] shadow-xl overflow-hidden">
+        <div className="p-5 sm:p-6 border-b border-amber-900/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-amber-400" />
+              <h2 className="text-lg sm:text-xl font-bold text-[#fdfaf6]">Rincian Baris Akun (BR-02)</h2>
+            </div>
+            <p className="text-xs sm:text-sm text-[#a89f91]">
               Klasifikasi transaksi debit dan kredit yang memengaruhi buku besar
             </p>
           </div>
-          <span className="text-xs font-semibold text-slate-600">
+          <span className="self-start sm:self-auto text-xs sm:text-sm font-bold text-amber-400 bg-amber-950/60 border border-amber-500/30 px-3.5 py-1.5 rounded-full">
             {jurnal.baris.length} Baris Akun
           </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold uppercase tracking-wider text-[11px]">
+          <table className="w-full text-left text-sm sm:text-base">
+            <thead className="bg-[#141210] border-b border-amber-900/30 text-[#d6cfc7] font-bold uppercase tracking-wider text-xs sm:text-sm">
               <tr>
-                <th scope="col" className="px-4 py-2.5 text-center w-12">#</th>
-                <th scope="col" className="px-4 py-2.5">Akun</th>
-                <th scope="col" className="px-4 py-2.5">Keterangan Baris</th>
-                <th scope="col" className="px-4 py-2.5 text-right w-36">Debit</th>
-                <th scope="col" className="px-4 py-2.5 text-right w-36">Kredit</th>
+                <th scope="col" className="px-5 py-3.5 text-center w-14">#</th>
+                <th scope="col" className="px-5 py-3.5">Akun</th>
+                <th scope="col" className="px-5 py-3.5">Keterangan Baris</th>
+                <th scope="col" className="px-5 py-3.5 text-right w-44">Debit</th>
+                <th scope="col" className="px-5 py-3.5 text-right w-44">Kredit</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-amber-900/10">
               {jurnal.baris.map((b) => (
-                <tr key={b.id} className="hover:bg-slate-50/50">
-                  <td className="px-4 py-3 text-center font-mono text-slate-400">
+                <tr key={b.id} className="hover:bg-[#161311] transition-colors">
+                  <td className="px-5 py-4 text-center font-mono text-[#8a7e72] font-semibold text-sm">
                     {b.urutan}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="font-semibold font-mono text-slate-900">
+                  <td className="px-5 py-4">
+                    <div className="font-bold font-mono text-sm sm:text-base text-[#fdfaf6]">
                       [{b.akun?.kode || "-"}] {b.akun?.nama || "Akun"}
                     </div>
-                    <span className="text-[10px] text-slate-500 uppercase">
+                    <span className="text-xs text-amber-400 uppercase tracking-wider mt-0.5 block">
                       Tipe: {b.akun?.tipe || "-"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-600">
-                    {b.keterangan || <span className="text-slate-400 italic">-</span>}
+                  <td className="px-5 py-4 text-[#a89f91] text-sm">
+                    {b.keterangan || <span className="text-[#685f54] italic">-</span>}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-slate-800">
+                  <td className="px-5 py-4 text-right font-mono text-sm sm:text-base font-bold tabular-nums">
                     {b.debit > 0 ? (
-                      <span className="font-semibold text-slate-900">{formatRupiah(b.debit)}</span>
+                      <span className="text-emerald-300">{formatRupiah(b.debit)}</span>
                     ) : (
-                      <span className="text-slate-400">-</span>
+                      <span className="text-[#5a524a]">-</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-slate-800">
+                  <td className="px-5 py-4 text-right font-mono text-sm sm:text-base font-bold tabular-nums">
                     {b.kredit > 0 ? (
-                      <span className="font-semibold text-slate-900">{formatRupiah(b.kredit)}</span>
+                      <span className="text-amber-300">{formatRupiah(b.kredit)}</span>
                     ) : (
-                      <span className="text-slate-400">-</span>
+                      <span className="text-[#5a524a]">-</span>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-slate-50 border-t-2 border-slate-200 font-bold text-xs">
+            <tfoot className="bg-[#141210] border-t-2 border-amber-500/30 font-bold text-sm sm:text-base">
               <tr>
-                <td colSpan={3} className="px-4 py-3 text-right text-slate-700">
+                <td colSpan={3} className="px-5 py-4 text-right text-[#d6cfc7]">
                   Total Nilai:
                 </td>
-                <td className="px-4 py-3 text-right font-mono text-slate-900 whitespace-nowrap">
+                <td className="px-5 py-4 text-right font-mono text-emerald-300 font-extrabold whitespace-nowrap">
                   {formatRupiah(totalDebit)}
                 </td>
-                <td className="px-4 py-3 text-right font-mono text-slate-900 whitespace-nowrap">
+                <td className="px-5 py-4 text-right font-mono text-amber-300 font-extrabold whitespace-nowrap">
                   {formatRupiah(totalKredit)}
                 </td>
               </tr>
-              <tr>
-                <td colSpan={5} className="px-4 py-2 text-center text-xs">
+              <tr className={isBalanced ? "bg-emerald-950/30 border-t border-emerald-500/20" : "bg-rose-950/30 border-t border-rose-500/20"}>
+                <td colSpan={5} className="px-5 py-3 text-center text-sm sm:text-base">
                   {isBalanced ? (
-                    <span className="text-emerald-700 font-semibold">
-                      ✓ Jurnal Seimbang (Debit = Kredit = {formatRupiah(totalDebit)})
+                    <span className="text-emerald-300 font-bold flex items-center justify-center gap-2">
+                      <span>✓</span>
+                      <span>Jurnal Seimbang (Debit = Kredit = {formatRupiah(totalDebit)})</span>
                     </span>
                   ) : (
-                    <span className="text-amber-800 font-semibold">
-                      ⚠ Jurnal Tidak Seimbang (Selisih: {formatRupiah(Math.abs(totalDebit - totalKredit))})
+                    <span className="text-rose-300 font-bold flex items-center justify-center gap-2">
+                      <span>⚠</span>
+                      <span>Jurnal Tidak Seimbang (Selisih: {formatRupiah(Math.abs(totalDebit - totalKredit))})</span>
                     </span>
                   )}
                 </td>
@@ -483,7 +500,7 @@ export function JurnalDetail({
       {/* Tombol Aksi Halaman Detail */}
       {/* Akuntan memiliki wewenang aksi; Direktur hanya membaca (tanpa tombol buat, ubah, posting, hapus, pembalik) */}
       {isAkuntan && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
           {/* Sisi Kiri: Aksi Hapus (hanya jika draf) */}
           <div>
             {jurnal.status === "draf" && (
@@ -491,7 +508,7 @@ export function JurnalDetail({
                 type="button"
                 onClick={() => setIsDeleteModalOpen(true)}
                 disabled={isPosting || isDeleting}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-3.5 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 transition shadow-sm disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-950/30 px-5 py-2.5 text-sm sm:text-base font-bold text-rose-300 hover:bg-rose-900/40 hover:text-rose-200 transition shadow-sm disabled:opacity-50"
                 id="btn-hapus-draf"
               >
                 <span aria-hidden="true">🗑</span>
@@ -501,14 +518,14 @@ export function JurnalDetail({
           </div>
 
           {/* Sisi Kanan: Aksi Ubah, Posting, atau Buat Pembalik */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             {jurnal.status === "draf" && (
               <>
                 <button
                   type="button"
                   onClick={() => setIsEditing(true)}
                   disabled={isPosting || isDeleting}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition shadow-sm disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl border border-amber-500/30 bg-[#141210] px-5 py-2.5 text-sm sm:text-base font-bold text-[#d6cfc7] hover:bg-[#1c1815] hover:text-[#fdfaf6] transition shadow-sm disabled:opacity-50"
                   id="btn-ubah-draf"
                 >
                   <span aria-hidden="true">✎</span>
@@ -524,7 +541,7 @@ export function JurnalDetail({
                     !isBalanced ||
                     jurnal.periode?.status !== "terbuka"
                   }
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-800 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-2.5 text-sm sm:text-base font-bold text-white shadow-lg shadow-emerald-950/50 hover:from-emerald-500 hover:to-emerald-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
                   id="btn-posting-detail"
                   title={
                     !isBalanced
@@ -536,7 +553,7 @@ export function JurnalDetail({
                 >
                   {isPosting ? (
                     <>
-                      <span className="animate-spin text-xs">⏳</span>
+                      <span className="animate-spin text-sm">⏳</span>
                       <span>Memposting...</span>
                     </>
                   ) : (
@@ -555,7 +572,7 @@ export function JurnalDetail({
                 type="button"
                 onClick={() => setIsPembalikModalOpen(true)}
                 disabled={isPosting || isDeleting}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-800 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-900 transition shadow-sm active:scale-95"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-2.5 text-sm sm:text-base font-bold text-[#070605] shadow-lg shadow-amber-950/50 hover:from-amber-500 hover:to-amber-600 transition active:scale-95 disabled:opacity-40"
                 id="btn-buka-pembalik"
               >
                 <span aria-hidden="true">🔄</span>
@@ -569,32 +586,32 @@ export function JurnalDetail({
       {/* Modal Dialog Konfirmasi Hapus Draf */}
       {isDeleteModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6 backdrop-blur-md"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-modal-title"
         >
-          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 font-bold">
+          <div className="sogan-card w-full max-w-md rounded-2xl border border-rose-500/30 bg-[#0e0c0a] p-6 sm:p-7 shadow-2xl space-y-5 text-[#fdfaf6]">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 font-bold text-xl">
                 ⚠
               </div>
-              <div>
-                <h3 id="delete-modal-title" className="text-sm font-bold text-slate-900">
+              <div className="space-y-1">
+                <h3 id="delete-modal-title" className="text-lg font-bold text-rose-200">
                   Hapus Draf Jurnal #{jurnal.id}?
                 </h3>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs sm:text-sm text-[#d6cfc7] leading-relaxed">
                   Apakah Anda yakin ingin menghapus draf jurnal ini beserta seluruh baris akunnya? Tindakan ini permanen dan tidak dapat dibatalkan.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/20">
               <button
                 type="button"
                 onClick={() => setIsDeleteModalOpen(false)}
                 disabled={isDeleting}
-                className="rounded-lg border border-slate-300 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition disabled:opacity-50"
+                className="rounded-xl border border-amber-900/40 bg-[#141210] px-5 py-2.5 text-sm sm:text-base font-bold text-[#d6cfc7] hover:bg-[#1c1815] hover:text-[#fdfaf6] transition disabled:opacity-50"
               >
                 Batal
               </button>
@@ -602,12 +619,12 @@ export function JurnalDetail({
                 type="button"
                 onClick={handleHapusDraf}
                 disabled={isDeleting}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-red-700 transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-700 to-rose-800 px-5 py-2.5 text-sm sm:text-base font-bold text-white shadow-lg shadow-rose-950/50 hover:from-rose-600 hover:to-rose-700 transition disabled:opacity-50"
                 id="btn-konfirmasi-hapus"
               >
                 {isDeleting ? (
                   <>
-                    <span className="animate-spin text-xs">⏳</span>
+                    <span className="animate-spin text-sm">⏳</span>
                     <span>Menghapus...</span>
                   </>
                 ) : (

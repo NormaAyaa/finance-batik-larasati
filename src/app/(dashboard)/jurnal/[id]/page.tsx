@@ -96,17 +96,17 @@ export default async function DetailJurnalPage({ params }: PageProps) {
   if (jurnalError) {
     console.error("Gagal memuat data jurnal detail id", numericId, ":", jurnalError);
     return (
-      <div className="space-y-4 max-w-4xl mx-auto py-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center space-y-3 shadow-sm">
-          <span className="text-3xl block">⚠️</span>
-          <h1 className="text-base font-bold text-red-900">Kendala Memuat Data Jurnal</h1>
-          <p className="text-xs text-red-700 max-w-md mx-auto">
+      <div className="w-full space-y-6 py-6">
+        <div className="sogan-card rounded-2xl border border-rose-900/40 bg-gradient-to-r from-rose-950/30 to-[#0f0d0b] p-8 text-center space-y-4 shadow-xl">
+          <span className="text-4xl block">⚠️</span>
+          <h1 className="text-xl font-bold text-rose-200">Kendala Memuat Data Jurnal</h1>
+          <p className="text-sm sm:text-base text-[#d6cfc7] max-w-lg mx-auto">
             Terjadi kendala teknis saat memuat data jurnal #{numericId}. Silakan muat ulang halaman atau hubungi administrator.
           </p>
           <div className="pt-2">
             <Link
               href="/jurnal"
-              className="inline-flex items-center px-4 py-2 rounded-lg bg-red-800 text-white text-xs font-semibold hover:bg-red-900 transition"
+              className="inline-flex items-center px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 to-rose-800 text-white text-sm font-bold shadow-lg shadow-rose-950/50 hover:from-rose-600 hover:to-rose-700 transition"
             >
               ← Kembali ke Daftar Jurnal
             </Link>

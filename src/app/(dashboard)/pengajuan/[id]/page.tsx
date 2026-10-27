@@ -165,46 +165,46 @@ export default async function DetailPengajuanPage({ params }: PageProps) {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 w-full">
       {/* Navigasi Kembali */}
       <nav aria-label="Breadcrumb">
-        <ol className="flex items-center gap-2 text-xs text-slate-500">
+        <ol className="flex items-center gap-2 text-sm sm:text-base text-[#a89f91]">
           <li>
             <Link
               href="/pengajuan"
-              className="hover:text-slate-900 transition font-medium"
+              className="hover:text-amber-300 transition font-semibold flex items-center gap-1.5"
             >
-              ← Kembali ke Daftar Pengajuan
+              <span aria-hidden="true">←</span> Kembali ke Daftar Pengajuan
             </Link>
           </li>
         </ol>
       </nav>
 
-      {/* Header Halaman & Status */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <div className="space-y-1">
+      {/* Header Halaman & Status (Sogan Obsidian Card) */}
+      <div className="sogan-card p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-amber-900/30">
+        <div className="space-y-1.5">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-mono">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#fdfaf6] tracking-tight font-mono">
               {pengajuan.nomor || `Draf #${pengajuan.id}`}
             </h1>
             <StatusBadge status={pengajuan.status} />
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm sm:text-base text-[#a89f91]">
             Dibuat oleh{" "}
-            <strong className="text-slate-800">
+            <strong className="text-amber-300 font-bold">
               {pengajuan.pengaju?.nama_lengkap || "Pengaju"}
             </strong>{" "}
             {pengajuan.pengaju?.peran ? `(${pengajuan.pengaju.peran}) • ` : "• "}
-            <span className="capitalize">{pengajuan.jenis}</span>
+            <span className="capitalize text-amber-400 font-semibold">{pengajuan.jenis}</span>
           </p>
         </div>
 
         {/* Nilai Pengajuan */}
         <div className="sm:text-right">
-          <span className="text-[11px] font-semibold text-slate-500 block uppercase tracking-wider">
+          <span className="text-xs sm:text-sm font-bold text-[#a89f91] block uppercase tracking-wider">
             Total Pengajuan
           </span>
-          <span className="text-2xl sm:text-3xl font-black text-amber-900 tabular-nums">
+          <span className="text-3xl sm:text-4xl font-black text-amber-300 font-mono tabular-nums">
             {formatRupiah(pengajuan.jumlah)}
           </span>
         </div>
@@ -224,31 +224,31 @@ export default async function DetailPengajuanPage({ params }: PageProps) {
       {/* Rincian Informasi Pengajuan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Kolom Kiri: Informasi Transaksi */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
-            Rincian Pengajuan
+        <div className="sogan-card p-6 sm:p-7 space-y-5">
+          <h2 className="text-base sm:text-lg font-bold text-[#fdfaf6] border-b border-amber-900/20 pb-3 flex items-center gap-2">
+            <span aria-hidden="true">📋</span> Rincian Pengajuan
           </h2>
 
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm sm:text-base">
             <div>
-              <dt className="text-slate-500 font-medium">Jenis Pengajuan</dt>
-              <dd className="font-bold text-slate-900 capitalize mt-0.5">
+              <dt className="text-[#a89f91] font-semibold text-xs sm:text-sm">Jenis Pengajuan</dt>
+              <dd className="font-bold text-[#fdfaf6] capitalize mt-1 text-base sm:text-lg">
                 {pengajuan.jenis}
               </dd>
             </div>
 
             <div>
-              <dt className="text-slate-500 font-medium">Tanggal Transaksi</dt>
-              <dd className="font-bold text-slate-900 mt-0.5">
+              <dt className="text-[#a89f91] font-semibold text-xs sm:text-sm">Tanggal Transaksi</dt>
+              <dd className="font-bold text-[#fdfaf6] font-mono mt-1 text-base sm:text-lg">
                 {formatDate(pengajuan.tanggal_transaksi)}
               </dd>
             </div>
 
             <div className="sm:col-span-2">
-              <dt className="text-slate-500 font-medium">Akun Beban</dt>
-              <dd className="font-bold text-slate-900 mt-0.5">
+              <dt className="text-[#a89f91] font-semibold text-xs sm:text-sm">Akun Beban</dt>
+              <dd className="font-bold text-[#fdfaf6] mt-1">
                 {pengajuan.akun_beban ? (
-                  <span>
+                  <span className="inline-block text-amber-300 bg-amber-950/60 border border-amber-900/40 px-3 py-1 rounded-lg text-sm sm:text-base">
                     {pengajuan.akun_beban.kode} — {pengajuan.akun_beban.nama}
                   </span>
                 ) : (
@@ -258,8 +258,8 @@ export default async function DetailPengajuanPage({ params }: PageProps) {
             </div>
 
             <div className="sm:col-span-2">
-              <dt className="text-slate-500 font-medium">Keperluan Transaksi</dt>
-              <dd className="mt-1 text-slate-800 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200 whitespace-pre-wrap">
+              <dt className="text-[#a89f91] font-semibold text-xs sm:text-sm">Keperluan Transaksi</dt>
+              <dd className="mt-1.5 text-[#fdfaf6] text-sm sm:text-base leading-relaxed bg-[#141210] p-4 rounded-xl border border-amber-900/30 whitespace-pre-wrap">
                 {pengajuan.keterangan}
               </dd>
             </div>
@@ -267,15 +267,15 @@ export default async function DetailPengajuanPage({ params }: PageProps) {
 
           {/* Rincian Akun Kas Pembayar jika sudah dibayar */}
           {pengajuan.status === "dibayar" && pengajuan.akun_kas && (
-            <div className="mt-4 pt-4 border-t border-slate-100 text-xs">
-              <span className="text-slate-500 font-medium block">
+            <div className="mt-4 pt-4 border-t border-amber-900/20 text-sm sm:text-base">
+              <span className="text-[#a89f91] font-semibold text-xs sm:text-sm block">
                 Dibayar Menggunakan Akun Kas / Bank:
               </span>
-              <span className="font-bold text-teal-800 block mt-0.5">
+              <span className="font-bold text-teal-300 block mt-1 text-base">
                 {pengajuan.akun_kas.kode} — {pengajuan.akun_kas.nama}
               </span>
               {pengajuan.dibayar_pada && (
-                <span className="text-[11px] text-slate-500 block mt-0.5">
+                <span className="text-xs sm:text-sm text-[#a89f91] font-mono block mt-1">
                   Pada tanggal: {formatDate(pengajuan.dibayar_pada)}
                 </span>
               )}
@@ -284,9 +284,9 @@ export default async function DetailPengajuanPage({ params }: PageProps) {
         </div>
 
         {/* Kolom Kanan: Bukti Transaksi */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
-            Bukti Transaksi (Nota / Faktur)
+        <div className="sogan-card p-6 sm:p-7 space-y-5">
+          <h2 className="text-base sm:text-lg font-bold text-[#fdfaf6] border-b border-amber-900/20 pb-3 flex items-center gap-2">
+            <span aria-hidden="true">🧾</span> Bukti Transaksi (Nota / Faktur)
           </h2>
 
           <BuktiViewer
@@ -297,7 +297,7 @@ export default async function DetailPengajuanPage({ params }: PageProps) {
       </div>
 
       {/* Riwayat Perkembangan Pengajuan (Timeline) */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div className="sogan-card p-6">
         <StatusTimeline
           status={pengajuan.status}
           dibuatPada={pengajuan.dibuat_pada}

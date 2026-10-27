@@ -30,22 +30,28 @@ export default async function BaruPengajuanPage() {
     <div className="space-y-6">
       {/* Breadcrumb Navigasi */}
       <nav aria-label="Breadcrumb">
-        <ol className="flex items-center gap-2 text-xs text-slate-500">
+        <ol className="flex items-center gap-2 text-sm sm:text-base text-[#a89f91]">
           <li>
-            <Link href="/pengajuan" className="hover:text-slate-900 transition font-medium">
-              ← Kembali ke Daftar Pengajuan
+            <Link href="/pengajuan" className="hover:text-amber-300 transition font-semibold flex items-center gap-1.5">
+              <span aria-hidden="true">←</span> Kembali ke Daftar Pengajuan
             </Link>
           </li>
         </ol>
       </nav>
 
       {/* Header Halaman */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+      <div className="pb-3 border-b border-amber-900/20">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-amber-400/90">
+            Formulir Pengajuan • CV Batik Larasati
+          </span>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#fdfaf6] tracking-tight">
           Buat Pengajuan Baru
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Lengkapi rincian biaya atau reimburse sesuai aturan bisnis BR-07 CV Batik Larasati.
+        <p className="text-sm sm:text-base text-[#a89f91] mt-1">
+          Lengkapi rincian biaya operasional atau reimburse sesuai aturan bisnis BR-07 CV Batik Larasati.
         </p>
       </div>
 

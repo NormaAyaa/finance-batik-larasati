@@ -62,19 +62,19 @@ export function TutupPeriodeModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="tutup-periode-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
     >
-      <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl transition-all my-8 space-y-4">
+      <div className="sogan-card relative w-full max-w-md rounded-2xl bg-[#0e0c0a] border border-amber-500/25 p-6 shadow-2xl text-[#fdfaf6] transition-all my-8 space-y-5">
         {/* Header Modal */}
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-lg">
+        <div className="flex items-start gap-3.5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-lg">
             🔒
           </div>
           <div className="flex-1">
-            <h2 id="tutup-periode-title" className="text-base font-bold text-slate-900">
+            <h2 id="tutup-periode-title" className="text-base sm:text-lg font-bold text-[#fdfaf6] tracking-tight">
               Tutup Periode Akuntansi
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#a89f91] mt-0.5">
               Konfirmasi penutupan buku periode bulanan (BR-06)
             </p>
           </div>
@@ -82,7 +82,7 @@ export function TutupPeriodeModal({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+            className="rounded-xl p-1.5 text-[#a89f91] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition"
             aria-label="Tutup dialog"
           >
             ✕
@@ -93,9 +93,9 @@ export function TutupPeriodeModal({
         {errorMessage && (
           <div
             role="alert"
-            className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-xs text-rose-800 flex items-start gap-2"
+            className="rounded-xl bg-rose-950/20 border border-rose-500/30 p-3.5 text-xs text-rose-300 flex items-start gap-2.5"
           >
-            <span className="font-bold text-rose-600" aria-hidden="true">
+            <span className="font-bold text-rose-400 text-sm" aria-hidden="true">
               ⚠️
             </span>
             <div className="flex-1">{errorMessage}</div>
@@ -103,19 +103,19 @@ export function TutupPeriodeModal({
         )}
 
         {/* Kotak Informasi Aturan Bisnis */}
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs text-amber-900 space-y-2">
-          <p className="font-semibold">
-            Anda akan menutup periode: <span className="text-slate-900 font-bold">{periodeLabel}</span>
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-950/20 p-4 text-xs text-amber-200/90 space-y-2.5">
+          <p className="font-semibold text-amber-300">
+            Anda akan menutup periode: <span className="text-[#fdfaf6] font-bold">{periodeLabel}</span>
           </p>
           {periode.jumlah_draf !== undefined && periode.jumlah_draf > 0 && (
-            <div className="rounded-lg bg-rose-50 border border-rose-200 p-2.5 text-rose-800 text-xs font-medium flex items-center gap-2">
-              <span aria-hidden="true" className="font-bold text-rose-600">⚠️</span>
+            <div className="rounded-xl bg-rose-950/30 border border-rose-500/40 p-3 text-rose-200 text-xs font-medium flex items-center gap-2">
+              <span aria-hidden="true" className="font-bold text-rose-400">⚠️</span>
               <span>
                 Periode ini masih memiliki <strong>{periode.jumlah_draf} jurnal draf</strong>. Database akan menolak penutupan sampai seluruh draf diposting atau dihapus (BR-06).
               </span>
             </div>
           )}
-          <ul className="list-disc pl-4 space-y-1 text-[11px] text-amber-800">
+          <ul className="list-disc pl-4 space-y-1.5 text-[11px] text-[#d6cfc7]">
             <li>Periode sebelumnya harus sudah dalam keadaan ditutup (BR-06).</li>
             <li>Tidak boleh ada jurnal draf yang masih tersisa di periode ini (BR-06).</li>
             <li>Setelah ditutup, jurnal baru tidak dapat dibuat atau diposting di periode ini (BR-05).</li>
@@ -124,12 +124,12 @@ export function TutupPeriodeModal({
         </div>
 
         {/* Aksi Bawah */}
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-amber-900/20">
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg border border-slate-300 px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-50"
+            className="rounded-xl border border-amber-900/30 bg-[#141210] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition disabled:opacity-50"
           >
             Batal
           </button>
@@ -137,11 +137,11 @@ export function TutupPeriodeModal({
             type="button"
             onClick={handleTutup}
             disabled={isSubmitting}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-amber-800 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-900 transition disabled:opacity-50 shadow-xs"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-[#070605] shadow-lg shadow-amber-950/40 transition disabled:opacity-50 active:scale-95"
           >
             {isSubmitting ? (
               <>
-                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#070605] border-t-transparent" />
                 <span>Memproses Penutupan...</span>
               </>
             ) : (

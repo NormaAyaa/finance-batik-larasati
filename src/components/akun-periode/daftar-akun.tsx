@@ -17,23 +17,23 @@ interface DaftarAkunProps {
 const TIPE_BADGE_STYLE: Record<TipeAkun, { label: string; className: string }> = {
   aset: {
     label: "1 - Aset",
-    className: "bg-blue-50 text-blue-700 border-blue-200",
+    className: "bg-blue-950/50 text-blue-300 border-blue-500/30",
   },
   kewajiban: {
     label: "2 - Kewajiban",
-    className: "bg-amber-50 text-amber-800 border-amber-200",
+    className: "bg-amber-950/50 text-amber-300 border-amber-500/30",
   },
   ekuitas: {
     label: "3 - Ekuitas",
-    className: "bg-purple-50 text-purple-700 border-purple-200",
+    className: "bg-purple-950/50 text-purple-300 border-purple-500/30",
   },
   pendapatan: {
     label: "4 - Pendapatan",
-    className: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    className: "bg-emerald-950/50 text-emerald-300 border-emerald-500/30",
   },
   beban: {
     label: "5 - Beban",
-    className: "bg-rose-50 text-rose-700 border-rose-200",
+    className: "bg-rose-950/50 text-rose-300 border-rose-500/30",
   },
 };
 
@@ -149,15 +149,15 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
 
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Banner Pesan Sukses & Error */}
       {successMessage && (
         <div
           role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-medium text-emerald-800 flex items-center justify-between"
+          className="rounded-2xl border border-emerald-500/30 bg-emerald-950/40 p-4 text-xs sm:text-sm font-medium text-emerald-300 flex items-center justify-between shadow-lg"
         >
-          <div className="flex items-center gap-2">
-            <span aria-hidden="true" className="font-bold text-emerald-600 text-sm">
+          <div className="flex items-center gap-2.5">
+            <span aria-hidden="true" className="font-bold text-emerald-400 text-base">
               ✓
             </span>
             <span>{successMessage}</span>
@@ -165,7 +165,7 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
           <button
             type="button"
             onClick={() => setSuccessMessage(null)}
-            className="text-emerald-600 hover:text-emerald-800 p-1"
+            className="text-emerald-400 hover:text-emerald-200 p-1.5 rounded-lg hover:bg-emerald-900/40 transition"
             aria-label="Tutup pesan sukses"
           >
             ✕
@@ -176,10 +176,10 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
       {errorMessage && (
         <div
           role="alert"
-          className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs font-medium text-rose-800 flex items-center justify-between"
+          className="rounded-2xl border border-rose-500/30 bg-rose-950/40 p-4 text-xs sm:text-sm font-medium text-rose-300 flex items-center justify-between shadow-lg"
         >
-          <div className="flex items-start gap-2">
-            <span aria-hidden="true" className="font-bold text-rose-600 text-sm">
+          <div className="flex items-start gap-2.5">
+            <span aria-hidden="true" className="font-bold text-rose-400 text-base">
               ⚠️
             </span>
             <span>{errorMessage}</span>
@@ -187,7 +187,7 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
           <button
             type="button"
             onClick={() => setErrorMessage(null)}
-            className="text-rose-600 hover:text-rose-800 p-1"
+            className="text-rose-400 hover:text-rose-200 p-1.5 rounded-lg hover:bg-rose-900/40 transition"
             aria-label="Tutup pesan error"
           >
             ✕
@@ -196,23 +196,28 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
       )}
 
       {/* Toolbar Filter & Aksi Tambah */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="sogan-card flex flex-col gap-4 rounded-2xl border border-amber-900/20 bg-[#0e0c0a] p-5 sm:p-6 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Bagan Akun (Chart of Accounts)</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Daftar akun 4 digit CV Batik Larasati diurutkan menurut kode (BR-01)
+            <div className="flex items-center gap-2 mb-1">
+              <span className="h-2 w-2 rounded-full bg-amber-400" />
+              <h2 className="text-base sm:text-lg font-bold text-[#fdfaf6]">
+                Bagan Akun (Chart of Accounts)
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-[#a89f91]">
+              Daftar kode akun 4 digit CV Batik Larasati diurutkan menurut kode (BR-01)
             </p>
           </div>
 
-          {/* Tombol Tambah Akun (Hanya Akuntan, Direktur tidak melihat tombol ini) */}
+          {/* Tombol Tambah Akun (Hanya Akuntan) */}
           {isAkuntan && (
             <button
               type="button"
               onClick={handleOpenTambah}
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition shadow-xs shrink-0"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-[#070605] transition shadow-lg shadow-amber-950/40 shrink-0 active:scale-95"
             >
-              <span aria-hidden="true" className="text-sm">
+              <span aria-hidden="true" className="text-base font-extrabold">
                 +
               </span>
               <span>Tambah Akun Baru</span>
@@ -221,10 +226,10 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
         </div>
 
         {/* Input Pencarian & Dropdown Filter */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-amber-900/20">
           {/* Kotak Cari */}
           <div>
-            <label htmlFor="search-akun" className="block text-[11px] font-semibold text-slate-600 mb-1">
+            <label htmlFor="search-akun" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider mb-1.5">
               Cari Akun
             </label>
             <input
@@ -233,55 +238,55 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
               placeholder="Cari kode atau nama..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2 text-xs sm:text-sm text-[#fdfaf6] placeholder-[#5c554b] focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition"
             />
           </div>
 
           {/* Filter Tipe */}
           <div>
-            <label htmlFor="filter-tipe" className="block text-[11px] font-semibold text-slate-600 mb-1">
+            <label htmlFor="filter-tipe" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider mb-1.5">
               Tipe Klasifikasi
             </label>
             <select
               id="filter-tipe"
               value={filterTipe}
               onChange={(e) => setFilterTipe(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2 text-xs sm:text-sm text-[#fdfaf6] focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition"
             >
-              <option value="semua">Semua Tipe (1 s.d. 5)</option>
-              <option value="aset">1 - Aset</option>
-              <option value="kewajiban">2 - Kewajiban</option>
-              <option value="ekuitas">3 - Ekuitas</option>
-              <option value="pendapatan">4 - Pendapatan</option>
-              <option value="beban">5 - Beban</option>
+              <option value="semua" className="bg-[#141210] text-[#fdfaf6]">Semua Tipe (1 s.d. 5)</option>
+              <option value="aset" className="bg-[#141210] text-[#fdfaf6]">1 - Aset</option>
+              <option value="kewajiban" className="bg-[#141210] text-[#fdfaf6]">2 - Kewajiban</option>
+              <option value="ekuitas" className="bg-[#141210] text-[#fdfaf6]">3 - Ekuitas</option>
+              <option value="pendapatan" className="bg-[#141210] text-[#fdfaf6]">4 - Pendapatan</option>
+              <option value="beban" className="bg-[#141210] text-[#fdfaf6]">5 - Beban</option>
             </select>
           </div>
 
           {/* Filter Status */}
           <div>
-            <label htmlFor="filter-status" className="block text-[11px] font-semibold text-slate-600 mb-1">
+            <label htmlFor="filter-status" className="block text-xs font-bold text-[#fdfaf6] uppercase tracking-wider mb-1.5">
               Status Akun
             </label>
             <select
               id="filter-status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-amber-900/30 bg-[#141210] px-3.5 py-2 text-xs sm:text-sm text-[#fdfaf6] focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition"
             >
-              <option value="semua">Semua Status</option>
-              <option value="aktif">Aktif Saja</option>
-              <option value="nonaktif">Nonaktif Saja</option>
+              <option value="semua" className="bg-[#141210] text-[#fdfaf6]">Semua Status</option>
+              <option value="aktif" className="bg-[#141210] text-[#fdfaf6]">Aktif Saja</option>
+              <option value="nonaktif" className="bg-[#141210] text-[#fdfaf6]">Nonaktif Saja</option>
             </select>
           </div>
 
           {/* Filter Kas/Bank */}
-          <div className="flex items-end pb-1.5">
-            <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-700">
+          <div className="flex items-end pb-2">
+            <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm font-semibold text-[#d6cfc7] hover:text-[#fdfaf6] transition">
               <input
                 type="checkbox"
                 checked={filterKasBank}
                 onChange={(e) => setFilterKasBank(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                className="h-4 w-4 rounded border-amber-900/40 bg-[#141210] text-amber-500 focus:ring-amber-500/40"
               />
               <span>Hanya Akun Kas/Bank</span>
             </label>
@@ -290,37 +295,37 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
       </div>
 
       {/* Ringkasan Jumlah */}
-      <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+      <div className="flex items-center justify-between text-xs sm:text-sm text-[#a89f91] px-1">
         <span>
-          Menampilkan <strong className="text-slate-900">{filteredAkun.length}</strong> dari{" "}
-          <strong className="text-slate-900">{akunList.length}</strong> akun
+          Menampilkan <strong className="text-amber-400 font-mono font-bold">{filteredAkun.length}</strong> dari{" "}
+          <strong className="text-[#fdfaf6] font-mono font-bold">{akunList.length}</strong> akun
         </span>
         {!isAkuntan && (
-          <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">
+          <span className="text-[11px] bg-amber-950/40 text-amber-300 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-semibold">
             Mode Lihat Saja (Direktur)
           </span>
         )}
       </div>
 
       {/* Tabel Akun Desktop / Tablet */}
-      <div className="hidden md:block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
-        <table className="w-full text-left text-xs text-slate-700">
-          <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+      <div className="hidden md:block sogan-card overflow-hidden rounded-2xl border border-amber-900/20 bg-[#0e0c0a] shadow-xl">
+        <table className="w-full text-left text-xs sm:text-sm text-[#d6cfc7]">
+          <thead className="border-b border-amber-900/20 bg-[#141210] text-[11px] font-bold uppercase tracking-wider text-[#a89f91]">
             <tr>
-              <th scope="col" className="px-4 py-3">Kode</th>
-              <th scope="col" className="px-4 py-3">Nama Akun</th>
-              <th scope="col" className="px-4 py-3">Tipe</th>
-              <th scope="col" className="px-4 py-3">Saldo Normal</th>
-              <th scope="col" className="px-4 py-3">Kas / Bank</th>
-              <th scope="col" className="px-4 py-3">Status</th>
-              <th scope="col" className="px-4 py-3">Keterangan</th>
-              {isAkuntan && <th scope="col" className="px-4 py-3 text-right">Aksi</th>}
+              <th scope="col" className="px-5 py-3.5">Kode</th>
+              <th scope="col" className="px-5 py-3.5">Nama Akun</th>
+              <th scope="col" className="px-5 py-3.5">Tipe</th>
+              <th scope="col" className="px-5 py-3.5">Saldo Normal</th>
+              <th scope="col" className="px-5 py-3.5">Kas / Bank</th>
+              <th scope="col" className="px-5 py-3.5">Status</th>
+              <th scope="col" className="px-5 py-3.5">Keterangan</th>
+              {isAkuntan && <th scope="col" className="px-5 py-3.5 text-right">Aksi</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-amber-900/10">
             {filteredAkun.length === 0 ? (
               <tr>
-                <td colSpan={isAkuntan ? 8 : 7} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={isAkuntan ? 8 : 7} className="px-5 py-10 text-center text-[#a89f91] italic">
                   Tidak ada akun yang sesuai dengan filter pencarian.
                 </td>
               </tr>
@@ -332,81 +337,81 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                 return (
                   <tr
                     key={akun.id}
-                    className={`hover:bg-slate-50/80 transition ${
-                      !akun.aktif ? "bg-slate-50/50 opacity-75" : ""
+                    className={`hover:bg-amber-950/20 transition-colors ${
+                      !akun.aktif ? "bg-[#141210]/30 opacity-70" : ""
                     }`}
                   >
                     {/* Kode 4 Digit */}
-                    <td className="px-4 py-3 font-mono font-bold text-slate-900 text-sm whitespace-nowrap">
+                    <td className="px-5 py-3.5 font-mono font-bold text-amber-300 text-sm whitespace-nowrap">
                       {akun.kode}
                     </td>
 
                     {/* Nama Akun */}
-                    <td className="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">
+                    <td className="px-5 py-3.5 font-semibold text-[#fdfaf6] whitespace-nowrap">
                       {akun.nama}
                     </td>
 
                     {/* Tipe Akun */}
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-5 py-3.5 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${tipeBadge.className}`}
+                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${tipeBadge.className}`}
                       >
                         {tipeBadge.label}
                       </span>
                     </td>
 
                     {/* Saldo Normal */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="capitalize font-medium text-slate-700">
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <span className="capitalize font-semibold text-[#d6cfc7]">
                         {akun.saldo_normal}
                       </span>
                     </td>
 
                     {/* Kas / Bank */}
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-5 py-3.5 whitespace-nowrap">
                       {akun.is_kas_bank ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-teal-50 border border-teal-200 px-2 py-0.5 text-[10px] font-semibold text-teal-800">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-teal-950/50 border border-teal-500/30 px-2.5 py-0.5 text-[11px] font-bold text-teal-300">
                           <span aria-hidden="true">🏦</span> Kas / Bank
                         </span>
                       ) : (
-                        <span className="text-slate-400">-</span>
+                        <span className="text-[#5c554b]">-</span>
                       )}
                     </td>
 
                     {/* Status Aktif */}
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-5 py-3.5 whitespace-nowrap">
                       {akun.aktif ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/50 border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-bold text-emerald-300">
                           <span aria-hidden="true">✓</span> Aktif
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-300 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#141210] border border-amber-900/30 px-2.5 py-0.5 text-[11px] font-medium text-[#a89f91]">
                           <span aria-hidden="true">✕</span> Nonaktif
                         </span>
                       )}
                     </td>
 
                     {/* Kolom Keterangan Tersendiri (BR-01) */}
-                    <td className="px-4 py-3 text-slate-600 max-w-xs">
+                    <td className="px-5 py-3.5 text-[#a89f91] max-w-xs">
                       {akun.keterangan ? (
-                        <span className="line-clamp-2 text-[11px]" title={akun.keterangan}>
+                        <span className="line-clamp-2 text-xs" title={akun.keterangan}>
                           {akun.keterangan}
                         </span>
                       ) : (
-                        <span className="text-slate-300">-</span>
+                        <span className="text-[#5c554b]">-</span>
                       )}
                     </td>
 
                     {/* Tombol Aksi (Khusus Akuntan) */}
                     {isAkuntan && (
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-2">
                           {/* Tombol Ubah */}
                           <button
                             type="button"
                             onClick={() => handleOpenUbah(akun)}
                             disabled={isLoading}
-                            className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-50"
+                            className="rounded-xl border border-amber-900/30 bg-[#141210] px-3 py-1.5 text-xs font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] hover:border-amber-500/40 transition disabled:opacity-50"
                             title="Ubah nama dan keterangan akun"
                           >
                             Ubah
@@ -417,10 +422,10 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                             type="button"
                             onClick={() => handleToggleAktif(akun)}
                             disabled={isLoading}
-                            className={`rounded-md border px-2 py-1 text-[11px] font-medium transition disabled:opacity-50 ${
+                            className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition disabled:opacity-50 ${
                               akun.aktif
-                                ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                                : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                                ? "border-amber-500/30 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50"
+                                : "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50"
                             }`}
                             title={akun.aktif ? "Nonaktifkan akun" : "Aktifkan akun"}
                           >
@@ -440,7 +445,7 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
       {/* Tampilan Kartu Ponsel (Mobile Responsive) */}
       <div className="grid grid-cols-1 gap-3 md:hidden">
         {filteredAkun.length === 0 ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 text-center text-xs text-slate-400">
+          <div className="sogan-card rounded-2xl border border-amber-900/20 bg-[#0e0c0a] p-8 text-center text-xs text-[#a89f91]">
             Tidak ada akun yang sesuai dengan filter pencarian.
           </div>
         ) : (
@@ -451,22 +456,22 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
             return (
               <div
                 key={akun.id}
-                className={`rounded-xl border border-slate-200 bg-white p-4 shadow-xs space-y-2.5 ${
-                  !akun.aktif ? "opacity-75 bg-slate-50" : ""
+                className={`sogan-card rounded-2xl border border-amber-900/20 bg-[#0e0c0a] p-5 shadow-lg space-y-3 ${
+                  !akun.aktif ? "opacity-75 bg-[#141210]/40" : ""
                 }`}
               >
                 {/* Header Kartu: Kode & Status */}
                 <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-sm text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                  <span className="font-mono font-bold text-sm text-amber-300 bg-[#141210] border border-amber-900/30 px-2.5 py-1 rounded-lg">
                     {akun.kode}
                   </span>
                   <div className="flex items-center gap-1.5">
                     {akun.aktif ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-950/50 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
                         <span aria-hidden="true">✓</span> Aktif
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-300 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#141210] border border-amber-900/30 px-2.5 py-0.5 text-[10px] font-medium text-[#a89f91]">
                         <span aria-hidden="true">✕</span> Nonaktif
                       </span>
                     )}
@@ -475,26 +480,26 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
 
                 {/* Nama & Keterangan */}
                 <div>
-                  <h3 className="text-xs font-bold text-slate-900">{akun.nama}</h3>
+                  <h3 className="text-sm font-bold text-[#fdfaf6]">{akun.nama}</h3>
                   {akun.keterangan && (
-                    <p className="text-[11px] text-slate-500 mt-0.5">{akun.keterangan}</p>
+                    <p className="text-xs text-[#a89f91] mt-1">{akun.keterangan}</p>
                   )}
                 </div>
 
                 {/* Rincian Atribut */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-100 text-[11px]">
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-amber-900/20 text-[11px]">
                   <span
-                    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${tipeBadge.className}`}
+                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${tipeBadge.className}`}
                   >
                     {tipeBadge.label}
                   </span>
 
-                  <span className="rounded bg-slate-100 text-slate-700 px-2 py-0.5 text-[10px] capitalize font-medium">
+                  <span className="rounded-full bg-[#141210] border border-amber-900/30 text-[#d6cfc7] px-2.5 py-0.5 text-[10px] capitalize font-semibold">
                     Saldo Normal: {akun.saldo_normal}
                   </span>
 
                   {akun.is_kas_bank && (
-                    <span className="inline-flex items-center gap-1 rounded bg-teal-50 border border-teal-200 text-teal-800 px-2 py-0.5 text-[10px] font-semibold">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-950/50 border border-teal-500/30 text-teal-300 px-2.5 py-0.5 text-[10px] font-bold">
                       🏦 Kas/Bank
                     </span>
                   )}
@@ -502,12 +507,12 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
 
                 {/* Tombol Aksi Mobile (Khusus Akuntan) */}
                 {isAkuntan && (
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                  <div className="flex items-center gap-2 pt-3 border-t border-amber-900/20">
                     <button
                       type="button"
                       onClick={() => handleOpenUbah(akun)}
                       disabled={isLoading}
-                      className="flex-1 rounded-lg border border-slate-200 bg-white py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition text-center disabled:opacity-50"
+                      className="flex-1 rounded-xl border border-amber-900/30 bg-[#141210] py-2 text-xs font-bold text-[#d6cfc7] hover:bg-amber-950/40 hover:text-[#fdfaf6] transition text-center disabled:opacity-50"
                     >
                       Ubah
                     </button>
@@ -515,10 +520,10 @@ export function DaftarAkun({ initialAkun, userRole, onRefresh }: DaftarAkunProps
                       type="button"
                       onClick={() => handleToggleAktif(akun)}
                       disabled={isLoading}
-                      className={`flex-1 rounded-lg border py-1.5 text-xs font-semibold transition text-center disabled:opacity-50 ${
+                      className={`flex-1 rounded-xl border py-2 text-xs font-bold transition text-center disabled:opacity-50 ${
                         akun.aktif
-                          ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                          : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                          ? "border-amber-500/30 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50"
+                          : "border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50"
                       }`}
                     >
                       {isLoading ? "..." : akun.aktif ? "Nonaktifkan" : "Aktifkan"}

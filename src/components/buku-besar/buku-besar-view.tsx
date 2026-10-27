@@ -27,18 +27,24 @@ export function BukuBesarView({
   const friendlyError = errorMessage ? getFriendlyErrorMessage(errorMessage) : null;
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* 1. Header Halaman (Hanya Baca, Sesuai PRD Bagian 7 & BR-11) */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Buku Besar</h1>
-            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 border border-slate-200">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">
+              Buku Besar & Mutasi Rekening
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-950/60 px-3 py-1 text-xs font-bold text-amber-300 border border-amber-500/40 shadow-sm">
               <span aria-hidden="true">🔒</span>
               <span>Hanya Baca</span>
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#fdfaf6] tracking-tight">
+            Buku Besar
+          </h1>
+          <p className="text-sm sm:text-base text-[#a89f91]">
             Mutasi debit/kredit dan pergerakan saldo berjalan per akun buku besar (BR-11)
           </p>
         </div>
@@ -48,13 +54,13 @@ export function BukuBesarView({
       {friendlyError && (
         <div
           role="alert"
-          className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-800 shadow-sm"
+          className="sogan-card rounded-2xl border border-rose-500/40 bg-rose-950/40 p-4 sm:p-5 text-sm sm:text-base text-rose-200 shadow-lg"
         >
-          <div className="flex items-start gap-2.5">
-            <span aria-hidden="true" className="text-base font-bold">⚠️</span>
-            <div>
-              <h2 className="font-semibold text-rose-900">Gagal Memuat Data Buku Besar</h2>
-              <p className="mt-0.5 text-rose-700">{friendlyError}</p>
+          <div className="flex items-start gap-3">
+            <span aria-hidden="true" className="text-lg font-bold text-rose-400">⚠️</span>
+            <div className="space-y-1">
+              <h2 className="font-semibold text-rose-200">Gagal Memuat Data Buku Besar</h2>
+              <p className="text-xs sm:text-sm text-rose-300/90">{friendlyError}</p>
             </div>
           </div>
         </div>
@@ -99,10 +105,10 @@ export function BukuBesarView({
 
       {/* Keadaan jika tidak ada akun sama sekali di sistem */}
       {daftarAkun.length === 0 && !friendlyError && (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-xs">
-          <span aria-hidden="true" className="text-3xl">📂</span>
-          <h2 className="text-sm font-semibold text-slate-800 mt-2">Belum Ada Akun Terdaftar</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+        <div className="sogan-card rounded-2xl border border-dashed border-amber-500/30 bg-[#0e0c0a] p-10 text-center shadow-xl">
+          <span aria-hidden="true" className="text-4xl block mb-2">📂</span>
+          <h2 className="text-lg font-bold text-[#fdfaf6]">Belum Ada Akun Terdaftar</h2>
+          <p className="text-sm text-[#a89f91] mt-1 max-w-md mx-auto">
             Bagan akun belum diatur. Akuntan dapat menambahkan akun pada menu Akun dan Periode.
           </p>
         </div>
