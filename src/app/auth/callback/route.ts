@@ -83,34 +83,54 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL(`/login?error=oauth_error&reason=${reason}`, baseUrl));
       }
 
-      const admin = createAdminClient();
       const userEmail = data.user.email?.toLowerCase().trim();
 
-      // Cari profil pengguna berdasarkan id
-      let { data: profile, error: profileError } = await admin
+      // 1. Cari profil menggunakan client sesi terautentikasi pengguna
+      let { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("id, nama_lengkap, email, peran, jabatan, aktif")
         .eq("id", data.user.id)
         .maybeSingle();
 
       if (profileError) {
-        console.error("Gagal memeriksa profil pengguna OAuth:", profileError);
+        console.warn("Pemeriksaan profil via client pengguna:", profileError.message);
+      }
+
+      let admin: ReturnType<typeof createAdminClient> | null = null;
+      try {
+        admin = createAdminClient();
+      } catch (adminErr) {
+        console.warn("Admin client fallback warning:", adminErr);
+      }
+
+      // 2. Jika profil belum ditemukan via user client, coba via admin
+      if (!profile && admin) {
+        const { data: adminProfile } = await admin
+          .from("profiles")
+          .select("id, nama_lengkap, email, peran, jabatan, aktif")
+          .eq("id", data.user.id)
+          .maybeSingle();
+        if (adminProfile) profile = adminProfile;
       }
 
       // Jika belum ditemukan berdasarkan id, cari berdasarkan email (sinkronisasi akun)
       if (!profile && userEmail) {
-        const { data: profileByEmail } = await admin
+        const clientToUse = admin || supabase;
+        const { data: profileByEmail } = await clientToUse
           .from("profiles")
           .select("id, nama_lengkap, email, peran, jabatan, aktif")
           .eq("email", userEmail)
           .maybeSingle();
 
         if (profileByEmail) {
-          // Perbarui ID profil agar cocok dengan auth.users id
-          await admin
-            .from("profiles")
-            .update({ id: data.user.id })
-            .eq("email", userEmail);
+          try {
+            await clientToUse
+              .from("profiles")
+              .update({ id: data.user.id })
+              .eq("email", userEmail);
+          } catch {
+            // Abaikan jika RLS membatasi update
+          }
           profile = { ...profileByEmail, id: data.user.id };
         }
       }
@@ -133,6 +153,8 @@ export async function GET(request: NextRequest) {
           userEmail === "rina@larasati.test" ||
           userEmail.includes("rina");
 
+        const clientToUse = admin || supabase;
+
         if (isLaras) {
           const newProfile = {
             id: data.user.id,
@@ -142,7 +164,9 @@ export async function GET(request: NextRequest) {
             jabatan: "Direktur dan Pemilik",
             aktif: true,
           };
-          await admin.from("profiles").upsert(newProfile);
+          try {
+            await clientToUse.from("profiles").upsert(newProfile);
+          } catch {}
           profile = newProfile;
         } else if (isDimas) {
           const newProfile = {
@@ -153,7 +177,9 @@ export async function GET(request: NextRequest) {
             jabatan: "Akuntan",
             aktif: true,
           };
-          await admin.from("profiles").upsert(newProfile);
+          try {
+            await clientToUse.from("profiles").upsert(newProfile);
+          } catch {}
           profile = newProfile;
         } else if (isRina) {
           const newProfile = {
@@ -164,7 +190,9 @@ export async function GET(request: NextRequest) {
             jabatan: "Kepala Produksi",
             aktif: true,
           };
-          await admin.from("profiles").upsert(newProfile);
+          try {
+            await clientToUse.from("profiles").upsert(newProfile);
+          } catch {}
           profile = newProfile;
         }
       }
