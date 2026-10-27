@@ -72,7 +72,7 @@ export default async function UbahPengajuanPage({ params }: PageProps) {
   const expenseAccounts = rawAccounts || [];
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Breadcrumb Navigasi */}
       <nav aria-label="Breadcrumb">
         <ol className="flex items-center gap-2 text-sm sm:text-base text-[#a89f91]">

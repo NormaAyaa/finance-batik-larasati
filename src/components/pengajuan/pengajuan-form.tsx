@@ -77,6 +77,12 @@ export function PengajuanForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // State fitur AI ekstraksi nota
+  const [userTouchedTanggal, setUserTouchedTanggal] = useState<boolean>(
+    Boolean(initialData?.tanggal_transaksi)
+  );
+  const [userTouchedAkun, setUserTouchedAkun] = useState<boolean>(
+    Boolean(initialData?.akun_beban_id)
+  );
   const [isExtractingAi, setIsExtractingAi] = useState(false);
   const [aiNotification, setAiNotification] = useState<{
     type: "success" | "error" | "info";
@@ -86,18 +92,24 @@ export function PengajuanForm({
     tanggal: boolean;
     jumlah: boolean;
     keterangan: boolean;
+    akunBeban: boolean;
   }>({
     tanggal: false,
     jumlah: false,
     keterangan: false,
+    akunBeban: false,
   });
   const [aiSuggestions, setAiSuggestions] = useState<{
     tanggal?: string;
     jumlah?: number;
     keterangan?: string;
+    akunBebanId?: number;
+    akunBebanLabel?: string;
   }>({});
 
-  const applyAiSuggestion = (field: "tanggal" | "jumlah" | "keterangan") => {
+  const applyAiSuggestion = (
+    field: "tanggal" | "jumlah" | "keterangan" | "akunBeban"
+  ) => {
     if (field === "tanggal" && aiSuggestions.tanggal) {
       setTanggalTransaksi(aiSuggestions.tanggal);
       setAiAppliedFields((prev) => ({ ...prev, tanggal: true }));
@@ -120,6 +132,15 @@ export function PengajuanForm({
       setAiSuggestions((prev) => {
         const copy = { ...prev };
         delete copy.keterangan;
+        return copy;
+      });
+    } else if (field === "akunBeban" && aiSuggestions.akunBebanId) {
+      setAkunBebanId(aiSuggestions.akunBebanId);
+      setAiAppliedFields((prev) => ({ ...prev, akunBeban: true }));
+      setAiSuggestions((prev) => {
+        const copy = { ...prev };
+        delete copy.akunBebanId;
+        delete copy.akunBebanLabel;
         return copy;
       });
     }
@@ -153,56 +174,61 @@ export function PengajuanForm({
         jumlah: aiJumlah,
         keperluan,
         nama_toko,
+        kode_akun: aiKodeAkun,
         keyakinan,
         pesan_jumlah,
       } = json.data;
 
       let filledCount = 0;
       let pendingCount = 0;
-      const newSuggestions: { tanggal?: string; jumlah?: number; keterangan?: string } = {};
+      const newSuggestions: {
+        tanggal?: string;
+        jumlah?: number;
+        keterangan?: string;
+        akunBebanId?: number;
+        akunBebanLabel?: string;
+      } = {};
 
-      // 1. Kolom Tanggal: hanya isi jika kosong; jika sudah ada nilainya tampilkan tombol "Pakai hasil AI"
+      // 1. Kolom Tanggal: langsung isi otomatis dengan hasil AI
       if (tanggal) {
-        if (!tanggalTransaksi) {
-          setTanggalTransaksi(tanggal);
-          setAiAppliedFields((prev) => ({ ...prev, tanggal: true }));
-          filledCount++;
-        } else if (tanggalTransaksi !== tanggal) {
-          newSuggestions.tanggal = tanggal;
-          pendingCount++;
-        }
+        setTanggalTransaksi(tanggal);
+        setAiAppliedFields((prev) => ({ ...prev, tanggal: true }));
+        filledCount++;
       }
 
-      // 2. Kolom Jumlah: hanya isi jika di dalam batas Rp 10.000 s/d Rp 25.000.000 (BR-07)
+      // 2. Kolom Jumlah: langsung isi otomatis dengan hasil AI jika dalam batas BR-07
       if (aiJumlah && aiJumlah >= 10000 && aiJumlah <= 25000000) {
-        if (!jumlah || jumlah.trim() === "") {
-          setJumlah(String(aiJumlah));
-          setAiAppliedFields((prev) => ({ ...prev, jumlah: true }));
-          filledCount++;
-        } else if (Number(jumlah) !== aiJumlah) {
-          newSuggestions.jumlah = aiJumlah;
-          pendingCount++;
-        }
+        setJumlah(String(aiJumlah));
+        setAiAppliedFields((prev) => ({ ...prev, jumlah: true }));
+        filledCount++;
       }
 
-      // 3. Kolom Keperluan: hanya isi jika kosong; jika sudah ada nilainya tampilkan tombol "Pakai hasil AI"
+      // 3. Kolom Keperluan: langsung isi otomatis dengan hasil AI
       if (keperluan) {
         const combinedText = nama_toko ? `${nama_toko} - ${keperluan}` : keperluan;
-        if (!keterangan || keterangan.trim() === "") {
-          setKeterangan(combinedText);
-          setAiAppliedFields((prev) => ({ ...prev, keterangan: true }));
+        setKeterangan(combinedText);
+        setAiAppliedFields((prev) => ({ ...prev, keterangan: true }));
+        filledCount++;
+      }
+
+      // 4. Kolom Akun Beban (Kategori): langsung pilih akun yang direkomendasikan AI
+      if (aiKodeAkun) {
+        const matchedAccount = expenseAccounts.find(
+          (acc) => acc.kode === aiKodeAkun
+        );
+        if (matchedAccount) {
+          setAkunBebanId(matchedAccount.id);
+          setAiAppliedFields((prev) => ({ ...prev, akunBeban: true }));
           filledCount++;
-        } else if (keterangan.trim() !== combinedText.trim()) {
-          newSuggestions.keterangan = combinedText;
-          pendingCount++;
         }
       }
 
-      setAiSuggestions(newSuggestions);
+      // Kosongkan saran tombol manual karena seluruh data langsung masuk ke formulir
+      setAiSuggestions({});
 
       const warningText = pesan_jumlah ? ` Catatan: ${pesan_jumlah}.` : "";
 
-      if (filledCount === 0 && pendingCount === 0) {
+      if (filledCount === 0) {
         setAiNotification({
           type: "info",
           message: pesan_jumlah
@@ -210,16 +236,9 @@ export function PengajuanForm({
             : "Nota berhasil dipindai, namun data transaksi (tanggal, jumlah, keperluan) tidak ditemukan dengan jelas. Silakan isi secara manual.",
         });
       } else {
-        const detailParts: string[] = [];
-        if (filledCount > 0) detailParts.push(`${filledCount} kolom diisi otomatis`);
-        if (pendingCount > 0)
-          detailParts.push(`${pendingCount} kolom sudah terisi (tersedia opsi "Pakai hasil AI")`);
-
         setAiNotification({
           type: "success",
-          message: `Ekstraksi AI selesai (Tingkat keyakinan: ${keyakinan}). ${detailParts.join(
-            ", "
-          )}.${warningText} Data hasil AI ditandai dengan teks, periksa dan sesuaikan sebelum disimpan.`,
+          message: `Ekstraksi AI selesai (Tingkat keyakinan: ${keyakinan}). ${filledCount} kolom berhasil diisi otomatis.${warningText} Silakan periksa kembali sebelum menyimpan.`,
         });
       }
     } catch {
@@ -395,7 +414,7 @@ export function PengajuanForm({
   };
 
   return (
-    <div className="space-y-6 w-full max-w-4xl sogan-card p-6 sm:p-8 border-amber-900/30 text-[#fdfaf6]">
+    <div className="space-y-6 w-full max-w-4xl mx-auto sogan-card p-6 sm:p-8 border-amber-900/30 text-[#fdfaf6]">
       {/* Catatan peninjau jika dalam status perlu revisi */}
       {mode === "edit" && initialData?.catatan_peninjau && (
         <div
@@ -574,7 +593,11 @@ export function PengajuanForm({
             min={minDateStr}
             max={todayStr}
             value={tanggalTransaksi}
-            onChange={(e) => setTanggalTransaksi(e.target.value)}
+            onChange={(e) => {
+              setUserTouchedTanggal(true);
+              setTanggalTransaksi(e.target.value);
+              setAiAppliedFields((prev) => ({ ...prev, tanggal: false }));
+            }}
             required
             className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 [color-scheme:dark]"
           />
@@ -585,16 +608,37 @@ export function PengajuanForm({
 
         {/* Akun Beban (Hanya Akun Beban Aktif) */}
         <div className="space-y-2">
-          <label
-            htmlFor="akun_beban_id"
-            className="block text-sm sm:text-base font-bold text-[#fdfaf6]"
-          >
-            Akun Beban <span className="text-rose-400">*</span>
-          </label>
+          <div className="flex flex-wrap items-center justify-between gap-1.5">
+            <label
+              htmlFor="akun_beban_id"
+              className="text-sm sm:text-base font-bold text-[#fdfaf6] inline-flex items-center flex-wrap gap-2"
+            >
+              <span>Akun Beban</span>
+              <span className="text-rose-400">*</span>
+              {aiAppliedFields.akunBeban && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-500/40">
+                  <span aria-hidden="true">✓</span> Diisi AI, periksa dulu
+                </span>
+              )}
+            </label>
+            {aiSuggestions.akunBebanId && (
+              <button
+                type="button"
+                onClick={() => applyAiSuggestion("akunBeban")}
+                className="text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 px-3 py-1 rounded-lg transition shadow-sm"
+              >
+                Pakai hasil AI: {aiSuggestions.akunBebanLabel}
+              </button>
+            )}
+          </div>
           <select
             id="akun_beban_id"
             value={akunBebanId}
-            onChange={(e) => setAkunBebanId(Number(e.target.value))}
+            onChange={(e) => {
+              setUserTouchedAkun(true);
+              setAkunBebanId(Number(e.target.value));
+              setAiAppliedFields((prev) => ({ ...prev, akunBeban: false }));
+            }}
             required
             className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
           >
@@ -652,7 +696,10 @@ export function PengajuanForm({
               max={25000000}
               step={1}
               value={jumlah}
-              onChange={(e) => setJumlah(e.target.value)}
+              onChange={(e) => {
+                setJumlah(e.target.value);
+                setAiAppliedFields((prev) => ({ ...prev, jumlah: false }));
+              }}
               placeholder="10000 s/d 25000000"
               required
               className="w-full pl-12 pr-4 py-3 text-base sm:text-lg font-mono font-bold rounded-xl border border-amber-900/40 bg-[#141210] text-amber-300 placeholder-[#78716c] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
@@ -700,7 +747,10 @@ export function PengajuanForm({
             id="keterangan"
             rows={4}
             value={keterangan}
-            onChange={(e) => setKeterangan(e.target.value)}
+            onChange={(e) => {
+              setKeterangan(e.target.value);
+              setAiAppliedFields((prev) => ({ ...prev, keterangan: false }));
+            }}
             placeholder="Jelaskan rincian keperluan pengeluaran atau reimburse secara jelas..."
             required
             className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] placeholder-[#78716c] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 leading-relaxed"
