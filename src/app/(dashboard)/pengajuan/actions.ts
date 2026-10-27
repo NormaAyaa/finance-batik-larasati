@@ -96,7 +96,11 @@ export async function transisiStatusPengajuanAction(params: {
   let emailNotice: string | null = null;
 
   try {
-    if (pengajuan.status === "perlu_revisi" || pengajuan.status === "ditolak") {
+    if (
+      pengajuan.status === "disetujui" ||
+      pengajuan.status === "perlu_revisi" ||
+      pengajuan.status === "ditolak"
+    ) {
       // Baca profil pengaju dari server
       const { data: pengajuProfile } = await supabase
         .from("profiles")

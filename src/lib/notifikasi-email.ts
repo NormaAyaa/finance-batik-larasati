@@ -117,6 +117,9 @@ export function generateEmailSubject(
   let suffix = "";
 
   switch (statusBaru) {
+    case "disetujui":
+      suffix = "telah disetujui";
+      break;
     case "perlu_revisi":
       suffix = "perlu revisi";
       break;
@@ -262,7 +265,7 @@ Email ini dikirim otomatis, mohon tidak membalas email ini.`;
  * - Jangan mengirim ke akun nonaktif.
  * - Jangan mengirim ke orang yang sama dengan pelaku perpindahan (actorId).
  *
- * CATATAN: status 'disetujui' sengaja TIDAK mengirim email (aturan bisnis awal).
+ * CATATAN: status 'disetujui' kini juga mengirim email ke pengaju.
  */
 export function filterEmailRecipients(params: {
   statusBaru: StatusPengajuan;
@@ -272,7 +275,12 @@ export function filterEmailRecipients(params: {
 }): ProfileRecipient[] {
   const { statusBaru, actorId, pengaju, direkturList = [] } = params;
 
-  if (statusBaru === "perlu_revisi" || statusBaru === "ditolak" || statusBaru === "dibayar") {
+  if (
+    statusBaru === "disetujui" ||
+    statusBaru === "perlu_revisi" ||
+    statusBaru === "ditolak" ||
+    statusBaru === "dibayar"
+  ) {
     if (!pengaju) {
       console.log("[email] dilewati: profil pengaju tidak ada", { status: statusBaru });
       return [];
@@ -349,12 +357,14 @@ export async function sendSingleEmail(params: {
   // Cek pemetaan email per penerima (EMAIL_UJI_PETA) terlebih dahulu
   const emailPeta = parseEmailMapping(stripQuotes(process.env.EMAIL_UJI_PETA));
   const mappedTarget = emailPeta.get(recipient.email.trim().toLowerCase());
-
-  // Jika tidak ada pemetaan spesifik, gunakan pengalihan umum (EMAIL_TEST_REDIRECT / EMAIL_UJI_PENERIMA)
-  const redirectTarget =
-    mappedTarget ||
-    stripQuotes(process.env.EMAIL_TEST_REDIRECT || process.env.EMAIL_UJI_PENERIMA);
   const isOriginalDummy = isDummyDomain(recipient.email);
+
+  // Pengalihan umum:
+  // - EMAIL_TEST_REDIRECT: pengalihan paksa global (jika sengaja dipasang untuk staging)
+  // - EMAIL_UJI_PENERIMA: fallback khusus HANYA jika penerima adalah domain contoh/dummy (.test) yang belum terdaftar di EMAIL_UJI_PETA
+  const globalRedirect = stripQuotes(process.env.EMAIL_TEST_REDIRECT);
+  const fallbackDummy = isOriginalDummy ? stripQuotes(process.env.EMAIL_UJI_PENERIMA) : undefined;
+  const redirectTarget = mappedTarget || globalRedirect || fallbackDummy;
 
   console.log("[email] tujuan", {
     adaPemetaan: !!mappedTarget,

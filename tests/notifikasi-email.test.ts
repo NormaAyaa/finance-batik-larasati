@@ -266,7 +266,7 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
       assert.equal(res[0].id, direktur2.id);
     });
 
-    it("TIDAK mengirim email untuk status lain (diajukan, disetujui, draf, dibatalkan)", () => {
+    it("TIDAK mengirim email untuk status draf, diajukan, atau dibatalkan", () => {
       assert.equal(
         filterEmailRecipients({
           statusBaru: "diajukan",
@@ -277,7 +277,7 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
       );
       assert.equal(
         filterEmailRecipients({
-          statusBaru: "disetujui",
+          statusBaru: "draf",
           actorId,
           pengaju: pengajuAktif,
         }).length,
@@ -290,6 +290,17 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
           pengaju: pengajuAktif,
         }).length,
         0
+      );
+    });
+
+    it("mengirim ke Pengaju saat status disetujui", () => {
+      assert.equal(
+        filterEmailRecipients({
+          statusBaru: "disetujui",
+          actorId,
+          pengaju: pengajuAktif,
+        }).length,
+        1
       );
     });
   });

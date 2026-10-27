@@ -244,6 +244,9 @@ export function getFriendlyErrorMessage(error: unknown): string {
   if (msg.includes("akun_kode_key") || (msg.includes("unique") && msg.includes("kode"))) {
     return "Kode akun sudah digunakan oleh akun lain. Silakan gunakan kode unik yang berbeda (BR-01).";
   }
+  if (msg.includes("jurnal_nomor_key") || msg.includes("pengajuan_nomor_key") || (msg.includes("duplicate key") && msg.includes("nomor"))) {
+    return "Terjadi duplikasi nomor dokumen otomatis pada sistem. Silakan coba kembali atau hubungi Akuntan.";
+  }
 
   // Periode (BR-06)
   if (msg.includes("uq_periode_tahun_bulan")) {
