@@ -22,8 +22,8 @@ export function LengkapiProfilForm({
   const router = useRouter();
 
   const isLaras =
-    initialEmail.toLowerCase() === "larasatiyw@gmail.com" ||
     initialEmail.toLowerCase() === "laras@larasati.test" ||
+    initialEmail.toLowerCase() === "direktur@mail-contoh.com" ||
     initialEmail.toLowerCase().includes("laras");
 
   const [namaLengkap, setNamaLengkap] = useState(

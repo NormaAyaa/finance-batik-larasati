@@ -51,8 +51,8 @@ export async function POST(request: Request) {
 
     // 4. Validasi Peran Pengguna (Direktur hanya untuk Ibu Laras Prameswari)
     const isLaras =
-      cleanEmail === "larasatiyw@gmail.com" ||
       cleanEmail === "laras@larasati.test" ||
+      cleanEmail === "direktur@mail-contoh.com" ||
       cleanEmail.includes("laras");
 
     const allowedRoles: PeranPengguna[] = isLaras

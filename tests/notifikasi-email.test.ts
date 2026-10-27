@@ -314,7 +314,7 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
       assert.equal(isDummyDomain("direktur@organisasi.invalid"), true);
       assert.equal(isDummyDomain("admin@server.localhost"), true);
       assert.equal(isDummyDomain("user@batiklarasati.com"), false);
-      assert.equal(isDummyDomain("user@gmail.com"), false);
+      assert.equal(isDummyDomain("user@mail-contoh.com"), false);
     });
 
     it("melewati pengiriman jika penerima memakai domain contoh tanpa alihan (mode kirim)", async () => {
@@ -402,11 +402,11 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
 
     it("parseEmailMapping berhasil memetakan string format key:value terpisah titik koma", () => {
       const mapping = parseEmailMapping(
-        "rina@larasati.test:rinalrsti@gmail.com;dimas@larasati.test:dimaslrst@gmail.com;laras@larasati.test:larasatiyw@gmail.com"
+        "rina@larasati.test:pengaju@mail-contoh.com;dimas@larasati.test:tujuan1@mail-contoh.com;laras@larasati.test:tujuan2@mail-contoh.com"
       );
-      assert.equal(mapping.get("rina@larasati.test"), "rinalrsti@gmail.com");
-      assert.equal(mapping.get("dimas@larasati.test"), "dimaslrst@gmail.com");
-      assert.equal(mapping.get("laras@larasati.test"), "larasatiyw@gmail.com");
+      assert.equal(mapping.get("rina@larasati.test"), "pengaju@mail-contoh.com");
+      assert.equal(mapping.get("dimas@larasati.test"), "tujuan1@mail-contoh.com");
+      assert.equal(mapping.get("laras@larasati.test"), "tujuan2@mail-contoh.com");
       assert.equal(mapping.get("unknown@larasati.test"), undefined);
     });
   });
@@ -416,7 +416,7 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
     const rinaPengaju: ProfileRecipient = {
       id: "user-rina-staf",
       nama_lengkap: "Rina Anggraini",
-      email: "rinalrsti@gmail.com",
+      email: "pengaju@mail-contoh.com",
       aktif: true,
     };
     const pengajuanDisetujui: PengajuanEmailData = {
@@ -440,7 +440,7 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
       });
       assert.equal(recipients.length, 1);
       assert.equal(recipients[0].id, rinaPengaju.id);
-      assert.equal(recipients[0].email, "rinalrsti@gmail.com");
+      assert.equal(recipients[0].email, "pengaju@mail-contoh.com");
 
       // 2. Eksekusi pengiriman notifikasi pengajuan
       const result = await kirimNotifikasiPengajuan({
@@ -451,7 +451,7 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
 
       assert.equal(result.success, true);
       assert.equal(result.count, 1);
-      assert.equal(result.notice, "Email terkirim ke ri***@gmail.com");
+      assert.equal(result.notice, "Email terkirim ke pe***@mail-contoh.com");
     });
 
     it("Pengaju tidak ditemukan: kirimNotifikasiPengajuan mengembalikan success: false dengan notice yang jelas", async () => {
@@ -602,8 +602,8 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
         assert.equal(result.count, 1);
         assert.equal(result.details?.[0].status, "sent");
         assert.equal(result.details?.[0].messageId, "msg_resend_success_999");
-        assert.equal(result.details?.[0].recipientEmail, "rinalrsti@gmail.com");
-        assert.equal(result.notice, "Email terkirim ke ri***@gmail.com (ID: msg_rese)");
+        assert.equal(result.details?.[0].recipientEmail, "pengaju@mail-contoh.com");
+        assert.equal(result.notice, "Email terkirim ke pe***@mail-contoh.com (ID: msg_rese)");
       } finally {
         globalThis.fetch = origFetch;
       }
@@ -615,7 +615,7 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
         process.env.EMAIL_MODE = "kirim";
         process.env.RESEND_API_KEY = "re_dummy_test_key";
         process.env.EMAIL_PENGIRIM = "notifikasi@mail.normasuci.site";
-        process.env.EMAIL_UJI_PETA = "rinalrsti@gmail.com:dimas.redirect@gmail.com";
+        process.env.EMAIL_UJI_PETA = "pengaju@mail-contoh.com:tujuan@mail-contoh.com";
 
         globalThis.fetch = async () =>
           new Response(JSON.stringify({ id: "msg_peta_success_12345" }), {
@@ -632,10 +632,10 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
         assert.equal(result.success, true);
         assert.equal(result.count, 1);
         assert.equal(result.details?.[0].status, "sent");
-        assert.equal(result.details?.[0].recipientEmail, "dimas.redirect@gmail.com");
+        assert.equal(result.details?.[0].recipientEmail, "tujuan@mail-contoh.com");
         assert.equal(
           result.notice,
-          "Email terkirim ke di***@gmail.com (ID: msg_peta)"
+          "Email terkirim ke tu***@mail-contoh.com (ID: msg_peta)"
         );
       } finally {
         globalThis.fetch = origFetch;
@@ -645,8 +645,8 @@ describe("Fitur Notifikasi Email - Unit Tests di Memori", () => {
 
   describe("9. Penyamaran Email (maskEmail)", () => {
     it("menampilkan 2 huruf pertama nama pengguna sebelum @ lalu *** dan domainnya", () => {
-      assert.equal(maskEmail("rinalrsti@gmail.com"), "ri***@gmail.com");
-      assert.equal(maskEmail("dimas.testing@gmail.com"), "di***@gmail.com");
+      assert.equal(maskEmail("pengaju@mail-contoh.com"), "pe***@mail-contoh.com");
+      assert.equal(maskEmail("tujuan.testing@mail-contoh.com"), "tu***@mail-contoh.com");
       assert.equal(maskEmail("suci@perusahaan.co.id"), "su***@perusahaan.co.id");
     });
 

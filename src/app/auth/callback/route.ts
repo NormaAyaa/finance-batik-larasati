@@ -156,16 +156,16 @@ export async function GET(request: NextRequest) {
       // 3. Rina -> Staf
       if (!profile && userEmail) {
         const isLaras =
-          userEmail === "larasatiyw@gmail.com" ||
           userEmail === "laras@larasati.test" ||
+          userEmail === "direktur@mail-contoh.com" ||
           userEmail.includes("laras");
         const isDimas =
-          userEmail === "dimaslrst@gmail.com" ||
           userEmail === "dimas@larasati.test" ||
+          userEmail === "akuntan@mail-contoh.com" ||
           userEmail.includes("dimas");
         const isRina =
-          userEmail === "rinalrsti@gmail.com" ||
           userEmail === "rina@larasati.test" ||
+          userEmail === "staf@mail-contoh.com" ||
           userEmail.includes("rina");
 
         const clientToUse = admin || supabase;

@@ -84,7 +84,7 @@ export function isDummyDomain(email: string): boolean {
 /**
  * Menyamarkan alamat email untuk tampilan UI / log:
  * Menampilkan 2 huruf pertama sebelum @ lalu "***", dan domainnya.
- * Contoh: "rinalrsti@gmail.com" -> "ri***@gmail.com"
+ * Contoh: "pengaju@mail-contoh.com" -> "pe***@mail-contoh.com"
  */
 export function maskEmail(email: string): string {
   if (!email) return "";
@@ -325,7 +325,7 @@ export function filterEmailRecipients(params: {
 
 /**
  * Membaca pemetaan email uji (EMAIL_UJI_PETA)
- * Format: dummy1@larasati.test:real1@gmail.com;dummy2@larasati.test:real2@gmail.com
+ * Format: dummy1@larasati.test:tujuan1@mail-contoh.com;dummy2@larasati.test:tujuan2@mail-contoh.com
  */
 export function parseEmailMapping(rawPeta?: string): Map<string, string> {
   const map = new Map<string, string>();
