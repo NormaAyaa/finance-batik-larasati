@@ -327,22 +327,46 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // (a) Validasi tanggal: harus tanggal kalender nyata dan tidak di masa depan (zona Asia/Jakarta)
+  // (a) Validasi & Normalisasi tanggal: mendukung format YYYY-MM-DD maupun DD/MM/YYYY atau DD-MM-YYYY
   let validTanggal: string | null = null;
-  if (typeof rawParsed.tanggal === "string" && /^\d{4}-\d{2}-\d{2}$/.test(rawParsed.tanggal)) {
-    const [year, month, day] = rawParsed.tanggal.split("-").map(Number);
-    const dateObj = new Date(year, month - 1, day);
-    if (
-      dateObj.getFullYear() === year &&
-      dateObj.getMonth() === month - 1 &&
-      dateObj.getDate() === day
-    ) {
-      // Bandingkan dengan tanggal hari ini zona Asia/Jakarta (WIB)
-      const todayWibStr = new Date().toLocaleDateString("en-CA", {
-        timeZone: "Asia/Jakarta",
-      });
-      if (rawParsed.tanggal <= todayWibStr) {
-        validTanggal = rawParsed.tanggal;
+  if (typeof rawParsed.tanggal === "string") {
+    const trimmedDate = rawParsed.tanggal.trim();
+    let y = 0,
+      m = 0,
+      d = 0;
+
+    // Format YYYY-MM-DD atau YYYY/MM/DD
+    const isoMatch = trimmedDate.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    // Format DD/MM/YYYY atau DD-MM-YYYY (format umum nota di Indonesia)
+    const dmyMatch = trimmedDate.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+
+    if (isoMatch) {
+      y = Number(isoMatch[1]);
+      m = Number(isoMatch[2]);
+      d = Number(isoMatch[3]);
+    } else if (dmyMatch) {
+      d = Number(dmyMatch[1]);
+      m = Number(dmyMatch[2]);
+      y = Number(dmyMatch[3]);
+    }
+
+    if (y > 0 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+      const dateObj = new Date(y, m - 1, d);
+      if (
+        dateObj.getFullYear() === y &&
+        dateObj.getMonth() === m - 1 &&
+        dateObj.getDate() === d
+      ) {
+        const formattedDate = `${String(y).padStart(4, "0")}-${String(
+          m
+        ).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        // Bandingkan dengan tanggal hari ini zona Asia/Jakarta (WIB)
+        const todayWibStr = new Date().toLocaleDateString("en-CA", {
+          timeZone: "Asia/Jakarta",
+        });
+        if (formattedDate <= todayWibStr) {
+          validTanggal = formattedDate;
+        }
       }
     }
   }
