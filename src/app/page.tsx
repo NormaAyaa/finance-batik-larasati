@@ -1,15 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Yeseva_One, Cinzel_Decorative } from "next/font/google";
+import { Yeseva_One } from "next/font/google";
 
 const yesevaOne = Yeseva_One({
   weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const cinzelDecorative = Cinzel_Decorative({
-  weight: "700",
   subsets: ["latin"],
   display: "swap",
 });

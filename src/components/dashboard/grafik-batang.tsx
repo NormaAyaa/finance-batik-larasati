@@ -129,9 +129,6 @@ export function GrafikBatang({ data }: GrafikBatangProps) {
       ? `${pathSplinePendapatan} L ${pointsPendapatan[pointsPendapatan.length - 1].x} ${marginTop + chartHeight} L ${pointsPendapatan[0].x} ${marginTop + chartHeight} Z`
       : "";
 
-  const activePointPend = pointsPendapatan[activeIndex];
-  const activePointBeban = pointsBeban[activeIndex];
-
   // Hitung persentase tren vs bulan sebelumnya
   const prevItem = activeIndex > 0 ? data[activeIndex - 1] : null;
   const growthPend =
