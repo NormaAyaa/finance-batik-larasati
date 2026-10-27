@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { Yeseva_One } from "next/font/google";
 import { LogoBatikLarasati } from "@/components/ui/logo-batik-larasati";
+import { createClient } from "@/lib/supabase/server";
 
 const yesevaOne = Yeseva_One({
   weight: "400",
@@ -15,7 +17,17 @@ export const metadata = {
     "Portal Resmi CV Batik Larasati Surakarta. Perpaduan mahakarya batik sogan klasik dengan tata kelola keuangan yang transparan dan akurat.",
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Jika pengguna sudah memiliki sesi aktif, arahkan langsung ke dashboard
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   const ctaLink = "/login";
   const ctaText = "Masuk Sistem Keuangan";
 

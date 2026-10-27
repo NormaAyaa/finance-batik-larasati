@@ -5,7 +5,17 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/types/database";
 
 function sanitizeRedirectUrl(url: string | null): string {
-  if (!url) return "/dashboard";
+  if (
+    !url ||
+    url === "/" ||
+    url === "/login" ||
+    url === "/register" ||
+    url === "/auth/keluar" ||
+    url.startsWith("/login?") ||
+    url.startsWith("/register?")
+  ) {
+    return "/dashboard";
+  }
   if (
     url.startsWith("/") &&
     !url.startsWith("//") &&
@@ -28,9 +38,12 @@ export async function GET(request: NextRequest) {
   // Dapatkan base URL yang akurat (mendukung reverse proxy / custom domain)
   const forwardedHost = request.headers.get("x-forwarded-host");
   const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
-  const baseUrl = forwardedHost
-    ? `${forwardedProto}://${forwardedHost}`
-    : request.nextUrl.origin;
+  const primaryForwardedHost = forwardedHost?.split(",")[0]?.trim();
+  const baseUrl =
+    process.env.APP_BASE_URL ||
+    (primaryForwardedHost
+      ? `${forwardedProto}://${primaryForwardedHost}`
+      : request.nextUrl.origin);
 
   // 1. Tangani jika ada error langsung dari provider OAuth (Google / Supabase)
   if (oauthError || oauthErrorDesc) {

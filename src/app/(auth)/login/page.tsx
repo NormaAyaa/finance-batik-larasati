@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
@@ -13,7 +15,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="relative min-h-screen w-screen overflow-hidden bg-[#070605] text-[#fbf7f0] font-sans flex items-center justify-center p-8 select-none">
       {/* ============================================================ */}

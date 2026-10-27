@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     }
 
     // 7. Simpan Profil ke Tabel profiles dengan Admin Client (Bypass RLS Insert)
-    const { error: profileError } = await admin.from("profiles").insert({
+    let { error: profileError } = await admin.from("profiles").insert({
       id: user.id,
       nama_lengkap: nama_lengkap.trim(),
       email: cleanEmail,
@@ -111,6 +111,19 @@ export async function POST(request: Request) {
       peran: peran as PeranPengguna,
       aktif: true,
     });
+
+    if (profileError) {
+      console.warn("Insert profil via admin client gagal, mencoba via client pengguna:", profileError.message);
+      const userRes = await supabase.from("profiles").insert({
+        id: user.id,
+        nama_lengkap: nama_lengkap.trim(),
+        email: cleanEmail,
+        jabatan: jabatan.trim(),
+        peran: peran as PeranPengguna,
+        aktif: true,
+      });
+      profileError = userRes.error;
+    }
 
     if (profileError) {
       console.error("Gagal melengkapi profil pengguna:", profileError);

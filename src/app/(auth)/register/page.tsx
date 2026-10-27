@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { createClient } from "@/lib/supabase/server";
 import { RegisterForm } from "./register-form";
 
 export const metadata: Metadata = {
@@ -10,7 +12,16 @@ export const metadata: Metadata = {
     "Pendaftaran akun pengguna internal sistem tata kelola keuangan CV Batik Larasati Surakarta.",
 };
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-[#070605] p-4 md:p-6 overflow-hidden select-none selection:bg-amber-500 selection:text-black">
       {/* ============================================================ */}

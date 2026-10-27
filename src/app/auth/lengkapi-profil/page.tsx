@@ -17,7 +17,17 @@ export const metadata: Metadata = {
 };
 
 function sanitizeRedirectUrl(url: string | null): string {
-  if (!url) return "/dashboard";
+  if (
+    !url ||
+    url === "/" ||
+    url === "/login" ||
+    url === "/register" ||
+    url === "/auth/keluar" ||
+    url.startsWith("/login?") ||
+    url.startsWith("/register?")
+  ) {
+    return "/dashboard";
+  }
   if (
     url.startsWith("/") &&
     !url.startsWith("//") &&
@@ -48,13 +58,24 @@ export default async function LengkapiProfilPage({ searchParams }: PageProps) {
     redirect("/login");
   }
 
-  // 2. Periksa apakah user SUDAH memiliki profil di tabel profiles
-  const admin = createAdminClient();
-  const { data: profile } = await admin
+  // 2. Periksa apakah user SUDAH memiliki profil di tabel profiles (gunakan client sesi pengguna)
+  let { data: profile } = await supabase
     .from("profiles")
     .select("id, aktif")
     .eq("id", user.id)
     .maybeSingle();
+
+  if (!profile) {
+    try {
+      const admin = createAdminClient();
+      const { data: adminProfile } = await admin
+        .from("profiles")
+        .select("id, aktif")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (adminProfile) profile = adminProfile;
+    } catch {}
+  }
 
   if (profile) {
     if (!profile.aktif) {

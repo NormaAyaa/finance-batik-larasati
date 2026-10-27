@@ -23,13 +23,20 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // 2. Halaman publik /login dan /register
+  // 2. Halaman publik /login dan /register: jika sudah terautentikasi, langsung arahkan ke /dashboard
   if (pathname === "/login" || pathname === "/register") {
+    if (user) {
+      return createRedirectResponse(new URL("/dashboard", request.url));
+    }
     return supabaseResponse;
   }
 
   // 3. Rute root (/) -> Halaman landing page publik
+  // Jika pengguna sudah terautentikasi, langsung bawa ke dashboard agar tidak kembali ke landing page
   if (pathname === "/") {
+    if (user) {
+      return createRedirectResponse(new URL("/dashboard", request.url));
+    }
     return supabaseResponse;
   }
 

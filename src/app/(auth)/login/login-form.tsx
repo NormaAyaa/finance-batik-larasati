@@ -7,7 +7,17 @@ import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/auth";
 
 function sanitizeRedirectUrl(url: string | null): string {
-  if (!url) return "/dashboard";
+  if (
+    !url ||
+    url === "/" ||
+    url === "/login" ||
+    url === "/register" ||
+    url === "/auth/keluar" ||
+    url.startsWith("/login?") ||
+    url.startsWith("/register?")
+  ) {
+    return "/dashboard";
+  }
   // Wajib diawali '/' dan BUKAN '//' atau '/\' serta tidak mengandung skema protokol '://'
   if (
     url.startsWith("/") &&
