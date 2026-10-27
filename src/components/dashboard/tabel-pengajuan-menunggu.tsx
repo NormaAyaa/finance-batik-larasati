@@ -99,57 +99,57 @@ export function TabelPengajuanMenunggu({
         <>
           {/* Tampilan Desktop & Tablet: Tabel Dark Semantik */}
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-xs text-[#fdfaf6]">
+            <table className="w-full text-left text-sm text-[#fdfaf6]">
               <caption className="sr-only">
                 Daftar pengajuan biaya yang menunggu verifikasi atau persetujuan Anda
               </caption>
-              <thead className="bg-[#141210] text-[#a89f91] font-semibold border-b border-amber-900/30 uppercase tracking-wider text-[11px]">
+              <thead className="bg-[#141210] text-[#a89f91] font-bold border-b border-amber-900/30 uppercase tracking-wider text-xs">
                 <tr>
-                  <th scope="col" className="px-4 py-3">Nomor & Tanggal</th>
-                  <th scope="col" className="px-4 py-3">Pengaju</th>
-                  <th scope="col" className="px-4 py-3 text-right">Jumlah</th>
-                  <th scope="col" className="px-4 py-3 text-center">Status</th>
-                  <th scope="col" className="px-4 py-3 text-right">Aksi</th>
+                  <th scope="col" className="px-4 py-3.5">Nomor & Tanggal</th>
+                  <th scope="col" className="px-4 py-3.5">Pengaju</th>
+                  <th scope="col" className="px-4 py-3.5 text-right">Jumlah</th>
+                  <th scope="col" className="px-4 py-3.5 text-center">Status</th>
+                  <th scope="col" className="px-4 py-3.5 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-amber-900/15">
                 {items.map((item) => (
                   <tr key={item.id} className="hover:bg-[#1a1613] transition">
                     {/* Nomor & Tanggal */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-bold text-[#fdfaf6] font-mono text-xs">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <div className="font-bold text-amber-300 font-mono text-sm sm:text-base">
                         {item.nomor}
                       </div>
-                      <div className="text-[11px] text-[#78716c] mt-0.5">
+                      <div className="text-xs text-[#a89f91] mt-0.5">
                         {formatDate(item.tanggal_transaksi)}
                       </div>
                     </td>
 
                     {/* Pengaju */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-medium text-[#fdfaf6]">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <div className="font-bold text-[#fdfaf6] text-sm sm:text-base">
                         {item.pengaju?.nama_lengkap || "-"}
                       </div>
-                      <div className="text-[11px] text-[#a89f91] capitalize">
+                      <div className="text-xs text-[#a89f91] capitalize mt-0.5">
                         {item.pengaju?.peran || "Staf"}
                       </div>
                     </td>
 
                     {/* Jumlah */}
-                    <td className="px-4 py-3 whitespace-nowrap text-right font-mono font-bold text-amber-300">
+                    <td className="px-4 py-3.5 whitespace-nowrap text-right font-mono font-bold text-sm sm:text-base text-amber-300 tabular-nums">
                       {formatRupiah(item.jumlah)}
                     </td>
 
                     {/* Status */}
-                    <td className="px-4 py-3 whitespace-nowrap text-center">
-                      <StatusBadge status={item.status} />
+                    <td className="px-4 py-3.5 whitespace-nowrap text-center">
+                      <StatusBadge status={item.status} size="md" />
                     </td>
 
                     {/* Aksi: Tombol Tinjau Emas Chamfer */}
-                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                    <td className="px-4 py-3.5 whitespace-nowrap text-right">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_10px_rgba(245,158,11,0.25)] hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-[0_0_10px_rgba(245,158,11,0.25)] hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]"
                         aria-label={`Tinjau pengajuan nomor ${item.nomor} sebesar ${formatRupiah(item.jumlah)}`}
                       >
                         <span>Tinjau</span>

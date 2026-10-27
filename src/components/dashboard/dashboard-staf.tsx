@@ -159,15 +159,15 @@ export function DashboardStaf({
                 <div className="flex items-center justify-between">
                   <span
                     aria-hidden="true"
-                    className={`font-bold text-xs ${cfg.glowColor}`}
+                    className={`font-bold text-sm ${cfg.glowColor}`}
                   >
                     {cfg.icon}
                   </span>
-                  <span className="text-lg font-extrabold font-mono text-[#fdfaf6]">{count}</span>
+                  <span className="text-xl font-extrabold font-mono text-[#fdfaf6]">{count}</span>
                 </div>
                 <div className="mt-2.5">
-                  <div className="text-xs font-bold text-[#fdfaf6] truncate">{cfg.label}</div>
-                  <div className="text-[10px] text-[#78716c] line-clamp-1 mt-0.5" title={cfg.description}>
+                  <div className="text-xs sm:text-sm font-bold text-[#fdfaf6] truncate">{cfg.label}</div>
+                  <div className="text-[11px] text-[#a89f91] line-clamp-1 mt-0.5" title={cfg.description}>
                     {cfg.description}
                   </div>
                 </div>
@@ -184,17 +184,17 @@ export function DashboardStaf({
       >
         <div className="flex items-center justify-between pb-4 border-b border-amber-900/20">
           <div>
-            <h3 id="riwayat-terbaru-title" className="text-base font-bold text-[#fdfaf6] tracking-tight">
+            <h3 id="riwayat-terbaru-title" className="text-base sm:text-lg font-bold text-[#fdfaf6] tracking-tight">
               Pengajuan Terbaru Saya
             </h3>
-            <p className="text-xs text-[#a89f91] mt-0.5">
+            <p className="text-xs sm:text-sm text-[#a89f91] mt-0.5">
               10 berkas pengajuan terakhir yang Anda ajukan di sistem
             </p>
           </div>
 
           <Link
             href="/pengajuan"
-            className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition inline-flex items-center gap-1"
+            className="text-xs sm:text-sm font-bold text-amber-400 hover:text-amber-300 transition inline-flex items-center gap-1.5"
           >
             <span>Semua Pengajuan</span>
             <span aria-hidden="true">→</span>
@@ -224,24 +224,24 @@ export function DashboardStaf({
           </div>
         ) : (
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-xs text-[#fdfaf6]">
+            <table className="w-full text-left text-sm text-[#fdfaf6]">
               <caption className="sr-only">Daftar pengajuan operasional terbaru milik Anda</caption>
-              <thead className="bg-[#141210] text-[#a89f91] font-semibold border-b border-amber-900/30 uppercase tracking-wider text-[11px]">
+              <thead className="bg-[#141210] text-[#a89f91] font-bold border-b border-amber-900/30 uppercase tracking-wider text-xs">
                 <tr>
-                  <th scope="col" className="px-4 py-3">Nomor & Tanggal</th>
-                  <th scope="col" className="px-4 py-3">Keperluan</th>
-                  <th scope="col" className="px-4 py-3">Jenis</th>
-                  <th scope="col" className="px-4 py-3 text-right">Jumlah</th>
-                  <th scope="col" className="px-4 py-3 text-center">Status</th>
-                  <th scope="col" className="px-4 py-3 text-right">Aksi</th>
+                  <th scope="col" className="px-4 py-3.5">Nomor & Tanggal</th>
+                  <th scope="col" className="px-4 py-3.5">Keperluan</th>
+                  <th scope="col" className="px-4 py-3.5">Jenis</th>
+                  <th scope="col" className="px-4 py-3.5 text-right">Jumlah</th>
+                  <th scope="col" className="px-4 py-3.5 text-center">Status</th>
+                  <th scope="col" className="px-4 py-3.5 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-amber-900/15">
                 {recentItems.map((item) => (
                   <tr key={item.id} className="hover:bg-[#1a1613] transition">
                     {/* Nomor & Tanggal */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-bold text-amber-300 font-mono text-xs">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      <div className="font-bold text-amber-300 font-mono text-sm sm:text-base">
                         <Link
                           href={`/pengajuan/${item.id}`}
                           className="hover:underline focus:outline-none"
@@ -249,38 +249,38 @@ export function DashboardStaf({
                           {item.nomor}
                         </Link>
                       </div>
-                      <div className="text-[11px] text-[#78716c] mt-0.5">
+                      <div className="text-xs text-[#a89f91] mt-0.5">
                         {formatDate(item.tanggal_transaksi)}
                       </div>
                     </td>
 
                     {/* Keperluan */}
-                    <td className="px-4 py-3">
-                      <p className="line-clamp-1 max-w-xs text-[#fdfaf6] font-medium">
+                    <td className="px-4 py-3.5">
+                      <p className="line-clamp-1 max-w-sm sm:max-w-md text-sm sm:text-base text-[#fdfaf6] font-medium leading-relaxed" title={item.keterangan}>
                         {item.keterangan || "-"}
                       </p>
                     </td>
 
                     {/* Jenis */}
-                    <td className="px-4 py-3 whitespace-nowrap capitalize text-[#a89f91]">
+                    <td className="px-4 py-3.5 whitespace-nowrap capitalize text-sm sm:text-base font-medium text-[#d6cfc7]">
                       {item.jenis}
                     </td>
 
                     {/* Jumlah */}
-                    <td className="px-4 py-3 whitespace-nowrap text-right font-mono font-bold text-amber-300">
+                    <td className="px-4 py-3.5 whitespace-nowrap text-right font-mono font-bold text-sm sm:text-base text-amber-300 tabular-nums">
                       {formatRupiah(item.jumlah)}
                     </td>
 
                     {/* Status */}
-                    <td className="px-4 py-3 whitespace-nowrap text-center">
-                      <StatusBadge status={item.status} />
+                    <td className="px-4 py-3.5 whitespace-nowrap text-center">
+                      <StatusBadge status={item.status} size="md" />
                     </td>
 
                     {/* Aksi */}
-                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                    <td className="px-4 py-3.5 whitespace-nowrap text-right">
                       <Link
                         href={`/pengajuan/${item.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-300 bg-amber-950/40 hover:bg-amber-900/40 border border-amber-500/30 transition"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-amber-300 bg-[#141210] hover:bg-amber-950/40 border border-amber-500/30 hover:border-amber-500/50 shadow-sm transition"
                       >
                         <span>Lihat</span>
                         <span aria-hidden="true">→</span>
