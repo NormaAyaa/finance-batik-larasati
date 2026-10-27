@@ -1,0 +1,546 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import { formatRupiah } from "@/lib/utils/formatters";
+import type { StatusPengajuan } from "@/types/database";
+
+export interface PengajuanEmailData {
+  id: number;
+  nomor: string | null;
+  jenis: string;
+  jumlah: number;
+  status: StatusPengajuan;
+  catatan_peninjau?: string | null;
+}
+
+export interface ProfileRecipient {
+  id: string;
+  nama_lengkap: string;
+  email: string;
+  aktif: boolean;
+}
+
+export type EmailSendStatus = "sent" | "logged" | "skipped" | "failed";
+
+export interface EmailSendResult {
+  status: EmailSendStatus;
+  errorType?: "TIMEOUT" | "RATE_LIMIT" | "CONFIG_MISSING" | "DUMMY_DOMAIN" | "PROVIDER_ERROR" | "NETWORK_ERROR";
+  notice?: string;
+}
+
+export interface KirimNotifikasiResult {
+  success: boolean;
+  count: number;
+  notice?: string;
+}
+
+/**
+ * Normalisasi APP_BASE_URL:
+ * - Menghilangkan trailing slash
+ * - Hanya menerima protokol http:// atau https://
+ * - Menggunakan nama persis APP_BASE_URL
+ */
+export function normalizeAppBaseUrl(rawUrl?: string): string {
+  if (!rawUrl) return "";
+  const trimmed = rawUrl.trim();
+  if (!/^https?:\/\//i.test(trimmed)) {
+    return "";
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return "";
+    }
+    return trimmed.replace(/\/+$/, "");
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Escape karakter HTML untuk mencegah XSS pada teks yang berasal dari pengguna.
+ */
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Memeriksa apakah alamat email menggunakan domain contoh/pengujian
+ * (.test, .example, .invalid, .localhost).
+ */
+export function isDummyDomain(email: string): boolean {
+  if (!email) return false;
+  const trimmed = email.trim().toLowerCase();
+  return /\.(test|example|invalid|localhost)$/i.test(trimmed);
+}
+
+/**
+ * Label status pengajuan dalam Bahasa Indonesia.
+ */
+export function getStatusLabel(status: StatusPengajuan): string {
+  switch (status) {
+    case "draf":
+      return "Draf";
+    case "diajukan":
+      return "Diajukan";
+    case "menunggu_direktur":
+      return "Menunggu Persetujuan Direktur";
+    case "disetujui":
+      return "Disetujui";
+    case "perlu_revisi":
+      return "Perlu Revisi";
+    case "ditolak":
+      return "Ditolak";
+    case "dibayar":
+      return "Sudah Dibayar";
+    case "dibatalkan":
+      return "Dibatalkan";
+    default:
+      return status;
+  }
+}
+
+/**
+ * Membentuk subjek email berdasarkan status pengajuan.
+ * Menghapus karakter baris baru (\r, \n) untuk mencegah email header injection.
+ */
+export function generateEmailSubject(
+  nomor: string | null,
+  statusBaru: StatusPengajuan,
+  redirectOriginalRecipient?: string
+): string {
+  const nomorStr = nomor ? nomor.trim() : "-";
+  let suffix = "";
+
+  switch (statusBaru) {
+    case "perlu_revisi":
+      suffix = "perlu revisi";
+      break;
+    case "ditolak":
+      suffix = "ditolak";
+      break;
+    case "dibayar":
+      suffix = "sudah dibayar";
+      break;
+    case "menunggu_direktur":
+      suffix = "menunggu persetujuan Anda";
+      break;
+    default:
+      suffix = statusBaru;
+      break;
+  }
+
+  let subject = `[Larasati] Pengajuan ${nomorStr} ${suffix}`;
+
+  if (redirectOriginalRecipient) {
+    subject = `[UJI untuk: ${redirectOriginalRecipient}] ${subject}`;
+  }
+
+  // Buang karakter baris baru (CR & LF) dari subjek untuk cegah header injection
+  return subject.replace(/[\r\n]+/g, " ").trim();
+}
+
+/**
+ * Membangun badan email versi Plain Text dan HTML.
+ * HANYA memuat: nomor, jenis, jumlah (format rupiah), status baru, catatan peninjau (jika ada),
+ * dan tautan APP_BASE_URL/pengajuan/<id>.
+ * JANGAN memuat bukti, URL bertanda tangan, saldo, nomor akun, atau data pengguna lain.
+ */
+export function generateEmailContent(params: {
+  pengajuan: PengajuanEmailData;
+  appBaseUrl: string;
+}): { text: string; html: string } {
+  const { pengajuan, appBaseUrl } = params;
+
+  const nomorBersih = pengajuan.nomor ? escapeHtml(pengajuan.nomor) : "-";
+  const jenisBersih = escapeHtml(pengajuan.jenis);
+  const statusLabel = getStatusLabel(pengajuan.status);
+  const jumlahFormatted = formatRupiah(pengajuan.jumlah);
+
+  const detailUrl = appBaseUrl
+    ? `${appBaseUrl}/pengajuan/${pengajuan.id}`
+    : `/pengajuan/${pengajuan.id}`;
+
+  const catatanText = pengajuan.catatan_peninjau?.trim()
+    ? `\nCatatan Peninjau: ${pengajuan.catatan_peninjau.trim()}\n`
+    : "";
+
+  const catatanHtml = pengajuan.catatan_peninjau?.trim()
+    ? `<div style="margin: 16px 0; padding: 12px 16px; background-color: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 4px;">
+        <strong style="color: #92400e;">Catatan Peninjau:</strong>
+        <p style="margin: 4px 0 0 0; color: #78350f; white-space: pre-wrap;">${escapeHtml(pengajuan.catatan_peninjau.trim())}</p>
+      </div>`
+    : "";
+
+  // Plain Text Body
+  const text = `Halo,
+
+Pemberitahuan perubahan status pengajuan keuangan CV Batik Larasati:
+
+Nomor Pengajuan: ${pengajuan.nomor || "-"}
+Jenis: ${pengajuan.jenis}
+Jumlah: ${jumlahFormatted}
+Status Baru: ${statusLabel}${catatanText}
+Untuk melihat rincian pengajuan, buka tautan berikut:
+${detailUrl}
+
+--
+Sistem Keuangan CV Batik Larasati
+Email ini dikirim otomatis, mohon tidak membalas email ini.`;
+
+  // HTML Body
+  const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Notifikasi Pengajuan Keuangan</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 24px;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+    <tr>
+      <td style="padding: 24px; background-color: #78350f; color: #ffffff;">
+        <h1 style="margin: 0; font-size: 20px; font-weight: bold; color: #ffffff;">CV Batik Larasati</h1>
+        <p style="margin: 4px 0 0 0; font-size: 13px; color: #fde68a;">Sistem Pengelolaan Keuangan Internal</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 24px;">
+        <p style="margin-top: 0; font-size: 15px; color: #334155;">Pemberitahuan perubahan status pengajuan keuangan Anda:</p>
+        
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="margin: 16px 0; border-collapse: collapse; font-size: 14px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b; width: 140px;">Nomor Pengajuan</td>
+            <td style="font-weight: 600; color: #0f172a;">${nomorBersih}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b;">Jenis Pengajuan</td>
+            <td style="font-weight: 500; text-transform: capitalize;">${jenisBersih}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b;">Jumlah</td>
+            <td style="font-weight: 700; color: #0f172a;">${jumlahFormatted}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="color: #64748b;">Status Baru</td>
+            <td style="font-weight: 600; color: #0369a1;">${statusLabel}</td>
+          </tr>
+        </table>
+
+        ${catatanHtml}
+
+        <div style="margin: 24px 0;">
+          <a href="${detailUrl}" style="display: inline-block; background-color: #92400e; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 14px;">
+            Buka Pengajuan
+          </a>
+        </div>
+
+        <p style="font-size: 12px; color: #94a3b8; margin: 24px 0 0 0; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+          Tautan langsung: <a href="${detailUrl}" style="color: #92400e; word-break: break-all;">${detailUrl}</a>
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 16px 24px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center;">
+        Email ini dikirim otomatis oleh Sistem Keuangan CV Batik Larasati. Harap tidak membalas email ini secara langsung.
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return { text, html };
+}
+
+/**
+ * Memilih penerima email yang sah sesuai aturan bisnis:
+ * (a) Ke PENGAJU saat status menjadi 'perlu_revisi', 'ditolak', atau 'dibayar'.
+ * (b) Ke seluruh DIREKTUR aktif saat status masuk 'menunggu_direktur'.
+ * - Jangan mengirim ke akun nonaktif.
+ * - Jangan mengirim ke orang yang sama dengan pelaku perpindahan (actorId).
+ */
+export function filterEmailRecipients(params: {
+  statusBaru: StatusPengajuan;
+  actorId: string;
+  pengaju?: ProfileRecipient | null;
+  direkturList?: ProfileRecipient[];
+}): ProfileRecipient[] {
+  const { statusBaru, actorId, pengaju, direkturList = [] } = params;
+
+  if (statusBaru === "perlu_revisi" || statusBaru === "ditolak" || statusBaru === "dibayar") {
+    if (!pengaju) return [];
+    if (!pengaju.aktif) return [];
+    if (pengaju.id === actorId) return [];
+    return [pengaju];
+  }
+
+  if (statusBaru === "menunggu_direktur") {
+    return direkturList.filter((d) => d.aktif && d.id !== actorId);
+  }
+
+  return [];
+}
+
+/**
+ * Membaca pemetaan email uji (EMAIL_UJI_PETA)
+ * Format: dummy1@larasati.test:real1@gmail.com;dummy2@larasati.test:real2@gmail.com
+ */
+export function parseEmailMapping(rawPeta?: string): Map<string, string> {
+  const map = new Map<string, string>();
+  if (!rawPeta) return map;
+  const pairs = rawPeta.split(/[;,]/);
+  for (const pair of pairs) {
+    const parts = pair.split(":");
+    if (parts.length >= 2) {
+      const fromEmail = parts[0].trim().toLowerCase();
+      const toEmail = parts.slice(1).join(":").trim();
+      if (fromEmail && toEmail) {
+        map.set(fromEmail, toEmail);
+      }
+    }
+  }
+  return map;
+}
+
+/**
+ * Pengiriman satu email: menangani mode 'kirim', 'log', atau 'mati',
+ * aturan alamat dummy (.test dsb.), pengalihan EMAIL_TEST_REDIRECT / EMAIL_UJI_PETA,
+ * dan timeout ~4 detik ke REST API Resend.
+ */
+export async function sendSingleEmail(params: {
+  recipient: ProfileRecipient;
+  pengajuan: PengajuanEmailData;
+  appBaseUrl: string;
+}): Promise<EmailSendResult> {
+  const { recipient, pengajuan, appBaseUrl } = params;
+  const mode = (process.env.EMAIL_MODE || "mati").trim().toLowerCase();
+
+  if (mode === "mati") {
+    return { status: "skipped" };
+  }
+
+  // Cek pemetaan email per penerima (EMAIL_UJI_PETA) terlebih dahulu
+  const emailPeta = parseEmailMapping(process.env.EMAIL_UJI_PETA);
+  const mappedTarget = emailPeta.get(recipient.email.trim().toLowerCase());
+
+  // Jika tidak ada pemetaan spesifik, gunakan pengalihan umum (EMAIL_TEST_REDIRECT / EMAIL_UJI_PENERIMA)
+  const redirectTarget =
+    mappedTarget ||
+    (process.env.EMAIL_TEST_REDIRECT || process.env.EMAIL_UJI_PENERIMA)?.trim();
+  const isOriginalDummy = isDummyDomain(recipient.email);
+
+  // Jika mode kirim dan tidak ada redirect, cek domain dummy penerima
+  if (mode === "kirim" && !redirectTarget && isOriginalDummy) {
+    return {
+      status: "skipped",
+      errorType: "DUMMY_DOMAIN",
+      notice: "Penerima memakai alamat contoh, email tidak dikirim.",
+    };
+  }
+
+  // Tentukan subjek dan penerima aktual
+  const activeRecipient = redirectTarget || recipient.email;
+  const redirectNoticeRecipient = redirectTarget ? recipient.email : undefined;
+
+  // Jangan pernah mengirim ke domain dummy bahkan jika redirectTarget yang dipasang salah ketik
+  if (isDummyDomain(activeRecipient)) {
+    return {
+      status: "skipped",
+      errorType: "DUMMY_DOMAIN",
+      notice: "Penerima memakai alamat contoh, email tidak dikirim.",
+    };
+  }
+
+  const subject = generateEmailSubject(
+    pengajuan.nomor,
+    pengajuan.status,
+    redirectNoticeRecipient
+  );
+
+  const { text, html } = generateEmailContent({ pengajuan, appBaseUrl });
+
+  // Mode "log": simpan sebagai file HTML di folder .outbox/ (hanya non-production)
+  if (mode === "log") {
+    if (process.env.NODE_ENV === "production") {
+      return { status: "skipped" };
+    }
+
+    try {
+      const outboxDir = path.join(process.cwd(), ".outbox");
+      await fs.mkdir(outboxDir, { recursive: true });
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const safeId = recipient.id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 8);
+      const filename = `${timestamp}_${pengajuan.status}_${safeId}.html`;
+      const filePath = path.join(outboxDir, filename);
+
+      const fileContent = `<!-- OUTBOX LOG
+Penerima Asli: ${recipient.nama_lengkap} <${recipient.email}>
+Penerima Terkirim: ${activeRecipient}
+Subjek: ${subject}
+Tanggal: ${new Date().toISOString()}
+Status Kejadian: ${pengajuan.status}
+Pengajuan ID: ${pengajuan.id}
+-->
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>${escapeHtml(subject)}</title></head>
+<body>
+<div style="background:#f1f5f9;padding:12px;margin-bottom:16px;border-bottom:1px solid #cbd5e1;font-family:monospace;font-size:12px;">
+  <p><strong>Penerima Asli:</strong> ${escapeHtml(recipient.email)} (${escapeHtml(recipient.nama_lengkap)})</p>
+  <p><strong>Subjek:</strong> ${escapeHtml(subject)}</p>
+  <p><strong>Mode:</strong> LOG (Tidak dikirim ke internet)</p>
+</div>
+${html}
+<hr style="margin:30px 0;">
+<h3>Versi Teks Polos:</h3>
+<pre style="background:#f8fafc;padding:16px;border:1px solid #e2e8f0;white-space:pre-wrap;">${escapeHtml(text)}</pre>
+</body>
+</html>`;
+
+      await fs.writeFile(filePath, fileContent, "utf-8");
+      return { status: "logged" };
+    } catch {
+      console.error("Gagal menulis berkas outbox log: FILE_WRITE_ERROR");
+      return { status: "failed", errorType: "PROVIDER_ERROR" };
+    }
+  }
+
+  // Mode "kirim": kirim ke REST API Resend
+  if (mode === "kirim") {
+    const apiKey = process.env.RESEND_API_KEY?.trim();
+    const emailFrom = (
+      process.env.EMAIL_FROM || process.env.EMAIL_PENGIRIM
+    )?.trim();
+
+    if (!apiKey || !emailFrom) {
+      // Konfigurasi kurang, lewati pengiriman tanpa error
+      return { status: "skipped", errorType: "CONFIG_MISSING" };
+    }
+
+    // Idempotency-Key: terbentuk dari pengajuan id, status baru, dan penerima (maks 256 karakter)
+    const rawIdempotency = `pg-${pengajuan.id}-${pengajuan.status}-${activeRecipient}`
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, "_")
+      .slice(0, 255);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": rawIdempotency,
+        },
+        body: JSON.stringify({
+          from: emailFrom,
+          to: [activeRecipient],
+          subject,
+          html,
+          text,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          console.error("Gagal mengirim notifikasi email: RATE_LIMIT");
+          return {
+            status: "failed",
+            errorType: "RATE_LIMIT",
+            notice: "Notifikasi email tidak terkirim",
+          };
+        }
+
+        console.error("Gagal mengirim notifikasi email: PROVIDER_ERROR");
+        return {
+          status: "failed",
+          errorType: "PROVIDER_ERROR",
+          notice: "Notifikasi email tidak terkirim",
+        };
+      }
+
+      return { status: "sent" };
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        console.error("Gagal mengirim notifikasi email: TIMEOUT");
+        return {
+          status: "failed",
+          errorType: "TIMEOUT",
+          notice: "Notifikasi email tidak terkirim",
+        };
+      }
+
+      console.error("Gagal mengirim notifikasi email: NETWORK_ERROR");
+      return {
+        status: "failed",
+        errorType: "NETWORK_ERROR",
+        notice: "Notifikasi email tidak terkirim",
+      };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  return { status: "skipped" };
+}
+
+/**
+ * Orkestrasi pengiriman notifikasi pengajuan:
+ * - Menentukan penerima yang valid
+ * - Mengirim secara berurutan (sequential)
+ * - Mengembalikan catatan non-blok jika ada kegagalan atau alamat contoh dilewati
+ */
+export async function kirimNotifikasiPengajuan(params: {
+  pengajuan: PengajuanEmailData;
+  actorId: string;
+  pengajuProfile?: ProfileRecipient | null;
+  direkturProfiles?: ProfileRecipient[];
+}): Promise<KirimNotifikasiResult> {
+  const { pengajuan, actorId, pengajuProfile, direkturProfiles = [] } = params;
+
+  const recipients = filterEmailRecipients({
+    statusBaru: pengajuan.status,
+    actorId,
+    pengaju: pengajuProfile,
+    direkturList: direkturProfiles,
+  });
+
+  if (recipients.length === 0) {
+    return { success: true, count: 0 };
+  }
+
+  const appBaseUrl = normalizeAppBaseUrl(process.env.APP_BASE_URL);
+
+  let successCount = 0;
+  let notice: string | undefined = undefined;
+
+  // Kirim berurutan (bukan paralel) untuk menjaga kestabilan Netlify serverless & rate-limit
+  for (const recipient of recipients) {
+    const result = await sendSingleEmail({
+      recipient,
+      pengajuan,
+      appBaseUrl,
+    });
+
+    if (result.status === "sent" || result.status === "logged") {
+      successCount++;
+    }
+
+    if (result.notice && !notice) {
+      notice = result.notice;
+    }
+  }
+
+  return {
+    success: true,
+    count: successCount,
+    notice,
+  };
+}
