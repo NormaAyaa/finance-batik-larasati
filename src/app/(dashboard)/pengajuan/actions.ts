@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getFriendlyErrorMessage } from "@/lib/utils/errors";
 import { kirimNotifikasiPengajuan } from "@/lib/notifikasi-email";
+import {
+  formatPeringatanDuplikat,
+  type CekDuplikatPengajuanParams,
+  type HasilCekDuplikatPengajuan,
+} from "@/lib/pengajuan/duplikat";
 import type { StatusPengajuan } from "@/types/database";
 
 export interface TransisiActionResult {
@@ -353,4 +358,156 @@ export async function bayarPengajuanAction(params: {
     success: true,
     emailNotice,
   };
+}
+
+export interface CekDuplikatActionResult {
+  success: boolean;
+  error?: string;
+  data?: HasilCekDuplikatPengajuan;
+}
+
+/**
+ * Server Action: Pengecekan pengajuan duplikat untuk mencegah pengajuan ganda.
+ * Aturan & Batasan:
+ * 1. Menjaga sesi pengguna via cookies Supabase server sehingga auth.uid() tetap valid.
+ * 2. Hanya membaca data milik pengguna sendiri (pengaju_id = auth.uid()) dan mematuhi RLS.
+ * 3. Mengabaikan pengajuan yang berstatus 'ditolak' (karena pengajuan ditolak boleh diajukan ulang).
+ * 4. Mendukung excludeId saat form dalam mode edit agar tidak mendeteksi diri sendiri.
+ * 5. Prioritas pencocokan:
+ *    a. bukti_hash sama -> duplikat PASTI
+ *    b. tanggal_transaksi sama + jumlah sama -> duplikat KEMUNGKINAN
+ */
+export async function cekDuplikatPengajuanAction(
+  params: CekDuplikatPengajuanParams
+): Promise<CekDuplikatActionResult> {
+  const { buktiHash, pengajuId, tanggalTransaksi, jumlah, excludeId } = params;
+
+  // 1. Verifikasi Sesi Pengguna
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return {
+      success: false,
+      error: "Akses ditolak: Pengguna belum terautentikasi.",
+    };
+  }
+
+  // Patuhi keamanan: Cegah membaca data pengguna lain
+  if (pengajuId && pengajuId !== user.id) {
+    return {
+      success: false,
+      error: "Akses ditolak: Tidak dapat memeriksa data pengguna lain.",
+    };
+  }
+
+  const targetPengajuId = user.id;
+
+  try {
+    // 2. Prioritas 1: Duplikat PASTI berdasarkan bukti_hash
+    if (buktiHash && buktiHash.trim().length > 0) {
+      let queryHash = supabase
+        .from("pengajuan")
+        .select("id, nomor, status, tanggal_transaksi, jumlah, keterangan, bukti_hash, pengaju_id")
+        .eq("pengaju_id", targetPengajuId)
+        .eq("bukti_hash", buktiHash.trim())
+        .neq("status", "ditolak");
+
+      if (excludeId && Number.isInteger(excludeId) && excludeId > 0) {
+        queryHash = queryHash.neq("id", excludeId);
+      }
+
+      const { data: rowsHash, error: errHash } = await queryHash
+        .order("id", { ascending: false })
+        .limit(1);
+
+      if (errHash) {
+        return {
+          success: false,
+          error: getFriendlyErrorMessage(errHash),
+        };
+      }
+
+      if (rowsHash && rowsHash.length > 0) {
+        const item = rowsHash[0];
+        return {
+          success: true,
+          data: {
+            isDuplikat: true,
+            jenisKecocokan: "pasti",
+            pengajuan: {
+              id: item.id,
+              nomor: item.nomor,
+              status: item.status,
+              tanggal_transaksi: item.tanggal_transaksi,
+              jumlah: item.jumlah,
+              keterangan: item.keterangan,
+            },
+            pesanPeringatan: formatPeringatanDuplikat("pasti", item),
+          },
+        };
+      }
+    }
+
+    // 3. Prioritas 2: Duplikat KEMUNGKINAN berdasarkan tanggal_transaksi dan jumlah
+    if (tanggalTransaksi && typeof jumlah === "number" && jumlah > 0) {
+      let querySim = supabase
+        .from("pengajuan")
+        .select("id, nomor, status, tanggal_transaksi, jumlah, keterangan, bukti_hash, pengaju_id")
+        .eq("pengaju_id", targetPengajuId)
+        .eq("tanggal_transaksi", tanggalTransaksi)
+        .eq("jumlah", jumlah)
+        .neq("status", "ditolak");
+
+      if (excludeId && Number.isInteger(excludeId) && excludeId > 0) {
+        querySim = querySim.neq("id", excludeId);
+      }
+
+      const { data: rowsSim, error: errSim } = await querySim
+        .order("id", { ascending: false })
+        .limit(1);
+
+      if (errSim) {
+        return {
+          success: false,
+          error: getFriendlyErrorMessage(errSim),
+        };
+      }
+
+      if (rowsSim && rowsSim.length > 0) {
+        const item = rowsSim[0];
+        return {
+          success: true,
+          data: {
+            isDuplikat: true,
+            jenisKecocokan: "kemungkinan",
+            pengajuan: {
+              id: item.id,
+              nomor: item.nomor,
+              status: item.status,
+              tanggal_transaksi: item.tanggal_transaksi,
+              jumlah: item.jumlah,
+              keterangan: item.keterangan,
+            },
+            pesanPeringatan: formatPeringatanDuplikat("kemungkinan", item),
+          },
+        };
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        isDuplikat: false,
+      },
+    };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: getFriendlyErrorMessage(err),
+    };
+  }
 }

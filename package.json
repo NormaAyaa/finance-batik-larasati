@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "test": "npx --yes tsx --test tests/notifikasi-email.test.ts"
+    "lint": "eslint .",
+    "test": "npx --yes tsx --test tests/notifikasi-email.test.ts tests/cek-duplikat.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -4,7 +4,11 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { transisiStatusPengajuanAction } from "@/app/(dashboard)/pengajuan/actions";
+import {
+  transisiStatusPengajuanAction,
+  cekDuplikatPengajuanAction,
+} from "@/app/(dashboard)/pengajuan/actions";
+import { type HasilCekDuplikatPengajuan } from "@/lib/pengajuan/duplikat";
 import { getFriendlyErrorMessage } from "@/lib/utils/errors";
 import { formatRupiah } from "@/lib/utils/formatters";
 import type { JenisPengajuan, StatusPengajuan } from "@/types/database";
@@ -28,10 +32,18 @@ interface PengajuanFormProps {
     jumlah: number;
     keterangan: string;
     bukti_path: string | null;
+    bukti_hash?: string | null;
     status: StatusPengajuan;
     catatan_peninjau: string | null;
   };
   mode: "create" | "edit";
+}
+
+async function hitungSha256Client(fileToHash: File): Promise<string> {
+  const arrayBuffer = await fileToHash.arrayBuffer();
+  const hashBuffer = await window.crypto.subtle.digest("SHA-256", arrayBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 export function PengajuanForm({
@@ -77,12 +89,6 @@ export function PengajuanForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // State fitur AI ekstraksi nota
-  const [userTouchedTanggal, setUserTouchedTanggal] = useState<boolean>(
-    Boolean(initialData?.tanggal_transaksi)
-  );
-  const [userTouchedAkun, setUserTouchedAkun] = useState<boolean>(
-    Boolean(initialData?.akun_beban_id)
-  );
   const [isExtractingAi, setIsExtractingAi] = useState(false);
   const [aiNotification, setAiNotification] = useState<{
     type: "success" | "error" | "info";
@@ -107,25 +113,70 @@ export function PengajuanForm({
     akunBebanLabel?: string;
   }>({});
 
+  // State deteksi pengajuan duplikat
+  const [fileHash, setFileHash] = useState<string | null>(
+    initialData?.bukti_hash || null
+  );
+  const [duplicateResult, setDuplicateResult] = useState<HasilCekDuplikatPengajuan | null>(null);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
+  const [isKemiripanConfirmed, setIsKemiripanConfirmed] = useState(false);
+
+  const periksaDuplikat = async (
+    currentHash: string | null | undefined,
+    currentTanggal: string,
+    currentJumlah: number
+  ) => {
+    if (!currentHash && (!currentTanggal || currentJumlah <= 0)) {
+      setDuplicateResult(null);
+      return;
+    }
+
+    setIsCheckingDuplicate(true);
+    try {
+      const res = await cekDuplikatPengajuanAction({
+        buktiHash: currentHash || null,
+        pengajuId: userId,
+        tanggalTransaksi: currentTanggal || null,
+        jumlah: currentJumlah > 0 ? currentJumlah : null,
+        excludeId: initialData?.id,
+      });
+
+      if (res.success && res.data) {
+        setDuplicateResult(res.data.isDuplikat ? res.data : null);
+        if (!res.data.isDuplikat) {
+          setIsKemiripanConfirmed(false);
+        }
+      }
+    } catch (err) {
+      console.error("Gagal memeriksa duplikat:", err);
+    } finally {
+      setIsCheckingDuplicate(false);
+    }
+  };
+
   const applyAiSuggestion = (
     field: "tanggal" | "jumlah" | "keterangan" | "akunBeban"
   ) => {
     if (field === "tanggal" && aiSuggestions.tanggal) {
-      setTanggalTransaksi(aiSuggestions.tanggal);
+      const nextTanggal = aiSuggestions.tanggal;
+      setTanggalTransaksi(nextTanggal);
       setAiAppliedFields((prev) => ({ ...prev, tanggal: true }));
       setAiSuggestions((prev) => {
         const copy = { ...prev };
         delete copy.tanggal;
         return copy;
       });
+      periksaDuplikat(fileHash, nextTanggal, parseInt(jumlah, 10) || 0);
     } else if (field === "jumlah" && aiSuggestions.jumlah) {
-      setJumlah(String(aiSuggestions.jumlah));
+      const nextJumlah = aiSuggestions.jumlah;
+      setJumlah(String(nextJumlah));
       setAiAppliedFields((prev) => ({ ...prev, jumlah: true }));
       setAiSuggestions((prev) => {
         const copy = { ...prev };
         delete copy.jumlah;
         return copy;
       });
+      periksaDuplikat(fileHash, tanggalTransaksi, nextJumlah);
     } else if (field === "keterangan" && aiSuggestions.keterangan) {
       setKeterangan(aiSuggestions.keterangan);
       setAiAppliedFields((prev) => ({ ...prev, keterangan: true }));
@@ -233,6 +284,14 @@ export function PengajuanForm({
           message: `Ekstraksi AI selesai (Tingkat keyakinan: ${keyakinan}). ${filledCount} kolom berhasil diisi otomatis.${warningText} Silakan periksa kembali sebelum menyimpan.`,
         });
       }
+
+      // Periksa duplikasi setelah ekstraksi AI mengisi tanggal/jumlah
+      const nextTanggal = tanggal || tanggalTransaksi;
+      const nextJumlah =
+        aiJumlah && aiJumlah >= 10000 && aiJumlah <= 25000000
+          ? aiJumlah
+          : parseInt(jumlah, 10) || 0;
+      await periksaDuplikat(fileHash, nextTanggal, nextJumlah);
     } catch {
       setAiNotification({
         type: "error",
@@ -278,6 +337,17 @@ export function PengajuanForm({
         return "Format file bukti harus berupa JPG, PNG, atau PDF.";
       }
     }
+
+    // Validasi pencegahan duplikasi saat pengiriman
+    if (isSending && duplicateResult?.isDuplikat) {
+      if (duplicateResult.jenisKecocokan === "pasti") {
+        return "Pengajuan tidak dapat dikirim karena berkas nota ini terdeteksi duplikat identik dari pengajuan lain.";
+      }
+      if (duplicateResult.jenisKecocokan === "kemungkinan" && !isKemiripanConfirmed) {
+        return "Pengajuan serupa terdeteksi. Harap centang konfirmasi bahwa transaksi ini bukan pengajuan ganda sebelum mengirim.";
+      }
+    }
+
     return null;
   };
 
@@ -346,6 +416,7 @@ export function PengajuanForm({
             jumlah: parsedJumlah,
             keterangan: keterangan.trim(),
             bukti_path: finalBuktiPath,
+            bukti_hash: fileHash,
             status: "draf", // Selalu draf saat insert (sesuai RLS pengajuan_insert_pemilik)
           })
           .select("id")
@@ -369,6 +440,7 @@ export function PengajuanForm({
             jumlah: parsedJumlah,
             keterangan: keterangan.trim(),
             bukti_path: finalBuktiPath,
+            bukti_hash: fileHash,
           })
           .eq("id", initialData.id);
 
@@ -485,6 +557,55 @@ export function PengajuanForm({
         </div>
       )}
 
+      {/* Banner Peringatan Pengajuan Duplikat */}
+      {duplicateResult?.isDuplikat && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className={`rounded-xl border p-5 text-sm sm:text-base ${
+            duplicateResult.jenisKecocokan === "pasti"
+              ? "border-rose-500/50 bg-gradient-to-r from-rose-950/50 to-[#141210] text-rose-200"
+              : "border-amber-500/50 bg-gradient-to-r from-amber-950/40 to-[#141210] text-amber-200"
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            <span aria-hidden="true" className="text-xl shrink-0">
+              {duplicateResult.jenisKecocokan === "pasti" ? "🚫" : "⚠️"}
+            </span>
+            <div className="space-y-2 flex-1">
+              <p className="font-bold text-base flex items-center gap-2">
+                {duplicateResult.jenisKecocokan === "pasti"
+                  ? "Peringatan: Nota Duplikat Terdeteksi!"
+                  : "Perhatian: Kemungkinan Pengajuan Serupa"}
+              </p>
+              <p className="leading-relaxed">
+                {duplicateResult.pesanPeringatan}
+              </p>
+
+              {duplicateResult.jenisKecocokan === "pasti" ? (
+                <div className="rounded-lg bg-rose-950/40 border border-rose-500/30 p-3 text-xs sm:text-sm text-rose-300">
+                  Tombol <strong>Kirim Pengajuan</strong> diblokir untuk mencegah dobel klaim/reimburse pada nota yang sama. Harap gunakan nota asli yang valid atau batalkan bila tidak diperlukan.
+                </div>
+              ) : (
+                <div className="pt-1.5">
+                  <label className="flex items-start gap-2.5 cursor-pointer bg-amber-950/40 border border-amber-500/30 p-3 rounded-lg text-xs sm:text-sm text-amber-100 hover:bg-amber-950/60 transition">
+                    <input
+                      type="checkbox"
+                      checked={isKemiripanConfirmed}
+                      onChange={(e) => setIsKemiripanConfirmed(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-amber-600 text-amber-500 focus:ring-amber-400 [color-scheme:dark]"
+                    />
+                    <span>
+                      <strong>Konfirmasi:</strong> Saya mengonfirmasi bahwa ini adalah transaksi yang berbeda (bukan pengajuan ganda).
+                    </span>
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -586,9 +707,10 @@ export function PengajuanForm({
             max={todayStr}
             value={tanggalTransaksi}
             onChange={(e) => {
-              setUserTouchedTanggal(true);
-              setTanggalTransaksi(e.target.value);
+              const val = e.target.value;
+              setTanggalTransaksi(val);
               setAiAppliedFields((prev) => ({ ...prev, tanggal: false }));
+              periksaDuplikat(fileHash, val, parseInt(jumlah, 10) || 0);
             }}
             required
             className="w-full px-4 py-3 text-sm sm:text-base rounded-xl border border-amber-900/40 bg-[#141210] text-[#fdfaf6] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 [color-scheme:dark]"
@@ -627,7 +749,6 @@ export function PengajuanForm({
             id="akun_beban_id"
             value={akunBebanId}
             onChange={(e) => {
-              setUserTouchedAkun(true);
               setAkunBebanId(Number(e.target.value));
               setAiAppliedFields((prev) => ({ ...prev, akunBeban: false }));
             }}
@@ -689,8 +810,10 @@ export function PengajuanForm({
               step={1}
               value={jumlah}
               onChange={(e) => {
-                setJumlah(e.target.value);
+                const val = e.target.value;
+                setJumlah(val);
                 setAiAppliedFields((prev) => ({ ...prev, jumlah: false }));
+                periksaDuplikat(fileHash, tanggalTransaksi, parseInt(val, 10) || 0);
               }}
               placeholder="10000 s/d 25000000"
               required
@@ -789,9 +912,31 @@ export function PengajuanForm({
             type="file"
             disabled={isSubmitting}
             accept="image/jpeg,image/png,application/pdf"
-            onChange={(e) => {
+            onChange={async (e) => {
               const selected = e.target.files?.[0] || null;
               setFile(selected);
+              setIsKemiripanConfirmed(false);
+
+              if (selected) {
+                try {
+                  const hash = await hitungSha256Client(selected);
+                  setFileHash(hash);
+                  await periksaDuplikat(
+                    hash,
+                    tanggalTransaksi,
+                    parseInt(jumlah, 10) || 0
+                  );
+                } catch (err) {
+                  console.error("Gagal menghitung hash berkas:", err);
+                }
+              } else {
+                setFileHash(initialData?.bukti_hash || null);
+                await periksaDuplikat(
+                  initialData?.bukti_hash || null,
+                  tanggalTransaksi,
+                  parseInt(jumlah, 10) || 0
+                );
+              }
             }}
             className="block w-full text-sm sm:text-base text-[#a89f91] file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-amber-950/70 file:text-amber-300 hover:file:bg-amber-900/70 cursor-pointer border border-amber-900/40 rounded-xl p-1.5 bg-[#141210] disabled:opacity-50 disabled:pointer-events-none"
           />
@@ -858,18 +1003,39 @@ export function PengajuanForm({
               : "Simpan sebagai Draf"}
           </button>
 
-          {/* Tombol Kirim Pengajuan */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn-3d-gold w-full sm:w-auto px-6 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
-          >
-            {isSubmitting && actionType === "kirim"
-              ? "Mengirim..."
-              : mode === "edit"
-              ? "Kirim Ulang Pengajuan"
-              : "Kirim Pengajuan"}
-          </button>
+          {/* Tombol Kirim Pengajuan (Diblokir jika duplikat pasti atau belum konfirmasi kemiripan) */}
+          {(() => {
+            const isPastiDuplikat = Boolean(duplicateResult?.isDuplikat && duplicateResult.jenisKecocokan === "pasti");
+            const isKemiripanUnconfirmed = Boolean(duplicateResult?.isDuplikat && duplicateResult.jenisKecocokan === "kemungkinan" && !isKemiripanConfirmed);
+            const isSendBlocked = isSubmitting || isCheckingDuplicate || isPastiDuplikat || isKemiripanUnconfirmed;
+
+            return (
+              <button
+                type="submit"
+                disabled={isSendBlocked}
+                title={
+                  isPastiDuplikat
+                    ? "Pengiriman diblokir karena nota duplikat"
+                    : isKemiripanUnconfirmed
+                    ? "Centang konfirmasi pengajuan serupa di atas sebelum mengirim"
+                    : undefined
+                }
+                className={`btn-3d-gold w-full sm:w-auto px-6 py-2.5 text-sm sm:text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none ${
+                  isPastiDuplikat ? "!border-rose-700/60 !from-rose-950 !to-rose-900" : ""
+                }`}
+              >
+                {isSubmitting && actionType === "kirim"
+                  ? "Mengirim..."
+                  : isCheckingDuplicate
+                  ? "Memeriksa Duplikat..."
+                  : isPastiDuplikat
+                  ? "🚫 Terdeteksi Duplikat"
+                  : mode === "edit"
+                  ? "Kirim Ulang Pengajuan"
+                  : "Kirim Pengajuan"}
+              </button>
+            );
+          })()}
         </div>
       </form>
     </div>

@@ -171,6 +171,7 @@ export interface Database {
           jumlah: number;
           keterangan: string;
           bukti_path: string | null;
+          bukti_hash: string | null;
           status: StatusPengajuan;
           catatan_peninjau: string | null;
           diverifikasi_oleh: string | null;
@@ -193,6 +194,7 @@ export interface Database {
           jumlah: number;
           keterangan: string;
           bukti_path?: string | null;
+          bukti_hash?: string | null;
           status?: StatusPengajuan;
           catatan_peninjau?: string | null;
           diverifikasi_oleh?: string | null;
@@ -215,6 +217,7 @@ export interface Database {
           jumlah?: number;
           keterangan?: string;
           bukti_path?: string | null;
+          bukti_hash?: string | null;
           status?: StatusPengajuan;
           catatan_peninjau?: string | null;
           diverifikasi_oleh?: string | null;

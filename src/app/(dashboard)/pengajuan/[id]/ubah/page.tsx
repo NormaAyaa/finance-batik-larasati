@@ -41,6 +41,7 @@ export default async function UbahPengajuanPage({ params }: PageProps) {
       jumlah,
       keterangan,
       bukti_path,
+      bukti_hash,
       status,
       catatan_peninjau
     `)
