@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { PeranPengguna } from "@/types/database";
+import { simpanProfilAction } from "./actions";
 
 interface LengkapiProfilFormProps {
   initialEmail: string;
@@ -57,22 +58,32 @@ export function LengkapiProfilForm({
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/lengkapi-profil", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nama_lengkap: namaLengkap,
-          jabatan,
-          peran,
-        }),
+      // Prioritaskan Server Action untuk menghindari masalah desinkronisasi cookie middleware
+      const result = await simpanProfilAction({
+        nama_lengkap: namaLengkap,
+        jabatan,
+        peran,
       });
 
-      const data = await res.json();
+      if (result.error) {
+        // Fallback coba ke API route jika Server Action mengembalikan error
+        console.warn("[lengkapi-profil] Server action notice, mencoba fallback API:", result.error);
+        const res = await fetch("/api/auth/lengkapi-profil", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nama_lengkap: namaLengkap,
+            jabatan,
+            peran,
+          }),
+        });
 
-      if (!res.ok) {
-        setErrorMessage(data.error || "Gagal melengkapi profil akun.");
-        setLoading(false);
-        return;
+        const data = await res.json();
+        if (!res.ok) {
+          setErrorMessage(data.error || result.error || "Gagal melengkapi profil akun.");
+          setLoading(false);
+          return;
+        }
       }
 
       setSuccessMessage(
@@ -82,7 +93,7 @@ export function LengkapiProfilForm({
       setTimeout(() => {
         router.push(nextTarget);
         router.refresh();
-      }, 1200);
+      }, 1000);
     } catch (err: unknown) {
       console.error("Gagal melengkapi profil:", err);
       setErrorMessage("Terjadi kendala koneksi ke server. Silakan coba kembali.");

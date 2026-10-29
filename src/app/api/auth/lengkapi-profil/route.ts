@@ -3,8 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PeranPengguna } from "@/types/database";
 
-// Sesuai aturan: Pendaftaran mandiri (termasuk via Google) HANYA untuk staf dan akuntan
-const ALLOWED_ROLES: PeranPengguna[] = ["staf", "akuntan"];
 
 export async function POST(request: Request) {
   try {
@@ -14,6 +12,10 @@ export async function POST(request: Request) {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
+
+    if (userError) {
+      console.error("[lengkapi-profil] userError details:", userError);
+    }
 
     if (userError || !user || !user.email) {
       return NextResponse.json(

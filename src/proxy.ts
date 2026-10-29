@@ -3,6 +3,16 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // 1. Rute auth internal (/auth/), rute API publik (/api/auth/), dan /api/ekstrak-nota tidak dicegat
+  if (
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/api/auth/") ||
+    pathname === "/api/ekstrak-nota"
+  ) {
+    return NextResponse.next();
+  }
+
   const { supabaseResponse, user } = await updateSession(request);
 
   // Helper untuk mempertahankan cookies Supabase SSR saat melakukan redirect
@@ -13,15 +23,6 @@ export async function proxy(request: NextRequest) {
     });
     return redirectResponse;
   };
-
-  // 1. Rute auth internal (/auth/), rute API publik (/api/auth/), dan /api/ekstrak-nota tidak dicegat
-  if (
-    pathname.startsWith("/auth/") ||
-    pathname.startsWith("/api/auth/") ||
-    pathname === "/api/ekstrak-nota"
-  ) {
-    return supabaseResponse;
-  }
 
   // 2. Halaman publik /login dan /register: jika sudah terautentikasi, langsung arahkan ke /dashboard
   if (pathname === "/login" || pathname === "/register") {

@@ -36,14 +36,17 @@ export async function GET(request: NextRequest) {
   const safeTarget = sanitizeRedirectUrl(rawNext);
 
   // Dapatkan base URL yang akurat (mendukung reverse proxy / custom domain)
+  const isLocalhost =
+    request.nextUrl.hostname === "localhost" ||
+    request.nextUrl.hostname === "127.0.0.1";
   const forwardedHost = request.headers.get("x-forwarded-host");
   const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
   const primaryForwardedHost = forwardedHost?.split(",")[0]?.trim();
-  const baseUrl =
-    process.env.APP_BASE_URL ||
-    (primaryForwardedHost
-      ? `${forwardedProto}://${primaryForwardedHost}`
-      : request.nextUrl.origin);
+  const baseUrl = isLocalhost
+    ? request.nextUrl.origin
+    : (primaryForwardedHost
+        ? `${forwardedProto}://${primaryForwardedHost}`
+        : process.env.APP_BASE_URL || request.nextUrl.origin);
 
   // 1. Tangani jika ada error langsung dari provider OAuth (Google / Supabase)
   if (oauthError || oauthErrorDesc) {
