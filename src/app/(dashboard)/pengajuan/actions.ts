@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getFriendlyErrorMessage } from "@/lib/utils/errors";
-import { kirimNotifikasiPengajuan } from "@/lib/notifikasi-email";
+import { kirimNotifikasiPengajuan, type ProfileRecipient } from "@/lib/notifikasi-email";
+import { getActiveProfilesByRoles, getProfileById } from "@/lib/notifikasi-server";
+import { BUSINESS_RULES } from "@/lib/constants/rules";
 import {
   formatPeringatanDuplikat,
   type CekDuplikatPengajuanParams,
@@ -101,8 +103,130 @@ export async function transisiStatusPengajuanAction(params: {
   let emailNotice: string | null = null;
 
   try {
-    if (
-      pengajuan.status === "disetujui" ||
+    // Ambil peran pelaku aksi saat ini
+    const { data: actorProfile } = await supabase
+      .from("profiles")
+      .select("id, peran")
+      .eq("id", user.id)
+      .maybeSingle();
+    const actorRole = actorProfile?.peran;
+
+    // Helper untuk mengambil profil pengaju dengan fallback admin client jika terhalang RLS
+    const fetchPengajuProfile = async () => {
+      const { data: pProfile, error: pErr } = await supabase
+        .from("profiles")
+        .select("id, nama_lengkap, email, aktif")
+        .eq("id", pengajuan.pengaju_id)
+        .maybeSingle();
+
+      if (pErr || !pProfile) {
+        return await getProfileById(pengajuan.pengaju_id);
+      }
+      return pProfile;
+    };
+
+    if (pengajuan.status === "diajukan") {
+      console.log("[pengajuan:transisi] Memproses notifikasi email pengajuan baru (diajukan):", {
+        pengajuanId: pengajuan.id,
+        nomor: pengajuan.nomor,
+        actorId: user.id,
+        jumlah: pengajuan.jumlah,
+      });
+
+      // Ambil profil Akuntan dan Direktur via Admin Client (bypass RLS)
+      const { profiles: recipientProfiles, errorNotice: rolesErrorNotice } =
+        await getActiveProfilesByRoles(["akuntan", "direktur"]);
+
+      if (rolesErrorNotice && recipientProfiles.length === 0) {
+        emailNotice = rolesErrorNotice;
+      } else {
+        const akuntanProfiles = recipientProfiles.filter((p) => p.peran === "akuntan");
+        const direkturProfiles = recipientProfiles.filter((p) => p.peran === "direktur");
+
+        const notifResult = await kirimNotifikasiPengajuan({
+          pengajuan: {
+            id: pengajuan.id,
+            nomor: pengajuan.nomor,
+            jenis: pengajuan.jenis,
+            jumlah: pengajuan.jumlah,
+            status: pengajuan.status,
+            catatan_peninjau: pengajuan.catatan_peninjau,
+            updated_at: pengajuan.diajukan_pada || pengajuan.dibuat_pada || new Date().toISOString(),
+          },
+          actorId: user.id,
+          akuntanProfiles,
+          direkturProfiles,
+          actorRole,
+        });
+
+        console.log("[pengajuan:transisi] Hasil pengiriman notifikasi diajukan:", {
+          success: notifResult.success,
+          count: notifResult.count,
+          notice: notifResult.notice ?? "-",
+        });
+
+        if (notifResult.notice) {
+          emailNotice = notifResult.notice;
+        } else {
+          emailNotice = notifResult.success
+            ? "Notifikasi email dilewati"
+            : "Notifikasi email tidak terkirim";
+        }
+      }
+    } else if (pengajuan.status === "disetujui") {
+      console.log("[pengajuan:transisi] Memproses notifikasi email status disetujui:", {
+        pengajuanId: pengajuan.id,
+        nomor: pengajuan.nomor,
+        pengajuId: pengajuan.pengaju_id,
+        penyetujuId: user.id,
+        actorRole,
+      });
+
+      const pengajuProfile = await fetchPengajuProfile();
+      const threshold = BUSINESS_RULES.SUBMISSION.DIRECTOR_APPROVAL_THRESHOLD;
+      const isApprovedByDirector =
+        actorRole === "direktur" || pengajuan.jumlah > threshold;
+
+      let akuntanProfiles: ProfileRecipient[] = [];
+      if (isApprovedByDirector) {
+        const { profiles: akuntanList, errorNotice: akuntanErr } =
+          await getActiveProfilesByRoles(["akuntan"]);
+        if (akuntanErr && akuntanList.length === 0) {
+          console.error("[pengajuan:transisi] Peringatan pembacaan profil akuntan:", akuntanErr);
+        }
+        akuntanProfiles = akuntanList;
+      }
+
+      const notifResult = await kirimNotifikasiPengajuan({
+        pengajuan: {
+          id: pengajuan.id,
+          nomor: pengajuan.nomor,
+          jenis: pengajuan.jenis,
+          jumlah: pengajuan.jumlah,
+          status: pengajuan.status,
+          catatan_peninjau: pengajuan.catatan_peninjau,
+          updated_at: pengajuan.disetujui_pada || pengajuan.dibuat_pada || new Date().toISOString(),
+        },
+        actorId: user.id,
+        pengajuProfile,
+        akuntanProfiles,
+        actorRole,
+      });
+
+      console.log("[pengajuan:transisi] Hasil pengiriman notifikasi disetujui:", {
+        success: notifResult.success,
+        count: notifResult.count,
+        notice: notifResult.notice ?? "-",
+      });
+
+      if (notifResult.notice) {
+        emailNotice = notifResult.notice;
+      } else {
+        emailNotice = notifResult.success
+          ? "Notifikasi email dilewati"
+          : "Notifikasi email tidak terkirim";
+      }
+    } else if (
       pengajuan.status === "perlu_revisi" ||
       pengajuan.status === "ditolak"
     ) {
@@ -114,21 +238,7 @@ export async function transisiStatusPengajuanAction(params: {
         penyetujuId: user.id,
       });
 
-      // Baca profil pengaju dari server
-      const { data: pengajuProfile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id, nama_lengkap, email, aktif")
-        .eq("id", pengajuan.pengaju_id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error("[pengajuan:transisi] Error membaca profil pengaju:", profileError.message);
-      }
-
-      console.log("[pengajuan:transisi] Profil pengaju:", {
-        ditemukan: !!pengajuProfile,
-        aktif: pengajuProfile?.aktif ?? false,
-      });
+      const pengajuProfile = await fetchPengajuProfile();
 
       const notifResult = await kirimNotifikasiPengajuan({
         pengajuan: {
@@ -138,9 +248,11 @@ export async function transisiStatusPengajuanAction(params: {
           jumlah: pengajuan.jumlah,
           status: pengajuan.status,
           catatan_peninjau: pengajuan.catatan_peninjau,
+          updated_at: pengajuan.diverifikasi_pada || pengajuan.dibuat_pada || new Date().toISOString(),
         },
         actorId: user.id,
         pengajuProfile,
+        actorRole,
       });
 
       console.log("[pengajuan:transisi] Hasil pengiriman notifikasi pengaju:", {
@@ -150,11 +262,11 @@ export async function transisiStatusPengajuanAction(params: {
       });
 
       if (notifResult.notice) {
-        emailNotice = `[v2] ${notifResult.notice}`;
+        emailNotice = notifResult.notice;
       } else {
         emailNotice = notifResult.success
-          ? "[v2] Notifikasi email dilewati"
-          : "[v2] Notifikasi email tidak terkirim";
+          ? "Notifikasi email dilewati"
+          : "Notifikasi email tidak terkirim";
       }
     } else if (pengajuan.status === "menunggu_direktur") {
       console.log("[pengajuan:transisi] Memproses notifikasi email eskalasi Direktur:", {
@@ -163,48 +275,47 @@ export async function transisiStatusPengajuanAction(params: {
         actorId: user.id,
       });
 
-      // Baca semua profil Direktur aktif dari server
-      const { data: direkturProfiles, error: dirError } = await supabase
-        .from("profiles")
-        .select("id, nama_lengkap, email, aktif")
-        .eq("peran", "direktur")
-        .eq("aktif", true);
+      // Baca semua profil Direktur aktif via admin client (bypass RLS)
+      const { profiles: direkturProfiles, errorNotice: dirErrorNotice } =
+        await getActiveProfilesByRoles(["direktur"]);
 
-      if (dirError) {
-        console.error("[pengajuan:transisi] Error membaca profil Direktur:", dirError.message);
-      }
-
-      const notifResult = await kirimNotifikasiPengajuan({
-        pengajuan: {
-          id: pengajuan.id,
-          nomor: pengajuan.nomor,
-          jenis: pengajuan.jenis,
-          jumlah: pengajuan.jumlah,
-          status: pengajuan.status,
-          catatan_peninjau: pengajuan.catatan_peninjau,
-        },
-        actorId: user.id,
-        direkturProfiles: direkturProfiles || [],
-      });
-
-      console.log("[pengajuan:transisi] Hasil pengiriman notifikasi direktur:", {
-        success: notifResult.success,
-        count: notifResult.count,
-        notice: notifResult.notice ?? "-",
-      });
-
-      if (notifResult.notice) {
-        emailNotice = `[v2] ${notifResult.notice}`;
+      if (dirErrorNotice && direkturProfiles.length === 0) {
+        emailNotice = dirErrorNotice;
       } else {
-        emailNotice = notifResult.success
-          ? "[v2] Notifikasi email dilewati"
-          : "[v2] Notifikasi email tidak terkirim";
+        const notifResult = await kirimNotifikasiPengajuan({
+          pengajuan: {
+            id: pengajuan.id,
+            nomor: pengajuan.nomor,
+            jenis: pengajuan.jenis,
+            jumlah: pengajuan.jumlah,
+            status: pengajuan.status,
+            catatan_peninjau: pengajuan.catatan_peninjau,
+            updated_at: pengajuan.diverifikasi_pada || pengajuan.diajukan_pada || pengajuan.dibuat_pada || new Date().toISOString(),
+          },
+          actorId: user.id,
+          direkturProfiles,
+          actorRole,
+        });
+
+        console.log("[pengajuan:transisi] Hasil pengiriman notifikasi direktur:", {
+          success: notifResult.success,
+          count: notifResult.count,
+          notice: notifResult.notice ?? "-",
+        });
+
+        if (notifResult.notice) {
+          emailNotice = notifResult.notice;
+        } else {
+          emailNotice = notifResult.success
+            ? "Notifikasi email dilewati"
+            : "Notifikasi email tidak terkirim";
+        }
       }
     }
   } catch (emailErr) {
     // Non-blocking: kegagalan email tidak boleh membatalkan perpindahan status
     console.error("[pengajuan:transisi] Pengecualian pada proses notifikasi email:", emailErr);
-    emailNotice = "[v2] Notifikasi email tidak terkirim";
+    emailNotice = "Notifikasi email tidak terkirim";
   }
 
   // 5. Revalidasi cache halaman terkait
@@ -307,14 +418,17 @@ export async function bayarPengajuanAction(params: {
       actorId: user.id,
     });
 
-    const { data: pengajuProfile, error: profileError } = await supabase
+    let pengajuProfile = null;
+    const { data: pProfile, error: profileError } = await supabase
       .from("profiles")
       .select("id, nama_lengkap, email, aktif")
       .eq("id", pengajuan.pengaju_id)
       .maybeSingle();
 
-    if (profileError) {
-      console.error("[pengajuan:bayar] Error membaca profil pengaju:", profileError.message);
+    if (profileError || !pProfile) {
+      pengajuProfile = await getProfileById(pengajuan.pengaju_id);
+    } else {
+      pengajuProfile = pProfile;
     }
 
     const notifResult = await kirimNotifikasiPengajuan({
@@ -325,6 +439,7 @@ export async function bayarPengajuanAction(params: {
         jumlah: pengajuan.jumlah,
         status: pengajuan.status,
         catatan_peninjau: pengajuan.catatan_peninjau,
+        updated_at: pengajuan.dibayar_pada || pengajuan.dibuat_pada || new Date().toISOString(),
       },
       actorId: user.id,
       pengajuProfile,
@@ -337,15 +452,15 @@ export async function bayarPengajuanAction(params: {
     });
 
     if (notifResult.notice) {
-      emailNotice = `[v2] ${notifResult.notice}`;
+      emailNotice = notifResult.notice;
     } else {
       emailNotice = notifResult.success
-        ? "[v2] Notifikasi email dilewati"
-        : "[v2] Notifikasi email tidak terkirim";
+        ? "Notifikasi email dilewati"
+        : "Notifikasi email tidak terkirim";
     }
   } catch (emailErr) {
     console.error("[pengajuan:bayar] Pengecualian pada proses notifikasi email:", emailErr);
-    emailNotice = "[v2] Notifikasi email tidak terkirim";
+    emailNotice = "Notifikasi email tidak terkirim";
   }
 
   // 5. Revalidasi cache

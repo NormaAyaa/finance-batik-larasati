@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import crypto from "node:crypto";
 import { formatRupiah } from "@/lib/utils/formatters";
+import { BUSINESS_RULES } from "@/lib/constants/rules";
 import type { StatusPengajuan } from "@/types/database";
 
 export interface PengajuanEmailData {
@@ -10,13 +12,23 @@ export interface PengajuanEmailData {
   jumlah: number;
   status: StatusPengajuan;
   catatan_peninjau?: string | null;
+  updated_at?: string | null;
 }
+
+export type EmailRecipientContext =
+  | "pengaju"
+  | "akuntan_baru"
+  | "direktur_info"
+  | "akuntan_siap_bayar"
+  | "direktur_approval";
 
 export interface ProfileRecipient {
   id: string;
   nama_lengkap: string;
   email: string;
   aktif: boolean;
+  peran?: string;
+  context?: EmailRecipientContext;
 }
 
 export type EmailSendStatus = "sent" | "logged" | "skipped" | "failed";
@@ -124,39 +136,48 @@ export function getStatusLabel(status: StatusPengajuan): string {
 }
 
 /**
- * Membentuk subjek email berdasarkan status pengajuan.
+ * Membentuk subjek email berdasarkan status pengajuan dan konteks penerima.
  * Menghapus karakter baris baru (\r, \n) untuk mencegah email header injection.
  */
 export function generateEmailSubject(
   nomor: string | null,
   statusBaru: StatusPengajuan,
-  redirectOriginalRecipient?: string
+  redirectOriginalRecipient?: string,
+  context?: EmailRecipientContext
 ): string {
   const nomorStr = nomor ? nomor.trim() : "-";
-  let suffix = "";
+  let subject = "";
 
-  switch (statusBaru) {
-    case "disetujui":
-      suffix = "telah disetujui";
-      break;
-    case "perlu_revisi":
-      suffix = "perlu revisi";
-      break;
-    case "ditolak":
-      suffix = "ditolak";
-      break;
-    case "dibayar":
-      suffix = "sudah dibayar";
-      break;
-    case "menunggu_direktur":
-      suffix = "menunggu persetujuan Anda";
-      break;
-    default:
-      suffix = statusBaru;
-      break;
+  if (context === "akuntan_baru") {
+    subject = `[Larasati] Pengajuan ${nomorStr} baru diajukan, menunggu verifikasi Anda`;
+  } else if (context === "direktur_info") {
+    subject = `[Larasati] Pengajuan ${nomorStr} (di atas Rp 1.000.000) diajukan, menunggu verifikasi Akuntan`;
+  } else if (context === "akuntan_siap_bayar") {
+    subject = `[Larasati] Pengajuan ${nomorStr} disetujui Direktur, siap dibayar`;
+  } else {
+    let suffix = "";
+    switch (statusBaru) {
+      case "disetujui":
+        suffix = "telah disetujui";
+        break;
+      case "perlu_revisi":
+        suffix = "perlu revisi";
+        break;
+      case "ditolak":
+        suffix = "ditolak";
+        break;
+      case "dibayar":
+        suffix = "sudah dibayar";
+        break;
+      case "menunggu_direktur":
+        suffix = "menunggu persetujuan Anda";
+        break;
+      default:
+        suffix = statusBaru;
+        break;
+    }
+    subject = `[Larasati] Pengajuan ${nomorStr} ${suffix}`;
   }
-
-  let subject = `[Larasati] Pengajuan ${nomorStr} ${suffix}`;
 
   if (redirectOriginalRecipient) {
     subject = `[UJI untuk: ${redirectOriginalRecipient}] ${subject}`;
@@ -175,8 +196,9 @@ export function generateEmailSubject(
 export function generateEmailContent(params: {
   pengajuan: PengajuanEmailData;
   appBaseUrl: string;
+  context?: EmailRecipientContext;
 }): { text: string; html: string } {
-  const { pengajuan, appBaseUrl } = params;
+  const { pengajuan, appBaseUrl, context } = params;
 
   const nomorBersih = pengajuan.nomor ? escapeHtml(pengajuan.nomor) : "-";
   const jenisBersih = escapeHtml(pengajuan.jenis);
@@ -198,10 +220,29 @@ export function generateEmailContent(params: {
       </div>`
     : "";
 
+  let openingText = "Pemberitahuan perubahan status pengajuan keuangan CV Batik Larasati:";
+  let openingHtml = "Pemberitahuan perubahan status pengajuan keuangan Anda:";
+
+  if (context === "akuntan_baru") {
+    openingText = "Pemberitahuan pengajuan keuangan baru diajukan dan menunggu verifikasi Anda:";
+    openingHtml = "Pengajuan keuangan baru diajukan dan saat ini menunggu verifikasi Anda:";
+  } else if (context === "direktur_info") {
+    openingText =
+      "Pemberitahuan pengajuan keuangan di atas Rp 1.000.000 baru diajukan.\nPengajuan ini menunggu verifikasi Akuntan terlebih dahulu. Anda akan menerima notifikasi email kembali saat pengajuan diteruskan untuk disetujui.";
+    openingHtml =
+      "Pemberitahuan pengajuan keuangan di atas Rp 1.000.000 baru diajukan.<br>Pengajuan ini <strong>menunggu verifikasi Akuntan terlebih dahulu</strong>. Anda akan menerima email kembali saat pengajuan diteruskan untuk persetujuan Direktur.";
+  } else if (context === "akuntan_siap_bayar") {
+    openingText = "Pemberitahuan pengajuan keuangan telah disetujui oleh Direktur dan siap diproses pembayarannya:";
+    openingHtml = "Pengajuan keuangan telah disetujui oleh Direktur dan kini siap diproses pembayarannya:";
+  } else if (context === "direktur_approval") {
+    openingText = "Pemberitahuan pengajuan keuangan menunggu persetujuan Direktur:";
+    openingHtml = "Pengajuan keuangan memerlukan persetujuan Anda sebagai Direktur:";
+  }
+
   // Plain Text Body
   const text = `Halo,
 
-Pemberitahuan perubahan status pengajuan keuangan CV Batik Larasati:
+${openingText}
 
 Nomor Pengajuan: ${pengajuan.nomor || "-"}
 Jenis: ${pengajuan.jenis}
@@ -231,7 +272,7 @@ Email ini dikirim otomatis, mohon tidak membalas email ini.`;
     </tr>
     <tr>
       <td style="padding: 24px;">
-        <p style="margin-top: 0; font-size: 15px; color: #334155;">Pemberitahuan perubahan status pengajuan keuangan Anda:</p>
+        <p style="margin-top: 0; font-size: 15px; color: #334155;">${openingHtml}</p>
         
         <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="margin: 16px 0; border-collapse: collapse; font-size: 14px;">
           <tr style="border-bottom: 1px solid #f1f5f9;">
@@ -278,49 +319,135 @@ Email ini dikirim otomatis, mohon tidak membalas email ini.`;
 }
 
 /**
+ * Menghasilkan kunci idempotensi unik untuk Resend REST API.
+ * Format: pg-<sha256 hex 64 chars> (total 67 karakter).
+ * Dihitung atas kombinasi pengajuanId, status, konteks, updated_at, dan email penerima.
+ * Tidak dipotong dari belakang sehingga aman dari benturan 409 Resend.
+ */
+export function generateIdempotencyKey(params: {
+  pengajuanId: number;
+  status: string;
+  context?: string;
+  updatedAt?: string | null;
+  recipientEmail: string;
+}): string {
+  const { pengajuanId, status, context, updatedAt, recipientEmail } = params;
+  const contextStr = context || "default";
+  const updatedAtStr = updatedAt || "";
+  const rawKeyData = `${pengajuanId}|${status}|${contextStr}|${updatedAtStr}|${recipientEmail.trim().toLowerCase()}`;
+  const keyHash = crypto.createHash("sha256").update(rawKeyData).digest("hex");
+  return `pg-${keyHash}`;
+}
+
+/**
  * Memilih penerima email yang sah sesuai aturan bisnis:
- * (a) Ke PENGAJU saat status menjadi 'perlu_revisi', 'ditolak', atau 'dibayar'.
+ * (a) Ke PENGAJU saat status menjadi 'perlu_revisi', 'ditolak', 'dibayar', atau 'disetujui'.
  * (b) Ke seluruh DIREKTUR aktif saat status masuk 'menunggu_direktur'.
+ * (c) Saat status menjadi 'diajukan' (staf mengajukan):
+ *     - Ke seluruh AKUNTAN aktif (kecuali pelaku).
+ *     - Jika jumlah > DIRECTOR_APPROVAL_THRESHOLD (1_000_000), kirim juga ke seluruh DIREKTUR aktif (kecuali pelaku) sebagai informasi.
+ * (d) Saat status menjadi 'disetujui' dan yang menyetujui adalah Direktur (peran pelaku = 'direktur' atau jumlah > 1_000_000):
+ *     - Tetap kirim ke pengaju DAN kirim ke seluruh AKUNTAN aktif (kecuali pelaku).
+ *     - Jika pelaku adalah Akuntan yang menyetujui langsung (jumlah <= 1_000_000), Akuntan tidak menerima email.
  * - Jangan mengirim ke akun nonaktif.
  * - Jangan mengirim ke orang yang sama dengan pelaku perpindahan (actorId).
- *
- * CATATAN: status 'disetujui' kini juga mengirim email ke pengaju.
+ * - Buang duplikat berdasarkan id dan email.
  */
 export function filterEmailRecipients(params: {
   statusBaru: StatusPengajuan;
   actorId: string;
   pengaju?: ProfileRecipient | null;
   direkturList?: ProfileRecipient[];
+  akuntanList?: ProfileRecipient[];
+  jumlah?: number;
+  actorRole?: string;
 }): ProfileRecipient[] {
-  const { statusBaru, actorId, pengaju, direkturList = [] } = params;
+  const {
+    statusBaru,
+    actorId,
+    pengaju,
+    direkturList = [],
+    akuntanList = [],
+    jumlah,
+    actorRole,
+  } = params;
 
-  if (
-    statusBaru === "disetujui" ||
+  const candidates: ProfileRecipient[] = [];
+
+  // Aturan A: Status menjadi "diajukan"
+  if (statusBaru === "diajukan") {
+    // Kirim email ke SEMUA Akuntan aktif (kecuali pelaku)
+    for (const akuntan of akuntanList) {
+      if (akuntan.aktif && akuntan.id !== actorId) {
+        candidates.push({ ...akuntan, context: "akuntan_baru" });
+      }
+    }
+
+    // Jika jumlah > 1_000_000 (di atas threshold), kirim juga ke SEMUA Direktur aktif (kecuali pelaku)
+    const threshold = BUSINESS_RULES.SUBMISSION.DIRECTOR_APPROVAL_THRESHOLD;
+    if (jumlah !== undefined && jumlah > threshold) {
+      for (const direktur of direkturList) {
+        if (direktur.aktif && direktur.id !== actorId) {
+          candidates.push({ ...direktur, context: "direktur_info" });
+        }
+      }
+    }
+  }
+  // Aturan B: Status menjadi "disetujui"
+  else if (statusBaru === "disetujui") {
+    // Tetap kirim ke pengaju (jika ada, aktif, dan bukan pelaku)
+    if (pengaju && pengaju.aktif && pengaju.id !== actorId) {
+      candidates.push({ ...pengaju, context: "pengaju" });
+    }
+
+    // Yang menyetujui adalah Direktur: peran pelaku = direktur ATAU jumlah > 1_000_000
+    const threshold = BUSINESS_RULES.SUBMISSION.DIRECTOR_APPROVAL_THRESHOLD;
+    const isDirekturApproval =
+      actorRole === "direktur" || (jumlah !== undefined && jumlah > threshold);
+
+    if (isDirekturApproval) {
+      // Kirim ke SEMUA Akuntan aktif (kecuali pelaku)
+      for (const akuntan of akuntanList) {
+        if (akuntan.aktif && akuntan.id !== actorId) {
+          candidates.push({ ...akuntan, context: "akuntan_siap_bayar" });
+        }
+      }
+    }
+  }
+  // Status menunggu_direktur
+  else if (statusBaru === "menunggu_direktur") {
+    for (const direktur of direkturList) {
+      if (direktur.aktif && direktur.id !== actorId) {
+        candidates.push({ ...direktur, context: "direktur_approval" });
+      }
+    }
+  }
+  // Status perlu_revisi, ditolak, dibayar
+  else if (
     statusBaru === "perlu_revisi" ||
     statusBaru === "ditolak" ||
     statusBaru === "dibayar"
   ) {
-    if (!pengaju) {
-      console.log("[email] dilewati: profil pengaju tidak ada", { status: statusBaru });
-      return [];
+    if (pengaju && pengaju.aktif && pengaju.id !== actorId) {
+      candidates.push({ ...pengaju, context: "pengaju" });
     }
-    if (!pengaju.aktif) {
-      console.log("[email] dilewati: akun pengaju nonaktif", { status: statusBaru });
-      return [];
-    }
-    if (pengaju.id === actorId) {
-      console.log("[email] dilewati: pelaku sama dengan pengaju", { status: statusBaru });
-      return [];
-    }
-    return [pengaju];
   }
 
-  if (statusBaru === "menunggu_direktur") {
-    return direkturList.filter((d) => d.aktif && d.id !== actorId);
+  // Deduplikasi berdasarkan id dan email
+  const result: ProfileRecipient[] = [];
+  const seenIds = new Set<string>();
+  const seenEmails = new Set<string>();
+
+  for (const c of candidates) {
+    const emailNorm = c.email.trim().toLowerCase();
+    if (!seenIds.has(c.id) && !seenEmails.has(emailNorm)) {
+      seenIds.add(c.id);
+      seenEmails.add(emailNorm);
+      result.push(c);
+    }
   }
 
-  console.log("[email] dilewati: status tidak memicu email", { status: statusBaru });
-  return [];
+  return result;
 }
 
 /**
@@ -422,10 +549,15 @@ export async function sendSingleEmail(params: {
   const subject = generateEmailSubject(
     pengajuan.nomor,
     pengajuan.status,
-    redirectNoticeRecipient
+    redirectNoticeRecipient,
+    recipient.context
   );
 
-  const { text, html } = generateEmailContent({ pengajuan, appBaseUrl });
+  const { text, html } = generateEmailContent({
+    pengajuan,
+    appBaseUrl,
+    context: recipient.context,
+  });
 
   // Mode "log": simpan sebagai file HTML di folder .outbox/ (hanya non-production)
   if (mode === "log") {
@@ -494,11 +626,14 @@ ${html}
       };
     }
 
-    // Idempotency-Key: terbentuk dari pengajuan id, status baru, dan penerima (maks 256 karakter)
-    const rawIdempotency = `pg-${pengajuan.id}-${pengajuan.status}-${activeRecipient}`
-      .toLowerCase()
-      .replace(/[^a-z0-9_-]/g, "_")
-      .slice(0, 255);
+    // Idempotency-Key: hash SHA-256 heksadesimal 64 karakter (format pg-<hash>)
+    const rawIdempotency = generateIdempotencyKey({
+      pengajuanId: pengajuan.id,
+      status: pengajuan.status,
+      context: recipient.context,
+      updatedAt: pengajuan.updated_at,
+      recipientEmail: activeRecipient,
+    });
 
     const controller = new AbortController();
     // Timeout dinaikkan ke 8 detik karena cold start serverless bisa lambat
@@ -610,8 +745,17 @@ export async function kirimNotifikasiPengajuan(params: {
   actorId: string;
   pengajuProfile?: ProfileRecipient | null;
   direkturProfiles?: ProfileRecipient[];
+  akuntanProfiles?: ProfileRecipient[];
+  actorRole?: string;
 }): Promise<KirimNotifikasiResult> {
-  const { pengajuan, actorId, pengajuProfile, direkturProfiles = [] } = params;
+  const {
+    pengajuan,
+    actorId,
+    pengajuProfile,
+    direkturProfiles = [],
+    akuntanProfiles = [],
+    actorRole,
+  } = params;
 
   console.log("[email] kirimNotifikasiPengajuan dipanggil:", {
     pengajuanId: pengajuan.id,
@@ -621,10 +765,11 @@ export async function kirimNotifikasiPengajuan(params: {
     adaPengaju: !!pengajuProfile,
     pengajuAktif: pengajuProfile?.aktif ?? false,
     jumlahDirektur: direkturProfiles.length,
+    jumlahAkuntan: akuntanProfiles.length,
+    actorRole,
   });
 
   const isPengajuTarget =
-    pengajuan.status === "disetujui" ||
     pengajuan.status === "perlu_revisi" ||
     pengajuan.status === "ditolak" ||
     pengajuan.status === "dibayar";
@@ -669,12 +814,52 @@ export async function kirimNotifikasiPengajuan(params: {
     }
   }
 
+  if (pengajuan.status === "diajukan") {
+    const activeAkuntan = akuntanProfiles.filter((a) => a.aktif && a.id !== actorId);
+    const threshold = BUSINESS_RULES.SUBMISSION.DIRECTOR_APPROVAL_THRESHOLD;
+    const activeDirektur = direkturProfiles.filter((d) => d.aktif && d.id !== actorId);
+    if (
+      activeAkuntan.length === 0 &&
+      (pengajuan.jumlah <= threshold || activeDirektur.length === 0)
+    ) {
+      console.warn("[email] Tidak ada akuntan aktif selain pelaku untuk menerima notifikasi");
+      return {
+        success: false,
+        count: 0,
+        notice: "Tidak ada akuntan aktif yang menerima notifikasi",
+      };
+    }
+  }
+
   const recipients = filterEmailRecipients({
     statusBaru: pengajuan.status,
     actorId,
     pengaju: pengajuProfile,
     direkturList: direkturProfiles,
+    akuntanList: akuntanProfiles,
+    jumlah: pengajuan.jumlah,
+    actorRole,
   });
+
+  if (pengajuan.status === "disetujui") {
+    if (!pengajuProfile && recipients.length === 0) {
+      console.warn("[email] Profil pengaju tidak ditemukan untuk pengajuan:", pengajuan.id);
+      return {
+        success: false,
+        count: 0,
+        notice: "Profil pengaju tidak ditemukan, email notifikasi tidak dikirim",
+      };
+    }
+
+    if (pengajuProfile && !pengajuProfile.aktif && recipients.length === 0) {
+      console.warn("[email] Akun pengaju nonaktif:", pengajuProfile.id);
+      return {
+        success: false,
+        count: 0,
+        notice: "Akun pengaju nonaktif, email notifikasi dilewati",
+      };
+    }
+  }
 
   console.log("[email] Jumlah penerima setelah filter:", recipients.length);
 
@@ -731,6 +916,19 @@ export async function kirimNotifikasiPengajuan(params: {
 
     if (successItems.length > 0) {
       successNotice = `Email terkirim ke ${successItems.join(", ")}`;
+      const failedItems = details.filter((d) => d.status === "failed");
+      if (failedItems.length > 0) {
+        const failedMasked = failedItems
+          .map((f) => maskEmail(f.recipientEmail || ""))
+          .join(", ");
+        successNotice += ` (gagal: ${failedMasked})`;
+      }
+      const skippedItems = details.filter(
+        (d) => d.status === "skipped" && d.errorType === "DUMMY_DOMAIN"
+      );
+      if (skippedItems.length > 0) {
+        successNotice += " (alamat contoh dilewati)";
+      }
     }
   }
 
